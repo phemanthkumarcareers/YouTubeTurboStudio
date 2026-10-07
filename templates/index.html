@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Turbo Studio - Agentic AI Faceless Video Platform</title>
+  <link rel="stylesheet" href="/static/css/studio.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- TOP HEADER -->
+  <header class="top-header">
+    <div class="brand">
+      <span class="brand-icon">⚡</span>
+      <div class="brand-title">YouTube <span>Turbo</span> Studio</div>
+    </div>
+    <div class="header-badges">
+      <div id="yt-auth-badge" class="status-pill">
+        <span class="status-dot dot-idle"></span> Checking YouTube Auth...
+      </div>
+      <div id="status-chip" class="status-pill">
+        <span id="status-dot" class="status-dot dot-idle"></span>
+        <span id="status-text">Studio Idle</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN BODY LAYOUT -->
+  <div class="main-layout">
+
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="nav-item active" data-tab="tab-generate">
+        <span class="nav-icon">🎬</span> Studio / Generate
+      </div>
+      <div class="nav-item" data-tab="tab-review">
+        <span class="nav-icon">👁️</span> Review & Publish
+      </div>
+      <div class="nav-item" data-tab="tab-api-keys">
+        <span class="nav-icon">🔑</span> API Keys & AI
+      </div>
+      <div class="nav-item" data-tab="tab-youtube">
+        <span class="nav-icon">📺</span> YouTube OAuth & Config
+      </div>
+      <div class="nav-item" data-tab="tab-banned">
+        <span class="nav-icon">🚫</span> Banned Topics
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- PIPELINE STEP TRACKER CARD -->
+      <div class="pipeline-card">
+        <div class="pipeline-card-title">Generation Stages</div>
+        <div id="stage-research" class="stage-step pending">
+          <div class="stage-step-icon">1</div>
+          <span>AI Topic Research</span>
+        </div>
+        <div id="stage-script" class="stage-step pending">
+          <div class="stage-step-icon">2</div>
+          <span>Cinematic Script</span>
+        </div>
+        <div id="stage-narration" class="stage-step pending">
+          <div class="stage-step-icon">3</div>
+          <span>Voice & Subtitles</span>
+        </div>
+        <div id="stage-media" class="stage-step pending">
+          <div class="stage-step-icon">4</div>
+          <span>Stock Footage</span>
+        </div>
+        <div id="stage-video" class="stage-step pending">
+          <div class="stage-step-icon">5</div>
+          <span>Video Rendering</span>
+        </div>
+        <div id="stage-thumbnail" class="stage-step pending">
+          <div class="stage-step-icon">6</div>
+          <span>Thumbnail Generator</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT DISPLAY AREA -->
+    <main class="content-area">
+
+      <!-- TAB 1: STUDIO / GENERATE -->
+      <div id="tab-generate" class="tab-pane active">
+        <div class="grid-3-gen">
+          
+          <!-- Col 1: Generation Configuration -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚡ Video Generation Studio</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Video Format / Aspect Ratio</label>
+              <div style="display:flex; gap:16px;">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="video_format" value="normal" checked>
+                  <span><strong>16:9 Standard</strong> (1920×1080)</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="video_format" value="shorts">
+                  <span><strong>9:16 Shorts</strong> (1080×1920)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Custom Topic (Optional)</label>
+              <input type="text" id="gen-topic-input" class="form-input" placeholder="e.g. What if Earth had two moons? Or leave blank for AI viral research...">
+              <div class="form-help">If empty, AI Research Agent discovers a high-retention trending concept in your niche.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Focus Angle / Mystery Niche</label>
+              <select id="gen-angle-select" class="form-select">
+                <option value="">🎲 Random High-Retention Angle</option>
+                <option value="Theoretical Physics & Time Travel">Theoretical Physics & Time Travel</option>
+                <option value="The Dark Forest Theory & Cosmic Fermi Paradox">The Dark Forest Theory & Fermi Paradox</option>
+                <option value="Mind-bending Mathematical Paradoxes">Mind-bending Mathematical Paradoxes</option>
+                <option value="Frightening AI Horizons & Technological Singularity">Frightening AI Horizons & Singularity</option>
+                <option value="Existential Psychology & Cognitive Biases">Existential Psychology & Illusions</option>
+                <option value="Deep-Sea Cryptogeography & The Ocean Abyss">Deep-Sea & Ocean Abyss</option>
+                <option value="Ancient Civilizations & Erased Human History">Ancient Civilizations & Lost History</option>
+                <option value="Quantum Mechanics & Multiverse Realities">Quantum Mechanics & Multiverse</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Execution Pipeline Steps</label>
+              <div class="grid-2">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="chk-research" checked> <span>1. AI Topic Research</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="chk-script" checked> <span>2. Write Script</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="chk-narration" checked> <span>3. Voice & Subtitles</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="chk-media" checked> <span>4. Fetch Footage</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="chk-video" checked> <span>5. Render Video</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="checkbox" id="chk-thumbnail" checked> <span>6. Make Thumbnail</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:16px;">
+              <button id="btn-generate" class="btn btn-primary" style="flex:1;">
+                ▶ Start Video Pipeline
+              </button>
+              <button id="btn-stop" class="btn btn-danger" style="display:none;">
+                ⏹ Stop
+              </button>
+            </div>
+          </div>
+
+          <!-- Col 2: Quick Audio & Video Settings -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🎙️ Audio & Video Settings</div>
+              <button class="btn btn-secondary" onclick="saveAllSettings()" style="font-size:11px; padding:4px 10px;">💾 Save</button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Narration Voice</label>
+              <select id="voice-select" class="form-select"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">TTS Provider</label>
+              <select id="tts-provider-select" class="form-select">
+                <option value="edge-tts">Microsoft Edge-TTS (Free, High Quality)</option>
+                <option value="elevenlabs">ElevenLabs (Requires API Key)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                  <label class="form-label">Voice Rate</label>
+                  <input type="text" id="voice-rate-input" class="form-input" placeholder="+0%">
+                </div>
+                <div style="flex:1;">
+                  <label class="form-label">Voice Pitch</label>
+                  <input type="text" id="voice-pitch-input" class="form-input" placeholder="+0Hz">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Footage Source</label>
+              <select id="video-source-select" class="form-select">
+                <option value="pexels_images">Pexels HD Photos + Ken Burns Motion</option>
+                <option value="pexels_videos">Pexels HD Video Clips</option>
+                <option value="pixabay_images">Pixabay Photos</option>
+                <option value="pixabay_videos">Pixabay Videos</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="music-enabled-check" checked>
+                <span class="form-label" style="margin:0;">Background Music</span>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" id="subtitles-enabled-check" checked>
+                <span class="form-label" style="margin:0;">📝 Burn-in Subtitles / Captions</span>
+              </label>
+              <div class="form-help">Synchronized captions on video. Uncheck for clean video without text.</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Music Volume: <span id="music-vol-display">12%</span></label>
+              <input type="range" id="music-volume-slider" min="0.02" max="0.30" step="0.01" value="0.12" style="width:100%;" oninput="document.getElementById('music-vol-display').innerText=Math.round(this.value*100)+'%'">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ken Burns Zoom: <span id="zoom-display">1.15×</span></label>
+              <input type="range" id="kb-zoom-end-slider" min="1.05" max="1.30" step="0.02" value="1.15" style="width:100%;" oninput="document.getElementById('zoom-display').innerText=parseFloat(this.value).toFixed(2)+'×'">
+            </div>
+
+            <button id="btn-preview-voice" class="btn btn-secondary" style="width:100%; font-size:12px; margin-top:4px;">🎧 Preview Voice</button>
+          </div>
+
+          <!-- Col 3: Live Console Output -->
+          <div class="card" style="display:flex; flex-direction:column;">
+            <div class="card-header">
+              <div class="card-title">🖥️ Live Studio Console</div>
+              <button class="btn btn-secondary" onclick="document.getElementById('console-logs').innerHTML=''" style="padding:4px 10px; font-size:11px;">Clear</button>
+            </div>
+            <div class="console-wrapper" style="flex:1;">
+              <div id="console-logs" class="console-logs">
+                <div class="log-line log-info"><span class="time">[00:00:00]</span> Studio initialized. Ready to generate.</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+
+      <!-- TAB 2: REVIEW & PUBLISH STUDIO -->
+      <div id="tab-review" class="tab-pane">
+        <div class="review-grid">
+
+          <!-- Left: Video & Thumbnail Player -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🎬 Video Preview</div>
+              </div>
+              <div id="video-preview-wrapper" class="video-container">
+                <div id="no-video-placeholder" style="color:var(--text-muted); font-size:13px; text-align:center;">
+                  No video generated yet.<br>Run the pipeline to produce a video.
+                </div>
+                <video id="review-video-player" controls style="display:none;"></video>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🖼️ YouTube Thumbnail Preview</div>
+                <button id="btn-regen-thumb" class="btn btn-secondary" style="font-size:11px; padding:4px 10px;">
+                  🔄 Regenerate Thumbnail
+                </button>
+              </div>
+              <div class="thumb-preview-box">
+                <div id="no-thumb-placeholder" style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--text-muted);">
+                  Thumbnail will appear here
+                </div>
+                <img id="review-thumb-img" style="display:none;" alt="Thumbnail">
+              </div>
+            </div>
+
+            <!-- Published URL Banner -->
+            <div id="yt-published-link" class="card" style="display:none; background:rgba(16, 185, 129, 0.1); border-color:var(--accent-emerald);"></div>
+          </div>
+
+          <!-- Right: Metadata & Upload Control -->
+          <div>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">✍️ Metadata & SEO Editor</div>
+                <button id="btn-save-meta" class="btn btn-secondary" style="font-size:11px; padding:4px 10px;">
+                  💾 Save Metadata
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Video Title</label>
+                <input type="text" id="review-title-input" class="form-input" placeholder="Video Title">
+              </div>
+
+              <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <label class="form-label" style="margin-bottom:0;">YouTube Description</label>
+                  <button id="btn-regen-desc" class="btn btn-secondary" style="font-size:11px; padding:3px 8px;">
+                    ✨ AI Re-write Description
+                  </button>
+                </div>
+                <textarea id="review-desc-input" class="form-textarea" style="height:140px;"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">SEO Tags (Press Enter to Add)</label>
+                <div id="tag-chips" class="tag-container"></div>
+                <input type="text" id="new-tag-input" class="form-input" style="margin-top:6px;" placeholder="Add tag and press Enter...">
+              </div>
+            </div>
+
+            <!-- Publishing & YouTube Upload -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🚀 YouTube Upload & Schedule</div>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Privacy Status</label>
+                  <select id="publish-privacy-select" class="form-select">
+                    <option value="public">Public (Immediate)</option>
+                    <option value="private">Private (Recommended first)</option>
+                    <option value="unlisted">Unlisted</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Category</label>
+                  <select id="publish-category-select" class="form-select">
+                    <option value="28">Science & Technology</option>
+                    <option value="27">Education</option>
+                    <option value="24">Entertainment</option>
+                    <option value="1">Film & Animation</option>
+                    <option value="20">Gaming</option>
+                    <option value="26">Howto & Style</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Schedule Publishing (Optional RFC 3339)</label>
+                <input type="datetime-local" id="publish-schedule-input" class="form-input">
+                <div class="form-help">Leave empty to publish immediately according to privacy selection.</div>
+              </div>
+
+              <!-- Upload Progress -->
+              <div id="upload-progress-box" style="display:none; margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; margin-bottom:4px;">
+                  <span>Uploading to YouTube...</span>
+                  <span id="upload-pct-label">0%</span>
+                </div>
+                <div style="height:6px; background:var(--bg-surface-elevated); border-radius:3px; overflow:hidden;">
+                  <div id="upload-progress-bar" style="width:0%; height:100%; background:var(--primary); transition:width 0.3s;"></div>
+                </div>
+              </div>
+
+              <button id="btn-publish-yt" class="btn btn-success" style="width:100%;">
+                🚀 Upload Directly to YouTube
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 3: API KEYS & AI PROVIDERS -->
+      <div id="tab-api-keys" class="tab-pane">
+        
+        <!-- Primary AI Brain Selector (Radio Buttons) -->
+        <div class="card" style="border: 1px solid var(--primary); background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.08) 100%);">
+          <div class="card-header">
+            <div class="card-title">🤖 Active AI Engine for Topic Research & Scriptwriting</div>
+          </div>
+          <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; font-size:15px; color:var(--text-main);">
+              <input type="radio" name="ai_provider_radio" value="gemini" id="radio-provider-gemini" checked style="width:20px; height:20px; accent-color:var(--primary); cursor:pointer;">
+              <span>🧠 Google Gemini AI</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; font-size:15px; color:var(--accent-emerald);">
+              <input type="radio" name="ai_provider_radio" value="groq" id="radio-provider-groq" style="width:20px; height:20px; accent-color:var(--accent-emerald); cursor:pointer;">
+              <span>⚡ Groq AI (Free, 100+ tokens/sec)</span>
+            </label>
+          </div>
+          <div class="form-help" style="margin-top:6px;">
+            Select which AI provider will generate research, scripts, titles, descriptions, and tags.
+          </div>
+        </div>
+
+        <!-- Google Gemini Configuration -->
+        <div class="card" id="gemini-card">
+          <div class="card-header">
+            <div class="card-title">🧠 Google Gemini AI Provider</div>
+            <button id="btn-test-gemini" class="btn btn-secondary" style="font-size:12px;">Test Gemini Key</button>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Gemini API Key</label>
+              <input type="password" id="gemini-api-key" class="form-input" placeholder="AQ.Ab8RN6I_...">
+              <div class="form-help">Get free key from <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--primary);">Google AI Studio</a>.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Preferred Gemini Model</label>
+              <select id="gemini-model-select" class="form-select">
+                <option value="gemini-3.8-flash">gemini-3.8-flash (Latest & Best Quality)</option>
+                <option value="gemini-3.7-flash">gemini-3.7-flash (High Quality)</option>
+                <option value="gemini-3.6-flash">gemini-3.6-flash (Balanced)</option>
+                <option value="gemini-3.5-flash">gemini-3.5-flash (Balanced)</option>
+                <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Fast)</option>
+                <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Fast & Reliable)</option>
+                <option value="gemini-2.5-flash">gemini-2.5-flash (Gemini 2.5 Flash)</option>
+                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Gemini 2.5 Flash Lite)</option>
+                <option value="gemini-2.5-pro">gemini-2.5-pro (Gemini 2.5 Pro)</option>
+                <option value="gemini-flash-latest">gemini-flash-latest (Auto Latest Flash)</option>
+                <option value="gemini-flash-lite-latest">gemini-flash-lite-latest (Auto Latest Lite)</option>
+                <option value="gemini-pro-latest">gemini-pro-latest (Pro Tier)</option>
+              </select>
+              <div class="form-help">Studio automatically rotates across backup Gemini models if any model is rate-limited.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Groq AI Configuration -->
+        <div class="card" id="groq-card" style="border: 1px solid rgba(16,185,129,0.4);">
+          <div class="card-header">
+            <div class="card-title">⚡ Groq AI Provider (100% Free, Ultra-Fast LLaMA 3.3)</div>
+            <div style="display:flex; gap:8px;">
+              <a href="https://console.groq.com/keys" target="_blank" class="btn btn-secondary" style="font-size:11px;">Get Free Key ↗</a>
+              <button id="btn-test-groq" class="btn btn-secondary" style="font-size:12px;">Test Groq Key</button>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Groq API Key</label>
+              <input type="password" id="groq-api-key" class="form-input" placeholder="gsk_...">
+              <div class="form-help">Free at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent-emerald);">console.groq.com</a> — Instant activation, no credit card.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Groq Model</label>
+              <select id="groq-model-select" class="form-select">
+                <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Recommended - 120B Model)</option>
+                <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (Ultra Fast 20B)</option>
+                <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b (Qwen 27B)</option>
+                <option value="allam-2-7b">allam-2-7b (Fast 7B)</option>
+              </select>
+              <div class="form-help">Ultra-fast inference with no daily limit bottlenecks.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock Footage API Keys -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🖼️ Stock Footage Provider Keys</div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="form-label" style="margin-bottom:0;">Pexels API Key</label>
+                <button id="btn-test-pexels" class="btn btn-secondary" style="font-size:11px; padding:2px 8px;">Test Pexels</button>
+              </div>
+              <input type="password" id="pexels-api-key" class="form-input" placeholder="Pexels Key">
+              <div class="form-help">Free key at <a href="https://www.pexels.com/api/" target="_blank" style="color:var(--primary);">pexels.com/api</a></div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="form-label" style="margin-bottom:0;">Pixabay API Key</label>
+                <button id="btn-test-pixabay" class="btn btn-secondary" style="font-size:11px; padding:2px 8px;">Test Pixabay</button>
+              </div>
+              <input type="password" id="pixabay-api-key" class="form-input" placeholder="Pixabay Key">
+              <div class="form-help">Free key at <a href="https://pixabay.com/api/docs/" target="_blank" style="color:var(--primary);">pixabay.com/api/docs</a></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">ElevenLabs API Key (Optional)</label>
+            <input type="password" id="elevenlabs-api-key" class="form-input" placeholder="ElevenLabs Key (Leave empty to use 100% free Edge-TTS)">
+          </div>
+        </div>
+
+        <button id="btn-save-settings" class="btn btn-primary" style="width:100%; margin-top:10px;">
+          💾 Save All API Keys & Settings
+        </button>
+
+      </div>
+
+
+      <div id="tab-youtube" class="tab-pane">
+
+        <!-- Connection Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📺 YouTube Account Authorization</div>
+            <button id="btn-yt-authenticate" class="btn btn-primary">Connect YouTube Channel</button>
+          </div>
+          
+          <div id="yt-channel-details" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <span style="font-size:32px;">🔴</span>
+              <div>
+                <div id="yt-channel-name" style="font-size:16px; font-weight:700;">Channel</div>
+                <div id="yt-channel-id" style="font-size:12px; color:var(--text-muted);">ID: </div>
+                <div id="yt-channel-subs" style="font-size:12px; color:var(--accent-emerald);"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-help">
+            Clicking <strong>Connect YouTube Channel</strong> will open your Google Account authentication page in your browser.
+            Once you grant permission, your OAuth token is saved automatically.
+          </div>
+        </div>
+
+        <!-- Client Secret Setup -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔑 Upload or Configure OAuth Client Secret</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Option A: Upload client_secret.json</label>
+            <input type="file" id="yt-secret-file-input" class="form-input" accept=".json">
+            <div class="form-help">Download from Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs.</div>
+          </div>
+
+          <div class="form-group" style="margin-top:10px;">
+            <label class="form-label">Option A2: Or Default File Path to client_secret.json</label>
+            <div style="display:flex; gap:10px;">
+              <input type="text" id="yt-secret-path-input" class="form-input" placeholder="e.g. C:\Users\PC\Turbo\Youtube\client_secret.json">
+              <button id="btn-load-secret-path" class="btn btn-secondary" style="white-space:nowrap;">📁 Load from Path</button>
+            </div>
+            <div class="form-help">Enter the path to your existing client_secret.json and click Load.</div>
+          </div>
+
+          <div style="text-align:center; color:var(--text-muted); font-size:12px; margin:14px 0;">— OR —</div>
+
+          <div class="form-group">
+            <label class="form-label">Option B: Enter Client ID and Client Secret Manually</label>
+            <div class="grid-2">
+              <input type="text" id="manual-client-id" class="form-input" placeholder="Client ID (e.g. 123...apps.googleusercontent.com)">
+              <input type="password" id="manual-client-secret" class="form-input" placeholder="Client Secret">
+            </div>
+            <button id="btn-save-manual-creds" class="btn btn-secondary" style="margin-top:10px;">
+              Save Manual Credentials
+            </button>
+          </div>
+        </div>
+
+        <!-- YouTube Defaults -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚙️ Channel Profile & Publishing Defaults</div>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label class="form-label">Channel Name / Branding</label>
+              <input type="text" id="channel-name-input" class="form-input" placeholder="e.g. The AI Brief It">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Default Privacy</label>
+              <select id="yt-default-privacy" class="form-select">
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+                <option value="unlisted">Unlisted</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Default Category</label>
+            <select id="yt-default-category" class="form-select">
+              <option value="28">Science & Technology</option>
+              <option value="27">Education</option>
+              <option value="24">Entertainment</option>
+              <option value="1">Film & Animation</option>
+              <option value="20">Gaming</option>
+              <option value="22">People & Blogs</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Channel Niche & Audience Description (Guides AI Research)</label>
+            <textarea id="channel-desc-input" class="form-textarea" placeholder="Describe your channel tone, niche, audience..."></textarea>
+          </div>
+
+          <button id="btn-save-youtube" class="btn btn-primary" style="width:100%; margin-top:14px;">
+            💾 Save YouTube Settings
+          </button>
+        </div>
+
+      </div>
+
+      <!-- TAB 5: BANNED TOPICS -->
+      <div id="tab-banned" class="tab-pane">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🚫 Negative Topic Filters</div>
+            <button id="btn-save-banned" class="btn btn-primary" style="font-size:12px;">Save Banned Topics</button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">One Topic per Line</label>
+            <textarea id="banned-topics-textarea" class="form-textarea" style="height:260px; font-family:var(--font-mono);"></textarea>
+            <div class="form-help">AI Researcher will strictly avoid selecting any topics listed here. Add topics here after you publish a video about them.</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container"></div>
+
+</div>
+
+<script src="/static/js/studio.js"></script>
+</body>
+</html>

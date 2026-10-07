@@ -1,0 +1,36 @@
+# Local client secrets / credentials
+client_secret*.json
+config_data.json
+config_bkp.py
+.env
+youtube_token.pickle
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Generated output
+output/
+
+# Large font files
+*.ttc
+
+# Generated media
+*.mp3
+*.mp4
+*.wav
+*.mov
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
