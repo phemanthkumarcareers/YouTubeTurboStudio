@@ -192,7 +192,7 @@ def generate_elders_scene(
     output_path: str = None
 ) -> str:
     """
-    Generate a warm, dignified, watercolor storybook plate for Golden Stories & Wisdom.
+    Generate a warm, dignified, watercolor storybook plate for Wonder Saga TV.
     """
     img = Image.new("RGBA", (W, H))
     draw = ImageDraw.Draw(img)
@@ -246,7 +246,7 @@ def generate_elders_scene(
 
     f_sub = _get_anim_font(int(card_h * 0.16), bold=False)
     f_title = _get_anim_font(int(card_h * 0.32), bold=True)
-    draw.text((card_x + 36, card_y + 24), "📖 GOLDEN STORIES & LIFE WISDOM", fill=(251, 191, 36), font=f_sub)
+    draw.text((card_x + 36, card_y + 24), "📖 WONDER SAGA TV — MYTHS & WONDERS", fill=(251, 191, 36), font=f_sub)
     clean_title = (title[:48] + "...") if len(title) > 48 else title
     draw.text((card_x + 36, card_y + 62), clean_title, fill=(248, 250, 252), font=f_title)
 

@@ -53,12 +53,12 @@ Each YouTube channel maintains its own isolated credentials, stored strictly in 
 
 | Channel | Engine | Audience | Required Keys | Visual Source |
 | :--- | :--- | :--- | :--- | :--- |
-| **🎬 The AI Brief It** | `media_video` | Science & Tech (General) | Gemini / Groq + Pexels + Pixabay | Pexels HD Videos & Photos (Ken Burns pan/zoom) |
+| **🎬 InsightSpark TV** | `media_video` | Curious Explorers (General Audience) | Gemini / Groq + Pexels + Pixabay | Pexels HD Videos & Photos (Ken Burns pan/zoom) |
 | **🎨 Kids Wonder Lab** | `animation` | Children (Ages 3–6) · Kids Only | Gemini / Groq (+ optional ElevenLabs) | **Animation Engine** (Procedural & AI 2D Cartoon scenes) |
-| **📖 Golden Stories & Wisdom** | `animation` | Mature Adults (45–75) | Gemini / Groq (+ optional ElevenLabs) | **Animation Engine** (Watercolor & Sunset Storybook plates) |
+| **📖 Wonder Saga TV** | `animation` | Wonder Seekers (General Audience) | Gemini / Groq (+ optional ElevenLabs) | **Animation Engine** (Watercolor & Mythological Storybook plates) |
 
 - **Strict Key Isolation**: If a channel does not have a key configured, its input remains empty. Saving keys for one channel never overwrites or affects another channel.
-- **Dedicated Sub-Tabs**: The **API Keys & AI** tab provides 3 individual channel sub-tabs (`The AI Brief It`, `Kids Wonder Lab`, `Golden Stories & Wisdom`) with individual model dropdowns, test buttons, and save buttons.
+- **Dedicated Sub-Tabs**: The **API Keys & AI** tab provides 3 individual channel sub-tabs (`InsightSpark TV`, `Kids Wonder Lab`, `Wonder Saga TV`) with individual model dropdowns, test buttons, and save buttons.
 
 ---
 
@@ -86,8 +86,8 @@ Each YouTube channel maintains its own isolated credentials, stored strictly in 
 
 ### 🎨 5. Animation Engine vs Media Video Engine
 - **Why Normal and Animated Channels Use Different Visual Pipelines**:
-  - Normal channels (*The AI Brief It*) require realistic stock footage (space nebulae, physics laboratories, technology concepts) fetched via Pexels & Pixabay APIs.
-  - Animated channels (*Kids Wonder Lab* and *Golden Stories & Wisdom*) require vibrant cartoon characters, colorful rolling hills, rainbows, and warm storybook watercolor paintings. Real-world corporate stock footage is completely inappropriate for preschool or nostalgic storytelling.
+  - Normal channels (*InsightSpark TV*) require realistic stock footage (space nebulae, physics laboratories, technology concepts) fetched via Pexels & Pixabay APIs.
+  - Animated channels (*Kids Wonder Lab* and *Wonder Saga TV*) require vibrant cartoon characters, colorful rolling hills, rainbows, and warm storybook watercolor paintings. Real-world corporate stock footage is completely inappropriate for preschool or mythological storytelling.
 - **Built-in Animation Engine (`video/animation_engine.py`)**:
   - Automatically activates when `engine: animation` is set in the channel profile.
   - Procedurally renders multi-layered 2D cartoon scenes (sky gradients, cartoon smiling suns, clouds, rainbow arcs, flower-dotted meadows) and storybook plates at 1080x1920 (Shorts) or 1920x1080 (Long).
@@ -102,7 +102,7 @@ Each YouTube channel maintains its own isolated credentials, stored strictly in 
     - `nano-banana-flux`: Cinematic, photorealistic, high-detail visuals for documentaries and tech explainers.
     - `nano-banana-sdxl`: Ultra-fast high-resolution generation.
     - `nano-banana-cartoon-v1`: Bright, cheerful 2D cartoon characters and preschool illustrations for Kids Wonder Lab.
-    - `nano-banana-storybook-v1`: Warm watercolor paintings and nostalgic storybook scenes for Golden Stories & Wisdom.
+    - `nano-banana-storybook-v1`: Warm watercolor paintings and mythic storybook scenes for Wonder Saga TV.
   - Features real-time connection testing (`/api/settings/test-nano-banana`), base64 and URL image extraction, and automatic seamless fallback to stock video or procedural animation plates if an API key is unconfigured.
 
 ---
@@ -120,8 +120,8 @@ Each YouTube channel maintains its own isolated credentials, stored strictly in 
     - **Character 2 (Barnaby the Bear / Gentle Giant)**: Warm, friendly deep voice (`en-US-GuyNeural` or OpenAI `alloy`).
   - Automatically synthesizes individual dialogue lines, concatenates clips with natural 250ms conversational pauses, and generates unified, millisecond-accurate synchronized SRT subtitles!
 - **Channel-Specific Voice Profiles**:
-  - **The AI Brief It**: Authoritative, cinematic, crisp cadence (`en-US-ChristopherNeural` or OpenAI `onyx`).
-  - **Golden Stories & Wisdom**: Dignified, unhurried, warm nostalgic pacing (`en-GB-RyanNeural`, `en-US-GuyNeural`).
+  - **InsightSpark TV**: Authoritative, cinematic, crisp cadence (`en-US-ChristopherNeural` or OpenAI `onyx`).
+  - **Wonder Saga TV**: Dignified, unhurried, warm storytelling pacing (`en-GB-RyanNeural`, `en-US-GuyNeural`).
 
 ---
 
@@ -196,9 +196,9 @@ http://localhost:5000
 ### 1. Configure Channel API Keys
 1. Open the **API Keys & AI** tab.
 2. Click on the channel you wish to configure:
-   - **The AI Brief It**: Enter Gemini API key or Groq API key, along with Pexels and Pixabay keys. Click **Save API Keys for The AI Brief It**.
+   - **InsightSpark TV**: Enter Gemini API key or Groq API key, along with Pexels and Pixabay keys. Click **Save API Keys for InsightSpark TV**.
    - **Kids Wonder Lab**: Enter Gemini or Groq key. Notice stock footage keys are not needed! Click **Save API Keys for Kids Wonder Lab**.
-   - **Golden Stories & Wisdom**: Enter Gemini or Groq key. Click **Save API Keys for Golden Stories & Wisdom**.
+   - **Wonder Saga TV**: Enter Gemini or Groq key. Click **Save API Keys for Wonder Saga TV**.
 3. Use the **Test Key** buttons to verify your credentials instantly.
 
 ### 2. Connect YouTube Channels

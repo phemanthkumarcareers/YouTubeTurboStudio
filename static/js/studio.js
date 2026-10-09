@@ -427,9 +427,9 @@ function updateChannelUI(chan) {
         if (audType === "children" || cid === "kids") {
             audBadge.innerText = "👶 Kids Only (COPPA)";
             audBadge.className = "audience-badge audience-kids";
-        } else if (audType === "mature_adults" || cid === "elders") {
-            audBadge.innerText = "📖 Elders (45-75)";
-            audBadge.className = "audience-badge audience-elders";
+        } else if (cid === "elders") {
+            audBadge.innerText = "📖 Wonder Saga (General Audience)";
+            audBadge.className = "audience-badge audience-general";
         } else {
             audBadge.innerText = "General Audience";
             audBadge.className = "audience-badge audience-general";

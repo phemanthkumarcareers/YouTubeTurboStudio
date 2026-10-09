@@ -39,9 +39,9 @@ class TestPhase5EldersChannel(unittest.TestCase):
         self.tmp_dir = tempfile.mkdtemp(prefix="phase5_elders_test_")
         self.elders_context = ChannelContext(
             channel_id="elders",
-            name="Golden Stories & Wisdom",
+            name="Wonder Saga TV",
             engine="animation",
-            audience={"type": "mature_adults", "age_group": "45-75"},
+            audience={"type": "general", "age_group": "all_ages"},
             youtube={"made_for_kids": False}
         )
 

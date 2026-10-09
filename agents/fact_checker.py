@@ -1,5 +1,5 @@
 """
-Fact Checker Agent — The AI Brief It
+Fact Checker Agent — InsightSpark TV
 Audits science scripts, extracts core factual claims, classifies veracity:
 - 'established': Consensus science / peer-reviewed physics/biology
 - 'plausible': Well-supported theoretical hypotheses
@@ -24,7 +24,7 @@ def check_script_facts(script_data: Dict[str, Any]) -> Dict[str, Any]:
 
     log_info(f"[FACT CHECKER] Auditing scientific claims in script: '{title}'...")
 
-    prompt = f"""You are the Chief Scientific Fact Checker for 'The AI Brief It'.
+    prompt = f"""You are the Chief Scientific Fact Checker for 'InsightSpark TV'.
 Audit this script for scientific, cosmological, and biological accuracy:
 
 Script Content:

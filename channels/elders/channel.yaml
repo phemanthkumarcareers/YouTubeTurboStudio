@@ -3,8 +3,8 @@ name: Wonder Saga TV
 engine: animation
 enabled: true
 audience:
-  type: wonder_seekers
-  age_group: 25-75
+  type: general
+  age_group: all_ages
 video:
   default_format: normal
   allow_short: true

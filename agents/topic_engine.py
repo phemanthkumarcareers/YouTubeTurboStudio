@@ -1,5 +1,5 @@
 """
-Topic Engine — The AI Brief It
+Topic Engine — InsightSpark TV
 Implements Topic Candidate Ranking and User Topic Mode.
 Core Pillars:
 1. Human body and brain
@@ -88,7 +88,7 @@ def discover_and_rank_topics(
 
     log_info(f"[TOPIC ENGINE] Brainstorming {candidate_count} candidates in pillar: '{pillar['name']}'...")
 
-    prompt = f"""You are the Lead Science Content Director for 'The AI Brief It' (mind-blowing science & future technology).
+    prompt = f"""You are the Lead Science Content Director for 'InsightSpark TV' (mind-blowing science & future technology).
 Pillar: {pillar['name']}
 Focus Themes: {json.dumps(pillar['themes'])}
 Format: {"YouTube Shorts (9:16 vertical, 50-60s punchy)" if video_type == "shorts" else "Long-form Documentary (16:9 cinematic, 3-8m)"}
@@ -171,7 +171,7 @@ def structure_user_topic(user_topic: str, video_type: str = "normal") -> Dict[st
     """
     log_info(f"[TOPIC ENGINE] Structuring user-provided topic: '{user_topic}'...")
 
-    prompt = f"""You are the Science Strategist for 'The AI Brief It'.
+    prompt = f"""You are the Science Strategist for 'InsightSpark TV'.
 A user requested a video on this topic: "{user_topic.strip()}"
 Format: {"YouTube Shorts (9:16 vertical, 50-60s)" if video_type == "shorts" else "Long-form Documentary (16:9 cinematic, 3-8m)"}
 

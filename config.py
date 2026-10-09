@@ -86,11 +86,10 @@ DEFAULT_CONFIG = {
     # YouTube Configuration
     "youtube_privacy": "private", # 'private', 'unlisted', 'public'
     "youtube_category_id": "28", # Science & Technology
-    "channel_name": "The AI Brief It",
-    "channel_description": """Channel niche: Mind-bending science, deep cosmic mysteries, ancient paradoxes,
-existential psychology, and theoretical physics.
-Tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
-Pacing: Engaging hook in the first 5 seconds, followed by escalating revelation and a memorable conclusion.""",
+    "channel_name": "InsightSpark TV",
+    "channel_description": """Welcome to InsightSpark TV — where curiosity meets discovery!
+Explore fascinating facts, mind-blowing science, cutting-edge technology, psychology, unbelievable human body facts, mysterious phenomena, and incredible real-world stories.
+InsightSpark TV — Big Questions. Brilliant Answers. In Minutes.""",
     "default_tags": ["science", "mystery", "space", "documentary", "physics", "universe", "philosophy"],
     "made_for_kids": False,
     "auto_upload": False

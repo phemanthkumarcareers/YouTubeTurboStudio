@@ -192,7 +192,7 @@ class ChannelRegistry:
             chan = self.get_channel(cid)
             if not chan:
                 # Return safe fallback if cache is somehow empty
-                return ChannelContext(channel_id="the-ai-brief-it", name="The AI Brief It")
+                return ChannelContext(channel_id="the-ai-brief-it", name="InsightSpark TV")
             return chan
 
     def save_channel(self, channel_id: str, updates: Dict[str, Any]) -> ChannelContext:

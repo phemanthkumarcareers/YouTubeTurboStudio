@@ -1,7 +1,7 @@
 """
-Elders Profiles & Content Categories
-Defines categories, animation pacing rules, and mature voice profiles
-for Golden Stories & Wisdom.
+Profiles & Content Categories — Wonder Saga TV
+Defines categories, animation pacing rules, and voice profiles
+for Wonder Saga TV.
 """
 from dataclasses import dataclass, field
 from typing import List, Dict, Any

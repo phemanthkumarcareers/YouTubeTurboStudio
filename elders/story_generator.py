@@ -9,7 +9,7 @@ from elders.profiles import get_elders_pacing_profile
 
 
 class EldersStoryGenerator:
-    """Generates heartwarming, philosophical narratives for Golden Stories & Wisdom."""
+    """Generates heartwarming, philosophical narratives for Wonder Saga TV."""
 
     def generate_story(
         self,

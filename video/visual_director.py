@@ -1,5 +1,5 @@
 """
-Visual Director — The AI Brief It
+Visual Director — InsightSpark TV
 Transforms narrative sections into fine-grained timestamped visual beats.
 A 50-60s Short will have 12-18 rapid visual cuts (every 2.5 - 3.5s).
 Supports video clips, photos with dynamic zooms, and programmatic science diagrams.

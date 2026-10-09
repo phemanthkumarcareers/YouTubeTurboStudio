@@ -9,7 +9,7 @@ from core.logger import log_info, log_warn
 
 
 class EldersQCChecker:
-    """Pre-publish quality control checker for Golden Stories & Wisdom."""
+    """Pre-publish quality control checker for Wonder Saga TV."""
 
     def evaluate(
         self,

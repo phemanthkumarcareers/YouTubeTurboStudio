@@ -1,5 +1,5 @@
 """
-Script Critic & Rewrite Agent — The AI Brief It
+Script Critic & Rewrite Agent — InsightSpark TV
 Evaluates script drafts across 11 retention and scientific criteria.
 Triggers targeted automated rewrites if the score falls below threshold (minimum 8.0/10).
 """
@@ -35,7 +35,7 @@ def evaluate_script(script_data: Dict[str, Any], is_shorts: bool = False) -> Dic
 
     log_info(f"[CRITIC] Reviewing script draft: '{title}'...")
 
-    prompt = f"""You are the Executive Editor and Retention Critic for 'The AI Brief It'.
+    prompt = f"""You are the Executive Editor and Retention Critic for 'InsightSpark TV'.
 Format: {"Shorts (50-60s fast-paced)" if is_shorts else "Long-form Documentary (3-8 min cinematic)"}
 Title: {title}
 Script Draft:
@@ -105,7 +105,7 @@ def rewrite_script_with_feedback(
 
     log_info(f"[CRITIC] Executing automated rewrite based on feedback...")
 
-    prompt = f"""You are the Master Science Scriptwriter for 'The AI Brief It'.
+    prompt = f"""You are the Master Science Scriptwriter for 'InsightSpark TV'.
 The executive editor reviewed your script draft and requested a rewrite.
 
 Current Script:

@@ -1,5 +1,5 @@
 """
-Hook Tournament — The AI Brief It
+Hook Tournament — InsightSpark TV
 Generates 8-10 hook variants across 8 distinct psychological structures,
 scores them, and selects the strongest truthful hook for maximum audience retention.
 """
@@ -35,7 +35,7 @@ def run_hook_tournament(topic_data: Dict[str, Any], is_shorts: bool = False) -> 
 
     log_info(f"[HOOK TOURNAMENT] Launching 8-way hook tournament for: '{topic}'...")
 
-    prompt = f"""You are the Lead Audience Retention Scientist for 'The AI Brief It'.
+    prompt = f"""You are the Lead Audience Retention Scientist for 'InsightSpark TV'.
 Topic: {topic}
 Core Scientific Mechanism: {core_mechanism}
 Key Points: {json.dumps(key_points)}

@@ -1,8 +1,8 @@
 """
 Pipeline Router
 Routes generation requests to the appropriate engine based on channel configuration:
-- 'media_video': Routes to Media Video Engine (The AI Brief It & media stock channels)
-- 'animation': Routes to Animation Engine (Kids, Elders & animated channels)
+- 'media_video': Routes to Media Video Engine (InsightSpark TV & media stock channels)
+- 'animation': Routes to Animation Engine (Kids Wonder Lab, Wonder Saga TV & animated channels)
 Extensible to future channels without hardcoded if/else branching.
 """
 from typing import List, Optional, Dict, Any
