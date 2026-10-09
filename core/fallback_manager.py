@@ -150,8 +150,8 @@ def acquire_visual_with_fallback(
     w, h = (1080, 1920) if is_shorts else (1920, 1080)
     assets = []
 
-    # 1. Nano Banana Generative Image
-    nano_key = cfg.get("nano_banana_api_key", "").strip()
+    # 1. Nano Banana Generative Image (uses Gemini API key)
+    nano_key = (cfg.get("gemini_api_key") or cfg.get("nano_banana_api_key", "")).strip()
     if nano_key:
         try:
             from media.nano_banana_client import generate_image_with_nano_banana

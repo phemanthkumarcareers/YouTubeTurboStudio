@@ -68,8 +68,8 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
 
         log_info(f"   [Section {sec_id}] Searching '{query}'...")
 
-        # ── 0. AI Visuals: Nano Banana Generation (if configured or source is nano_banana) ──
-        nano_key = cfg.get("nano_banana_api_key", "").strip()
+        # ── 0. AI Visuals: Nano Banana Generation (uses Gemini API key) ──
+        nano_key = (cfg.get("gemini_api_key") or cfg.get("nano_banana_api_key", "")).strip()
         if nano_key and (source == "nano_banana" or not pexels_key):
             try:
                 from media.nano_banana_client import generate_image_with_nano_banana

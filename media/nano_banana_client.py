@@ -25,16 +25,21 @@ SUPPORTED_NANO_BANANA_MODELS = [
 
 
 def test_nano_banana_connection(
-    api_key: str,
+    api_key: Optional[str] = None,
     model: str = DEFAULT_NANO_BANANA_MODEL,
     base_url: str = DEFAULT_NANO_BANANA_ENDPOINT
 ) -> Tuple[bool, str]:
     """
-    Test connectivity and authentications with the Nano Banana API.
+    Test connectivity and authentications with the Nano Banana API using the Gemini API key.
     """
-    key = (api_key or "").strip()
+    if api_key is None:
+        cfg = load_config()
+        key = (cfg.get("gemini_api_key") or cfg.get("nano_banana_api_key") or os.getenv("GEMINI_API_KEY", "")).strip()
+    else:
+        key = api_key.strip()
+
     if not key:
-        return False, "Nano Banana API key cannot be empty. Configure it in the API Keys tab."
+        return False, "Gemini API key cannot be empty. Please configure your Google Gemini API key above."
 
     # Validate header format and make a minimal test probe
     headers = {
@@ -86,13 +91,13 @@ def generate_image_with_nano_banana(
     model: Optional[str] = None
 ) -> Optional[str]:
     """
-    Generate image asset from prompt using Nano Banana.
+    Generate image asset from prompt using Nano Banana powered by the channel's Gemini API key.
     Saves image to output_path and returns destination file path.
     """
     cfg = load_config()
-    key = (api_key or cfg.get("nano_banana_api_key", "")).strip()
+    key = (api_key or cfg.get("gemini_api_key") or cfg.get("nano_banana_api_key") or os.getenv("GEMINI_API_KEY", "")).strip()
     if not key:
-        log_warn("Nano Banana API key is not configured.")
+        log_warn("Gemini API key is not configured for Nano Banana image generation.")
         return None
 
     chosen_model = model or cfg.get("nano_banana_model", DEFAULT_NANO_BANANA_MODEL)

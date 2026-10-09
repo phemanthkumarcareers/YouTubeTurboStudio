@@ -292,10 +292,10 @@ def generate_animated_media_map(
         out_path = str(img_dir / f"anim_scene_{sec_id}_{'kids' if is_kids else 'elders'}.jpg")
         plate_generated = False
 
-        # Attempt AI generation with Nano Banana if key configured
+        # Attempt AI generation with Nano Banana if Gemini key configured
         from config import load_config
         cfg = load_config()
-        nano_key = cfg.get("nano_banana_api_key", "").strip()
+        nano_key = (cfg.get("gemini_api_key") or cfg.get("nano_banana_api_key", "")).strip()
         if nano_key:
             try:
                 from media.nano_banana_client import generate_image_with_nano_banana

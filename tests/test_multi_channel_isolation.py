@@ -222,6 +222,17 @@ class TestMultiChannelIsolationAndAnimation(unittest.TestCase):
             "nano_banana_api_key": ""
         })
 
+    def test_11_nano_banana_uses_gemini_key(self):
+        """Verifies that Nano Banana endpoint accepts and validates Gemini key."""
+        resp = self.client.post("/api/settings/test-nano-banana", json={
+            "gemini_api_key": "",
+            "nano_banana_model": "nano-banana-flux"
+        })
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertFalse(data.get("ok"))
+        self.assertIn("Gemini API key cannot be empty", data.get("message", ""))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -512,7 +512,15 @@ def api_test_pixabay():
 @app.route("/api/settings/test-nano-banana", methods=["POST"])
 def api_test_nano_banana():
     body = request.get_json(force=True) or {}
-    key = body.get("nano_banana_api_key", "")
+    channel_id = body.get("channel_id")
+    if "gemini_api_key" in body:
+        key = (body.get("gemini_api_key") or "").strip()
+    elif "nano_banana_api_key" in body:
+        key = (body.get("nano_banana_api_key") or "").strip()
+    else:
+        cid = channel_id or registry.get_active_channel_id()
+        creds = load_channel_credentials(cid)
+        key = creds.get("gemini_api_key", "").strip()
     model = body.get("nano_banana_model", "nano-banana-flux")
     base_url = body.get("nano_banana_base_url", "")
     ok, msg = test_nano_banana_connection(key, model=model, base_url=base_url)

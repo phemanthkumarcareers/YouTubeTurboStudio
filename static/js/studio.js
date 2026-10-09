@@ -559,7 +559,6 @@ async function loadAllChannelSettings() {
             setVal(`gemini-api-key-${cid}`, creds.gemini_api_key || "");
             setVal(`groq-api-key-${cid}`, creds.groq_api_key || "");
             setVal(`openai-api-key-${cid}`, creds.openai_api_key || "");
-            setVal(`nano-banana-api-key-${cid}`, creds.nano_banana_api_key || "");
             setVal(`pexels-api-key-${cid}`, creds.pexels_api_key || "");
             setVal(`pixabay-api-key-${cid}`, creds.pixabay_api_key || "");
             setVal(`elevenlabs-api-key-${cid}`, creds.elevenlabs_api_key || "");
@@ -604,7 +603,6 @@ async function saveChannelKeys(channelId) {
     const gKey = cleanKey(getVal(`gemini-api-key-${channelId}`));
     const grKey = cleanKey(getVal(`groq-api-key-${channelId}`));
     const oaKey = cleanKey(getVal(`openai-api-key-${channelId}`));
-    const nbKey = cleanKey(getVal(`nano-banana-api-key-${channelId}`));
     const pxKey = cleanKey(getVal(`pexels-api-key-${channelId}`));
     const pbKey = cleanKey(getVal(`pixabay-api-key-${channelId}`));
     const elKey = cleanKey(getVal(`elevenlabs-api-key-${channelId}`));
@@ -620,7 +618,6 @@ async function saveChannelKeys(channelId) {
         gemini_api_key: gKey,
         groq_api_key: grKey,
         openai_api_key: oaKey,
-        nano_banana_api_key: nbKey,
         pexels_api_key: pxKey,
         pixabay_api_key: pbKey,
         elevenlabs_api_key: elKey,
@@ -1360,17 +1357,18 @@ function setupEventListeners() {
     });
 
     // 4. Nano Banana Generative Visuals
+    // 4. Nano Banana Generative Visuals (Uses Gemini API Key)
     document.querySelectorAll(".btn-test-nano-banana").forEach(btn => {
         btn.addEventListener("click", async () => {
             const cid = btn.getAttribute("data-chan");
-            const key = getVal(`nano-banana-api-key-${cid}`);
+            const key = getVal(`gemini-api-key-${cid}`);
             const model = getVal(`nano-banana-model-${cid}`) || "nano-banana-flux";
-            showToast(`Testing Nano Banana for ${cid}...`, "info");
+            showToast(`Testing Nano Banana (via Gemini key) for ${cid}...`, "info");
             try {
                 const resp = await fetch("/api/settings/test-nano-banana", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ nano_banana_api_key: key, nano_banana_model: model })
+                    body: JSON.stringify({ gemini_api_key: key, nano_banana_model: model, channel_id: cid })
                 });
                 const res = await resp.json();
                 showToast(res.message, res.ok ? "success" : "error");
