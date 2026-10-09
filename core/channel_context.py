@@ -149,4 +149,5 @@ class ChannelContext:
             "channel_niche": prm.get("niche", ""),
             "default_tags": prm.get("default_tags", []),
             "banned_topics": prm.get("banned_topics", []),
+            "focus_angles": prm.get("focus_angles", []),
         }

@@ -22,6 +22,7 @@ credentials:
   groq_model: openai/gpt-oss-120b
   openai_model: gpt-4o-mini
   video_source: animation_engine
+  nano_banana_model: nano-banana-flux
 youtube:
   channel_id: ''
   oauth_profile: kids
@@ -34,15 +35,24 @@ pipeline:
   auto_publish: false
   minimum_quality_score: 92
 prompts:
-  niche: Fun educational rhymes, counting games, animal facts, bedtime stories, and
-    moral adventures.
+  niche: Fun educational rhymes, counting games, animal facts, bedtime stories, alphabets,
+    numbers, songs, and moral adventures.
   description: 'Channel niche: Engaging, wholesome, and educational content for preschool
-    and kindergarten kids.
+    and kindergarten kids (stories, alphabets, numbers, songs, rhymes, and discoveries).
 
     Tone: Joyful, encouraging, musical, gentle, and highly visual.
 
     Pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive
     emotional reinforcement.'
+  focus_angles:
+  - Animated Bedtime & Fairy Tale Stories
+  - Alphabet, Phonics & ABC Adventures
+  - Numbers, Counting & Fun Math (1 to 20)
+  - Catchy Nursery Rhymes & Sing-Alongs
+  - Fun Animal Kingdom Facts & Sounds
+  - Curious Kids Science & Space Wonders
+  - Kindness, Friendship & Good Manners
+  - Colors, Shapes & Creative Wonder
   default_tags:
   - kids
   - animation
@@ -51,6 +61,9 @@ prompts:
   - counting
   - animals
   - bedtime stories
+  - alphabets
+  - numbers
+  - kids songs
   tone: Joyful, encouraging, musical, gentle, and highly visual.
   pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive
     emotional reinforcement.

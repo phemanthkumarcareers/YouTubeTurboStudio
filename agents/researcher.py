@@ -42,20 +42,27 @@ def clean_json_response(raw: str) -> dict:
 
 def research_topic(topic_override: str = "", focus_angle: str = "", video_type: str = "normal") -> dict:
     """
-    Generate an engaging research brief for a video.
+    Generate an engaging research brief for a video tailored to the active channel.
     """
     cfg = load_config()
+    channel_name = cfg.get("channel_name", "YouTube Channel")
     channel_desc = cfg.get("channel_description", "")
+    channel_niche = cfg.get("channel_niche", "")
+    channel_angles = cfg.get("focus_angles") or FOCUS_ANGLES
     banned = load_banned_topics()
     
     if not focus_angle:
-        focus_angle = random.choice(FOCUS_ANGLES)
+        focus_angle = random.choice(channel_angles) if channel_angles else random.choice(FOCUS_ANGLES)
 
     banned_str = ", ".join(f'"{b}"' for b in banned[:25])
 
     if topic_override and topic_override.strip():
-        log_info(f"Researching custom user topic: '{topic_override}'...")
-        prompt = f"""You are a senior YouTube strategist specializing in high-retention educational and mystery videos.
+        log_info(f"Researching custom user topic: '{topic_override}' for '{channel_name}'...")
+        prompt = f"""You are a senior YouTube content strategist for '{channel_name}'.
+Channel Niche: {channel_niche}
+Channel Profile:
+{channel_desc}
+
 The user wants a video specifically about: "{topic_override.strip()}"
 Format: {"YouTube Shorts (vertical 9:16, punchy 50-60 second viral story)" if video_type == "shorts" else "Long-form YouTube Documentary (16:9 cinematic 3-8 minute deep dive)"}
 
@@ -75,8 +82,9 @@ Analyze this topic and produce a compelling research dossier in valid JSON forma
 
 Output ONLY the JSON object. Do not wrap in markdown or backticks."""
     else:
-        log_info(f"Researching trending topic in angle: '{focus_angle}'...")
-        prompt = f"""You are a master YouTube content strategist for a viral documentary & explainer channel.
+        log_info(f"Researching trending topic in angle: '{focus_angle}' for '{channel_name}'...")
+        prompt = f"""You are a master YouTube content strategist for '{channel_name}'.
+Channel Niche: {channel_niche}
 Channel Profile:
 {channel_desc}
 

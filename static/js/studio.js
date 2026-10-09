@@ -10,6 +10,145 @@ let sseSource = null;
 let currentTags = [];
 let currentChannelId = "the-ai-brief-it";
 
+// Dynamic focus angles & topic discovery metadata for each channel
+const CHANNEL_METADATA = {
+    "the-ai-brief-it": {
+        name: "InsightSpark TV",
+        handle: "@InsightSparkTV",
+        topicPlaceholder: "e.g. Hidden Secrets of Everyday Things, Quantum Computing, or leave blank...",
+        angles: [
+            "🎲 Random High-Retention Angle",
+            "Fascinating Facts & Everyday Secrets",
+            "Mind-Blowing Science & Physics",
+            "Cutting-Edge Technology & AI Horizons",
+            "Psychology & Human Mind Mysteries",
+            "Unbelievable Human Body Facts",
+            "Mysterious Phenomena & Curiosities",
+            "Incredible Real-World Stories",
+            "Futuristic Inventions & Breakthroughs"
+        ],
+        suggestedTopics: [
+            "Why Airplane Windows Have Tiny Holes",
+            "What Happens If The Earth Stops Spinning For 5 Seconds?",
+            "The Psychology Behind Why We Procrastinate",
+            "Quantum Computers Explained In 60 Seconds",
+            "How The Human Brain Erases Memories While Sleeping",
+            "The Mystery of the Mariana Trench Abyss"
+        ]
+    },
+    "kids": {
+        name: "Kids Wonder Lab",
+        handle: "@KidsWonderLab",
+        topicPlaceholder: "e.g. Pip the Bunny learns the ABCs, Counting 1 to 10, or leave blank...",
+        angles: [
+            "🎲 Random High-Retention Angle",
+            "Animated Bedtime & Fairy Tale Stories",
+            "Alphabet, Phonics & ABC Adventures",
+            "Numbers, Counting & Fun Math (1 to 20)",
+            "Catchy Nursery Rhymes & Sing-Alongs",
+            "Fun Animal Kingdom Facts & Sounds",
+            "Curious Kids Science & Space Wonders",
+            "Kindness, Friendship & Good Manners",
+            "Colors, Shapes & Creative Wonder"
+        ],
+        suggestedTopics: [
+            "Pip the Bunny Learns the ABCs with Magic Apples",
+            "Counting from 1 to 10 with Friendly Farm Animals",
+            "Twinkle Twinkle Little Star Space Journey",
+            "Why Do Frogs Jump So High? Fun Animal Facts",
+            "The Rainbow Colors Song for Preschoolers",
+            "Barnaby the Bear Shares His Honey Pot"
+        ]
+    },
+    "elders": {
+        name: "Wonder Saga TV",
+        handle: "@WonderSagaTV",
+        topicPlaceholder: "e.g. The Lost Library of Alexandria, Myth of Atlantis, or leave blank...",
+        angles: [
+            "🎲 Random High-Retention Angle",
+            "Fascinating Myths & Legendary Tales",
+            "Mysterious Events & Unexplained Phenomena",
+            "Ancient Civilizations & Forgotten Secrets",
+            "Mind-Blowing Archaeological Discoveries",
+            "Inspiring True Stories & Life Lessons",
+            "World Folklore, Epics & Lost Kingdoms",
+            "Wonders of Ancient Architecture",
+            "Extraordinary Natural Phenomena & Enigmas"
+        ],
+        suggestedTopics: [
+            "The Lost Library of Alexandria & Its Forgotten Secrets",
+            "The Legend of the Phoenix: Rebirth Across World Mythologies",
+            "How Ancient Builders Moved 1,000-Ton Stones",
+            "The Unsolved Riddle of the Antikythera Mechanism",
+            "The Tale of Two Wolves: Ancient Cherokee Wisdom",
+            "Sunken Cities: The Real Atlantis Beneath the Mediterranean"
+        ]
+    }
+};
+
+function updateChannelGenerationOptions(channelId) {
+    const cid = channelId || currentChannelId || "the-ai-brief-it";
+    const meta = CHANNEL_METADATA[cid] || CHANNEL_METADATA["the-ai-brief-it"];
+
+    // Update Focus Angle dropdown
+    const angleSelect = document.getElementById("gen-angle-select");
+    if (angleSelect && meta.angles) {
+        const prevVal = angleSelect.value;
+        angleSelect.innerHTML = "";
+        meta.angles.forEach((angle, idx) => {
+            const opt = document.createElement("option");
+            if (idx === 0) {
+                opt.value = "";
+                opt.textContent = angle;
+            } else {
+                opt.value = angle;
+                opt.textContent = angle;
+            }
+            angleSelect.appendChild(opt);
+        });
+        if (prevVal && meta.angles.includes(prevVal)) {
+            angleSelect.value = prevVal;
+        }
+    }
+
+    // Update Topic placeholder
+    const topicInput = document.getElementById("gen-topic-input");
+    if (topicInput && meta.topicPlaceholder) {
+        topicInput.placeholder = meta.topicPlaceholder;
+    }
+
+    // Render suggested topic clickable pills
+    const topicsBox = document.getElementById("suggested-topics-container");
+    if (topicsBox && meta.suggestedTopics) {
+        topicsBox.innerHTML = "";
+        const label = document.createElement("span");
+        label.style.fontSize = "11.5px";
+        label.style.color = "var(--text-muted)";
+        label.style.width = "100%";
+        label.style.marginBottom = "2px";
+        label.textContent = `💡 Suggested ${meta.name} Topics (Click to fill):`;
+        topicsBox.appendChild(label);
+
+        meta.suggestedTopics.forEach(top => {
+            const pill = document.createElement("button");
+            pill.type = "button";
+            pill.className = "btn btn-secondary";
+            pill.style.fontSize = "11px";
+            pill.style.padding = "3px 8px";
+            pill.style.borderRadius = "12px";
+            pill.style.cursor = "pointer";
+            pill.textContent = top;
+            pill.addEventListener("click", () => {
+                if (topicInput) {
+                    topicInput.value = top;
+                    showToast(`Topic selected: "${top}"`, "info");
+                }
+            });
+            topicsBox.appendChild(pill);
+        });
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     initTabs();
     initSSE();
@@ -17,6 +156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadSettings();
     await loadAllChannelSettings();
     await loadYouTubeStatus();
+    updateChannelGenerationOptions(currentChannelId);
     startStatusPolling();
     setupEventListeners();
 });
@@ -299,6 +439,9 @@ function updateChannelUI(chan) {
     // Synchronize sub-tabs in API Keys and YouTube
     switchSubTab("api", cid);
     switchSubTab("yt", cid);
+
+    // Update dynamic focus angle dropdown, topic placeholder, and topic pills
+    updateChannelGenerationOptions(cid);
 
     // Set format radio button if specified in channel defaults
     const defFormat = chan.video?.default_format || (chan.default_format || "normal");

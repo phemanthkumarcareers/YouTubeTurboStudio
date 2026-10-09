@@ -1,18 +1,38 @@
-niche: Mind-bending science, deep cosmic mysteries, ancient paradoxes, existential psychology, and theoretical physics.
-tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
-pacing: Engaging hook in the first 5 seconds, followed by escalating revelation and a memorable conclusion.
+niche: Fascinating facts, mind-blowing science, cutting-edge technology, psychology, unbelievable human body facts, mysterious phenomena, and incredible real-world stories.
+tone: Engaging, fast-paced, insightful, provocative, and inspiring.
+pacing: Irresistible hook in the first 3 seconds, dynamic pacing, and memorable climax.
 description: |-
-  Channel niche: Mind-bending science, deep cosmic mysteries, ancient paradoxes, existential psychology, and theoretical physics.
-  Tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
-  Pacing: Engaging hook in the first 5 seconds, followed by escalating revelation and a memorable conclusion.
+  Welcome to InsightSpark TV — where curiosity meets discovery!
+
+  Explore fascinating facts, mind-blowing science, cutting-edge technology, psychology, unbelievable human body facts, mysterious phenomena, and incredible real-world stories.
+
+  From the hidden secrets behind everyday things to futuristic inventions and extraordinary discoveries, we break down complex ideas into short, engaging, easy-to-understand videos.
+
+  💡 Discover something surprising.
+  🧠 Understand the world around you.
+  🚀 Spark your curiosity, one video at a time.
+
+  Subscribe to InsightSpark TV and keep your curiosity alive!
+
+  **InsightSpark TV — Big Questions. Brilliant Answers. In Minutes.**
+focus_angles:
+  - Fascinating Facts & Everyday Secrets
+  - Mind-Blowing Science & Physics
+  - Cutting-Edge Technology & AI Horizons
+  - Psychology & Human Mind Mysteries
+  - Unbelievable Human Body Facts
+  - Mysterious Phenomena & Curiosities
+  - Incredible Real-World Stories
+  - Futuristic Inventions & Breakthroughs
 default_tags:
   - science
+  - fascinating facts
+  - technology
+  - psychology
   - mystery
-  - space
+  - human body facts
+  - discovery
   - documentary
-  - physics
-  - universe
-  - philosophy
 banned_topics:
   - The Boltzmann Brain
   - Simulation Theory

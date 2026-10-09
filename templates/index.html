@@ -24,9 +24,9 @@
       <div class="channel-selector-container">
         <label for="active-channel-select" class="channel-selector-label">Channel:</label>
         <select id="active-channel-select" class="form-select channel-select-dropdown">
-          <option value="the-ai-brief-it">🎬 The AI Brief It (Media Video)</option>
-          <option value="kids">🎨 Kids Wonder Lab (Animation · Kids Only)</option>
-          <option value="elders">📖 Golden Stories & Wisdom (Animation · Elders)</option>
+          <option value="the-ai-brief-it">🎬 InsightSpark TV (@InsightSparkTV · Media)</option>
+          <option value="kids">🎨 Kids Wonder Lab (@KidsWonderLab · Animation)</option>
+          <option value="elders">📖 Wonder Saga TV (@WonderSagaTV · Animation)</option>
         </select>
         <span id="active-engine-badge" class="engine-badge engine-media">Media Video</span>
         <span id="active-audience-badge" class="audience-badge audience-general">General</span>
@@ -177,6 +177,7 @@
               <label class="form-label">Custom Topic (Optional)</label>
               <input type="text" id="gen-topic-input" class="form-input" placeholder="e.g. What if Earth had two moons? Or leave blank for AI viral research...">
               <div class="form-help">If empty, AI Research Agent discovers a high-retention trending concept in your niche.</div>
+              <div id="suggested-topics-container" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
             </div>
 
             <div class="form-group">
@@ -491,32 +492,32 @@
         <!-- Channel Sub-Tabs Navigation for API Keys -->
         <div class="channel-subtabs-nav">
           <button class="channel-subtab-btn active" data-subchannel="the-ai-brief-it">
-            <span>🎬</span> The AI Brief It <em>(Media Video)</em>
+            <span>🎬</span> InsightSpark TV <em>(Media Video)</em>
           </button>
           <button class="channel-subtab-btn" data-subchannel="kids">
             <span>🎨</span> Kids Wonder Lab <em>(Animation · Kids Only)</em>
           </button>
           <button class="channel-subtab-btn" data-subchannel="elders">
-            <span>📖</span> Golden Stories & Wisdom <em>(Animation · Elders)</em>
+            <span>📖</span> Wonder Saga TV <em>(Animation · Elders)</em>
           </button>
         </div>
 
-        <!-- ═════════ 1. THE AI BRIEF IT (MEDIA VIDEO) ═════════ -->
+        <!-- ═════════ 1. INSIGHTSPARK TV (MEDIA VIDEO) ═════════ -->
         <div id="subpane-api-the-ai-brief-it" class="channel-subpane">
           <div class="card" style="border: 1px solid var(--sky-blue); background: linear-gradient(135deg, rgba(56,189,248,0.12) 0%, rgba(15,23,42,0.6) 100%);">
             <div class="card-header">
-              <div class="card-title">🎬 The AI Brief It — Media Video Engine</div>
+              <div class="card-title">🎬 InsightSpark TV (@InsightSparkTV) — Media Video Engine</div>
               <span class="engine-badge engine-media">Stock Media & Ken Burns</span>
             </div>
             <div style="font-size:12.5px; color:var(--text-secondary);">
-              This channel creates cinematic documentaries using high-resolution stock video footage (Pexels / Pixabay) and voice narration.
+              Welcome to InsightSpark TV — where curiosity meets discovery! Big Questions. Brilliant Answers. In Minutes.
             </div>
           </div>
 
           <!-- AI Brain Provider Selection -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title">🤖 AI Brain for The AI Brief It</div>
+              <div class="card-title">🤖 AI Brain for InsightSpark TV</div>
             </div>
             <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700;">
@@ -845,15 +846,15 @@
           </button>
         </div>
 
-        <!-- ═════════ 3. GOLDEN STORIES & WISDOM (ANIMATION · ELDERS) ═════════ -->
+        <!-- ═════════ 3. WONDER SAGA TV (ANIMATION · ELDERS) ═════════ -->
         <div id="subpane-api-elders" class="channel-subpane" style="display:none;">
           <div class="card" style="border: 1px solid rgba(245,158,11,0.4); background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(15,23,42,0.6) 100%);">
             <div class="card-header">
-              <div class="card-title">📖 Golden Stories & Wisdom — Animation Engine</div>
-              <span class="audience-badge audience-elders">Mature Adults (45-75)</span>
+              <div class="card-title">📖 Wonder Saga TV (@WonderSagaTV) — Myth & Story Animation</div>
+              <span class="audience-badge audience-elders">Wonder Seekers (25-75)</span>
             </div>
             <div style="font-size:12.5px; color:var(--text-secondary);">
-              Generates dignified, heartfelt storybook animations, nostalgic reflections, and emotional life wisdom.
+              Welcome to Wonder Saga TV — where imagination meets discovery! Every Story Holds a Wonder.
             </div>
           </div>
 
@@ -867,7 +868,7 @@
           <!-- AI Brain Provider Selection -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title">🤖 AI Brain for Golden Stories & Wisdom</div>
+              <div class="card-title">🤖 AI Brain for Wonder Saga TV</div>
             </div>
             <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700;">
@@ -1011,24 +1012,24 @@
         <!-- Channel Sub-Tabs Navigation for YouTube -->
         <div class="channel-subtabs-nav">
           <button class="channel-subtab-btn active" data-subchannel-yt="the-ai-brief-it">
-            <span>🎬</span> The AI Brief It <em>(YouTube OAuth)</em>
+            <span>🎬</span> InsightSpark TV <em>(YouTube OAuth)</em>
           </button>
           <button class="channel-subtab-btn" data-subchannel-yt="kids">
             <span>🎨</span> Kids Wonder Lab <em>(YouTube OAuth · Kids Only)</em>
           </button>
           <button class="channel-subtab-btn" data-subchannel-yt="elders">
-            <span>📖</span> Golden Stories & Wisdom <em>(YouTube OAuth · Elders)</em>
+            <span>📖</span> Wonder Saga TV <em>(YouTube OAuth · Elders)</em>
           </button>
         </div>
 
-        <!-- ═════════ 1. YOUTUBE OAUTH: THE AI BRIEF IT ═════════ -->
+        <!-- ═════════ 1. YOUTUBE OAUTH: INSIGHTSPARK TV ═════════ -->
         <div id="subpane-yt-the-ai-brief-it" class="channel-subpane-yt">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📺 The AI Brief It — YouTube Account Authorization</div>
+              <div class="card-title">📺 InsightSpark TV — YouTube Account Authorization</div>
               <div style="display:flex; gap:8px;">
                 <button class="btn btn-secondary btn-test-yt-status" data-chan="the-ai-brief-it" style="font-size:12px;">🔍 Check Status</button>
-                <button class="btn btn-primary btn-yt-auth" data-chan="the-ai-brief-it">Connect The AI Brief It</button>
+                <button class="btn btn-primary btn-yt-auth" data-chan="the-ai-brief-it">Connect InsightSpark TV</button>
               </div>
             </div>
             
@@ -1044,7 +1045,7 @@
             </div>
 
             <div class="form-help">
-              Connect Google OAuth specifically for <strong>The AI Brief It</strong>. Access tokens are stored strictly in <code>runtime/credentials/the-ai-brief-it/</code>.
+              Connect Google OAuth specifically for <strong>InsightSpark TV (@InsightSparkTV)</strong>. Access tokens are stored strictly in <code>runtime/credentials/the-ai-brief-it/</code>.
             </div>
           </div>
 
@@ -1175,14 +1176,14 @@
           </div>
         </div>
 
-        <!-- ═════════ 3. YOUTUBE OAUTH: GOLDEN STORIES ═════════ -->
+        <!-- ═════════ 3. YOUTUBE OAUTH: WONDER SAGA TV ═════════ -->
         <div id="subpane-yt-elders" class="channel-subpane-yt" style="display:none;">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📺 Golden Stories & Wisdom — YouTube Account Authorization</div>
+              <div class="card-title">📺 Wonder Saga TV — YouTube Account Authorization</div>
               <div style="display:flex; gap:8px;">
                 <button class="btn btn-secondary btn-test-yt-status" data-chan="elders" style="font-size:12px;">🔍 Check Status</button>
-                <button class="btn btn-primary btn-yt-auth" data-chan="elders">Connect Golden Stories</button>
+                <button class="btn btn-primary btn-yt-auth" data-chan="elders">Connect Wonder Saga TV</button>
               </div>
             </div>
             
@@ -1190,7 +1191,7 @@
               <div style="display:flex; align-items:center; gap:14px;">
                 <span style="font-size:32px;">📖</span>
                 <div>
-                  <div id="yt-name-elders" style="font-size:16px; font-weight:700;">Golden Stories Channel</div>
+                  <div id="yt-name-elders" style="font-size:16px; font-weight:700;">Wonder Saga TV Channel</div>
                   <div id="yt-id-elders" style="font-size:12px; color:var(--text-muted);">ID: </div>
                   <div id="yt-subs-elders" style="font-size:12px; color:var(--accent-emerald);"></div>
                 </div>
@@ -1198,7 +1199,7 @@
             </div>
 
             <div class="form-help">
-              OAuth token for <strong>Golden Stories & Wisdom</strong> is strictly isolated in <code>runtime/credentials/elders/</code>.
+              OAuth token for <strong>Wonder Saga TV (@WonderSagaTV)</strong> is strictly isolated in <code>runtime/credentials/elders/</code>.
             </div>
           </div>
 

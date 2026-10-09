@@ -1,9 +1,9 @@
 id: the-ai-brief-it
-name: The AI Brief It
+name: InsightSpark TV
 engine: media_video
 enabled: true
 audience:
-  type: science_enthusiasts
+  type: curious_explorers
   age_group: 16-55
 video:
   default_format: normal
@@ -20,12 +20,13 @@ credentials:
   llm_provider: gemini
   gemini_model: gemini-3.5-flash-lite
   groq_model: openai/gpt-oss-120b
-  openai_model: gpt-4o-mini
+  openai_model: gpt-4o
   video_source: pexels_images
   nano_banana_model: nano-banana-flux
 youtube:
   channel_id: ''
   oauth_profile: the-ai-brief-it
+  handle: '@InsightSparkTV'
   privacy: public
   category_id: '28'
   made_for_kids: false
@@ -35,26 +36,39 @@ pipeline:
   auto_publish: false
   minimum_quality_score: 85
 prompts:
-  niche: Mind-bending science, deep cosmic mysteries, ancient paradoxes, existential
-    psychology, and theoretical physics.
-  description: 'Channel niche: Mind-bending science, deep cosmic mysteries, ancient
-    paradoxes, existential psychology, and theoretical physics.
-
-    Tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
-
-    Pacing: Engaging hook in the first 5 seconds, followed by escalating revelation
-    and a memorable conclusion.'
+  niche: Fascinating facts, mind-blowing science, cutting-edge technology, psychology,
+    unbelievable human body facts, mysterious phenomena, and incredible real-world
+    stories.
+  description: "Welcome to InsightSpark TV \u2014 where curiosity meets discovery!\n\
+    \nExplore fascinating facts, mind-blowing science, cutting-edge technology, psychology,\
+    \ unbelievable human body facts, mysterious phenomena, and incredible real-world\
+    \ stories.\n\nFrom the hidden secrets behind everyday things to futuristic inventions\
+    \ and extraordinary discoveries, we break down complex ideas into short, engaging,\
+    \ easy-to-understand videos.\n\n\U0001F4A1 Discover something surprising.\n\U0001F9E0\
+    \ Understand the world around you.\n\U0001F680 Spark your curiosity, one video\
+    \ at a time.\n\nSubscribe to InsightSpark TV and keep your curiosity alive!\n\n\
+    **InsightSpark TV \u2014 Big Questions. Brilliant Answers. In Minutes.**"
+  focus_angles:
+  - Fascinating Facts & Everyday Secrets
+  - Mind-Blowing Science & Physics
+  - Cutting-Edge Technology & AI Horizons
+  - Psychology & Human Mind Mysteries
+  - Unbelievable Human Body Facts
+  - Mysterious Phenomena & Curiosities
+  - Incredible Real-World Stories
+  - Futuristic Inventions & Breakthroughs
   default_tags:
   - science
+  - fascinating facts
+  - technology
+  - psychology
   - mystery
-  - space
+  - human body facts
+  - discovery
   - documentary
-  - physics
-  - universe
-  - philosophy
-  tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
-  pacing: Engaging hook in the first 5 seconds, followed by escalating revelation
-    and a memorable conclusion.
+  tone: Engaging, fast-paced, insightful, provocative, and inspiring.
+  pacing: Irresistible hook in the first 3 seconds, dynamic pacing, and memorable
+    climax.
   banned_topics:
   - The Boltzmann Brain
   - Simulation Theory

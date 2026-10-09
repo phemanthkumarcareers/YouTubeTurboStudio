@@ -55,7 +55,7 @@ class TestPhase1MultiChannelFoundation(unittest.TestCase):
         # Verify engine types
         ai_brief = registry.get_channel("the-ai-brief-it")
         self.assertEqual(ai_brief.engine, "media_video")
-        self.assertEqual(ai_brief.name, "The AI Brief It")
+        self.assertEqual(ai_brief.name, "InsightSpark TV")
 
         kids = registry.get_channel("kids")
         self.assertEqual(kids.engine, "animation")
@@ -134,7 +134,7 @@ class TestPhase1MultiChannelFoundation(unittest.TestCase):
         fresh_registry = ChannelRegistry()
         reloaded_chan = fresh_registry.get_channel("the-ai-brief-it")
         self.assertEqual(reloaded_chan.video.get("fps"), original_fps)
-        self.assertEqual(reloaded_chan.name, "The AI Brief It")
+        self.assertEqual(reloaded_chan.name, "InsightSpark TV")
 
     def test_06_pipeline_routing(self):
         """Acceptance Criteria: Science routes to media_video, Kids/Elders handled gracefully before Phase 3."""

@@ -75,9 +75,17 @@ Return strictly valid JSON:
 }}
 Output ONLY raw JSON."""
 
-    raw = generate(prompt, json_mode=True)
-    parsed = clean_json_response(raw)
-    hooks = parsed.get("hooks", [])
+    try:
+        raw = generate(prompt, json_mode=True)
+        parsed = clean_json_response(raw)
+        hooks = parsed.get("hooks", [])
+    except Exception as e:
+        log_info(f"[HOOK TOURNAMENT] LLM unavailable or unconfigured ({e}), using robust heuristic hooks.")
+        hooks = [
+            {"text": f"What actually happens during {topic}?", "structure": "curiosity_gap", "curiosity": 9, "retention_pull": 9, "truthfulness": 10},
+            {"text": f"Almost everything you knew about {topic} is wrong.", "structure": "contrarian_pattern_interrupt", "curiosity": 8, "retention_pull": 9, "truthfulness": 8},
+            {"text": f"If you think {topic} is ordinary, wait until you see this.", "structure": "high_stakes_what_if", "curiosity": 8, "retention_pull": 8, "truthfulness": 9}
+        ]
 
     if not hooks:
         default_hook = topic_data.get("hook_question", f"What actually happens during {topic}?")

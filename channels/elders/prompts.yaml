@@ -1,18 +1,34 @@
-niche: Heartfelt life lessons, generational stories, nostalgic reflections, and emotional family wisdom.
-tone: Calm, empathetic, nostalgic, dignified, and emotionally resonant.
-pacing: Unhurried, poetic, contemplative, with rich character moments and meaningful payoffs.
+niche: Fascinating myths, legendary tales, mysterious events, unexplained phenomena, amazing discoveries, incredible facts, and inspiring stories from around the world.
+tone: Epic, immersive, wonder-filled, thoughtful, dignified, and emotionally resonant.
+pacing: Cinematic, captivating opening hook, rich narrative progression, and inspiring conclusion.
 description: |-
-  Channel niche: Deep, heartwarming life stories, emotional moments, and philosophical reflections for older adults.
-  Tone: Calm, empathetic, nostalgic, dignified, and emotionally resonant.
-  Pacing: Unhurried, poetic, contemplative, with rich character moments and meaningful payoffs.
+  Welcome to Wonder Saga TV — where imagination meets discovery!
+
+  Explore fascinating myths, legendary tales, mysterious events, unexplained phenomena, amazing discoveries, incredible facts, and inspiring stories from around the world.
+
+  From ancient civilizations and forgotten secrets to mind-blowing discoveries and powerful life lessons, every video takes you on a journey beyond the ordinary.
+
+  ✨ New wonders. Incredible stories. Endless curiosity.
+
+  **Wonder Saga TV — Every Story Holds a Wonder.**
+focus_angles:
+  - Fascinating Myths & Legendary Tales
+  - Mysterious Events & Unexplained Phenomena
+  - Ancient Civilizations & Forgotten Secrets
+  - Mind-Blowing Archaeological Discoveries
+  - Inspiring True Stories & Life Lessons
+  - World Folklore, Epics & Lost Kingdoms
+  - Wonders of Ancient Architecture
+  - Extraordinary Natural Phenomena & Enigmas
 default_tags:
-  - life lessons
-  - wisdom
-  - nostalgic stories
-  - family
-  - inspiration
-  - golden years
-  - life stories
+  - myths and legends
+  - ancient mysteries
+  - discoveries
+  - inspiring stories
+  - wonder saga
+  - forgotten history
+  - unexplained phenomena
+  - world folklore
 banned_topics:
   - cynicism
   - trivial clickbait

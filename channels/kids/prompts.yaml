@@ -1,10 +1,19 @@
-niche: Fun educational rhymes, counting games, animal facts, bedtime stories, and moral adventures.
+niche: Fun educational rhymes, counting games, animal facts, bedtime stories, alphabets, numbers, songs, and moral adventures.
 tone: Joyful, encouraging, musical, gentle, and highly visual.
 pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive emotional reinforcement.
 description: |-
-  Channel niche: Engaging, wholesome, and educational content for preschool and kindergarten kids.
+  Channel niche: Engaging, wholesome, and educational content for preschool and kindergarten kids (stories, alphabets, numbers, songs, rhymes, and discoveries).
   Tone: Joyful, encouraging, musical, gentle, and highly visual.
   Pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive emotional reinforcement.
+focus_angles:
+  - Animated Bedtime & Fairy Tale Stories
+  - Alphabet, Phonics & ABC Adventures
+  - Numbers, Counting & Fun Math (1 to 20)
+  - Catchy Nursery Rhymes & Sing-Alongs
+  - Fun Animal Kingdom Facts & Sounds
+  - Curious Kids Science & Space Wonders
+  - Kindness, Friendship & Good Manners
+  - Colors, Shapes & Creative Wonder
 default_tags:
   - kids
   - animation
@@ -13,6 +22,9 @@ default_tags:
   - counting
   - animals
   - bedtime stories
+  - alphabets
+  - numbers
+  - kids songs
 banned_topics:
   - scary monsters
   - violence
