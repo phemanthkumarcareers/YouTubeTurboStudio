@@ -1,51 +1,77 @@
 """
 YouTube Video Uploader
 Uploads generated videos and custom thumbnails to YouTube Data API v3 with resumable chunking.
+Enforces channel verification prior to upload to prevent cross-channel posting.
 """
 import os
 import pickle
+from typing import Optional, List
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from config import TOKEN_PATH, CLIENT_SECRET_PATH, load_config
+from core.credential_manager import get_youtube_token_path
+from core.channel_registry import registry
 from core.logger import log_info, log_warn, log_success, log_error
 from core.state import update_state
+from youtube.channel_verifier import get_channel_youtube_credentials, verify_channel
 
 
-def get_youtube_service():
-    """Return authenticated YouTube API service."""
-    if not TOKEN_PATH.exists():
-        raise FileNotFoundError("youtube_token.pickle does not exist. Please authenticate via the YouTube tab.")
+def get_youtube_service(channel_id: str = None):
+    """Return authenticated YouTube API service for a specific channel."""
+    cid = channel_id or registry.get_active_channel_id()
+    creds = get_channel_youtube_credentials(cid)
+    if not creds:
+        # Fall back to root token if the-ai-brief-it and file exists
+        if cid == "the-ai-brief-it" and TOKEN_PATH.exists():
+            with open(TOKEN_PATH, "rb") as f:
+                creds = pickle.load(f)
 
-    with open(TOKEN_PATH, "rb") as f:
-        creds = pickle.load(f)
+    if not creds:
+        raise FileNotFoundError(
+            f"No valid YouTube token found for channel '{cid}'. Please authenticate via the YouTube tab."
+        )
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and getattr(creds, "refresh_token", None):
-            from google.auth.transport.requests import Request
-            try:
-                creds.refresh(Request())
-                with open(TOKEN_PATH, "wb") as f:
-                    pickle.dump(creds, f)
-            except Exception as e:
-                raise PermissionError(f"YouTube authentication token expired and could not be refreshed ({e}). Please open the YouTube tab and click 'Connect YouTube Channel' to re-authorize.")
-        else:
-            raise PermissionError("YouTube token is expired or invalid. Please open the YouTube tab and click 'Connect YouTube Channel' to authorize.")
+    if not creds.valid:
+        raise PermissionError(
+            f"YouTube token for channel '{cid}' is expired or invalid. Please re-authenticate."
+        )
 
     return build("youtube", "v3", credentials=creds)
 
 
-def upload_video_to_youtube(video_path: str, title: str, description: str, tags: list[str] = None,
-                            privacy: str = "private", category_id: str = "28",
-                            publish_at: str = None, thumb_path: str = None) -> str:
+def upload_video_to_youtube(
+    video_path: str,
+    title: str,
+    description: str,
+    tags: Optional[List[str]] = None,
+    privacy: str = "private",
+    category_id: str = "28",
+    publish_at: Optional[str] = None,
+    thumb_path: Optional[str] = None,
+    channel_id: Optional[str] = None,
+    expected_youtube_channel_id: Optional[str] = None,
+    made_for_kids: bool = False
+) -> str:
     """
-    Resumable video upload with progress callback.
-    publish_at: RFC 3339 datetime string (e.g. '2026-10-15T15:00:00Z') or None
+    Resumable video upload with progress callback and pre-upload channel verification.
     """
     if not os.path.exists(video_path):
         raise FileNotFoundError(f"Video file not found at: {video_path}")
 
-    update_state(uploading=True, upload_pct=0)
-    yt = get_youtube_service()
+    cid = channel_id or registry.get_active_channel_id()
+    chan_ctx = registry.get_channel(cid)
+    exp_id = expected_youtube_channel_id or (chan_ctx.youtube.get("channel_id") if chan_ctx else "")
+    is_kids = made_for_kids or (chan_ctx.youtube.get("made_for_kids", False) if chan_ctx else False)
+
+    # ── SECURITY PRE-UPLOAD CHECK ──────────────────────────────────────
+    log_info(f"Verifying YouTube OAuth identity for channel '{cid}' before upload...")
+    verified, verif_msg, _ = verify_channel(cid, exp_id)
+    if not verified:
+        log_error(f"Pre-upload verification failed: {verif_msg}")
+        raise PermissionError(f"Upload blocked by channel verifier: {verif_msg}")
+
+    update_state(uploading=True, upload_pct=0, channel_id=cid)
+    yt = get_youtube_service(cid)
 
     # Append hashtags to description so they show on the YouTube video page
     if tags:
@@ -61,13 +87,13 @@ def upload_video_to_youtube(video_path: str, title: str, description: str, tags:
         },
         "status": {
             "privacyStatus": "private" if publish_at else privacy,
-            "selfDeclaredMadeForKids": False
+            "selfDeclaredMadeForKids": bool(is_kids)
         }
     }
     if publish_at:
         body["status"]["publishAt"] = publish_at
 
-    log_info(f"Initiating YouTube upload for '{title}' (Privacy: {body['status']['privacyStatus']})...")
+    log_info(f"Initiating YouTube upload for '{title}' (Channel: {cid}, Privacy: {body['status']['privacyStatus']})...")
 
     media = MediaFileUpload(
         video_path,

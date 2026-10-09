@@ -1,9 +1,32 @@
-# Local client secrets / credentials
+# Local client secrets / credentials / environment files
+.env
+.env.*
+!.env.example
 client_secret*.json
 config_data.json
 config_bkp.py
-.env
 youtube_token.pickle
+youtube_token*.json
+
+# Channel specific secrets & credentials
+channels/*/.env
+channels/*/.env.*
+!channels/*/.env.example
+channels/*/credentials.json
+channels/*/client_secret*.json
+channels/*/token*.json
+channels/*/token*.pickle
+channels/*/oauth*.json
+channels/*/*.pickle
+
+# Runtime directories and secret caches
+runtime/
+runtime/credentials/
+runtime/cache/
+runtime/jobs/
+runtime/output/
+credentials/
+secrets/
 
 # Python cache
 __pycache__/

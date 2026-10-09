@@ -8,10 +8,12 @@ let currentConfig = {};
 let currentStatus = {};
 let sseSource = null;
 let currentTags = [];
+let currentChannelId = "the-ai-brief-it";
 
 document.addEventListener("DOMContentLoaded", () => {
     initTabs();
     initSSE();
+    initChannelManager();
     loadSettings();
     loadYouTubeStatus();
     startStatusPolling();
@@ -173,6 +175,92 @@ function updateStatusUI(status) {
     }
 }
 
+// ── CHANNEL MANAGEMENT (MULTI-CHANNEL) ──
+async function initChannelManager() {
+    const selectEl = document.getElementById("active-channel-select");
+    if (!selectEl) return;
+
+    try {
+        const resp = await fetch("/api/channels");
+        const data = await resp.json();
+        if (data.ok && data.channels) {
+            selectEl.innerHTML = "";
+            data.channels.forEach(ch => {
+                const opt = document.createElement("option");
+                opt.value = ch.channel_id;
+                opt.textContent = ch.name;
+                if (ch.is_active || ch.channel_id === data.active_channel_id) {
+                    opt.selected = true;
+                    currentChannelId = ch.channel_id;
+                }
+                selectEl.appendChild(opt);
+            });
+            // Update UI based on active channel
+            const activeCh = data.channels.find(c => c.channel_id === currentChannelId);
+            if (activeCh) updateChannelUI(activeCh);
+        }
+    } catch (e) {
+        console.error("Error loading channels:", e);
+    }
+
+    selectEl.addEventListener("change", () => {
+        switchChannel(selectEl.value);
+    });
+}
+
+function updateChannelUI(chan) {
+    if (!chan) return;
+    const name = chan.name || "Default Channel";
+    const engine = (chan.engine || "media_video").toLowerCase();
+
+    // Update target badges
+    const targetPillName = document.getElementById("target-channel-name");
+    if (targetPillName) targetPillName.innerText = name;
+
+    const reviewTargetName = document.getElementById("review-target-channel-name");
+    if (reviewTargetName) reviewTargetName.innerText = name;
+
+    // Update engine badge
+    const badge = document.getElementById("active-engine-badge");
+    if (badge) {
+        if (engine === "animation") {
+            badge.innerText = "Animation Engine";
+            badge.className = "engine-badge engine-animation";
+        } else {
+            badge.innerText = "Media Video";
+            badge.className = "engine-badge engine-media";
+        }
+    }
+
+    // Set format radio button if specified in channel defaults
+    const defFormat = chan.video?.default_format || (chan.default_format || "normal");
+    const fmtRadio = document.querySelector(`input[name="video_format"][value="${defFormat}"]`);
+    if (fmtRadio) fmtRadio.checked = true;
+}
+
+async function switchChannel(channelId) {
+    try {
+        showToast(`Switching channel to ${channelId}...`, "info");
+        const resp = await fetch("/api/channels/select", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ channel_id: channelId })
+        });
+        const res = await resp.json();
+        if (res.ok) {
+            currentChannelId = channelId;
+            updateChannelUI(res.channel);
+            await loadSettings();
+            await loadYouTubeStatus();
+            showToast(`Active channel switched to "${res.channel.name}"!`, "success");
+        } else {
+            showToast(`Switch failed: ${res.error}`, "error");
+        }
+    } catch (e) {
+        showToast(`Error switching channel: ${e.message}`, "error");
+    }
+}
+
 // ── LOAD SETTINGS ──
 async function loadSettings() {
     try {
@@ -273,17 +361,41 @@ async function loadSettings() {
 async function saveAllSettings() {
     const selectedProvider = document.querySelector('input[name="ai_provider_radio"]:checked')?.value || currentConfig.llm_provider || "gemini";
     
+    // Only send non-masked credentials to prevent overwriting keys with bullet points
+    const cleanKey = (val) => (val && !val.includes("••••")) ? val : undefined;
+
     const payload = {
+        channel_id: currentChannelId,
+        name: getVal("channel-name-input") || currentConfig.channel_name,
+        credentials: {
+            llm_provider: selectedProvider,
+            gemini_model: getVal("gemini-model-select") || currentConfig.gemini_model || "gemini-3.8-flash",
+            groq_model: getVal("groq-model-select") || currentConfig.groq_model || "llama-3.3-70b-versatile",
+            video_source: getVal("video-source-select") || currentConfig.video_source || "pexels_images",
+        },
+        voice: {
+            tts_provider: getVal("tts-provider-select") || currentConfig.tts_provider || "edge-tts",
+            voice_id: getVal("voice-select") || currentConfig.voice_id || "en-US-ChristopherNeural",
+            voice_rate: getVal("voice-rate-input") || currentConfig.voice_rate || "+0%",
+            voice_pitch: getVal("voice-pitch-input") || currentConfig.voice_pitch || "+0Hz",
+            music_volume: parseFloat(getVal("music-volume-slider")) || currentConfig.music_volume || 0.12,
+            music_enabled: document.getElementById("music-enabled-check") ? document.getElementById("music-enabled-check").checked : (currentConfig.music_enabled !== false),
+        },
+        video: {
+            kb_zoom_end: parseFloat(getVal("kb-zoom-end-slider")) || currentConfig.kb_zoom_end || 1.15,
+            subtitles_enabled: document.getElementById("subtitles-enabled-check") ? document.getElementById("subtitles-enabled-check").checked : (currentConfig.subtitles_enabled !== false),
+        },
+        prompts: {
+            description: getVal("channel-desc-input") || currentConfig.channel_description || "",
+        },
+        youtube: {
+            privacy: getVal("yt-default-privacy") || currentConfig.youtube_privacy || "private",
+            category_id: getVal("yt-default-category") || currentConfig.youtube_category_id || "28",
+        },
+        // Flat aliases for backwards compatibility
         llm_provider: selectedProvider,
-        gemini_api_key: getVal("gemini-api-key") || currentConfig.gemini_api_key || "",
         gemini_model: getVal("gemini-model-select") || currentConfig.gemini_model || "gemini-3.8-flash",
-        groq_api_key: getVal("groq-api-key") || currentConfig.groq_api_key || "",
         groq_model: getVal("groq-model-select") || currentConfig.groq_model || "llama-3.3-70b-versatile",
-
-        pexels_api_key: getVal("pexels-api-key") || currentConfig.pexels_api_key || "",
-        pixabay_api_key: getVal("pixabay-api-key") || currentConfig.pixabay_api_key || "",
-        elevenlabs_api_key: getVal("elevenlabs-api-key") || currentConfig.elevenlabs_api_key || "",
-
         video_source: getVal("video-source-select") || currentConfig.video_source || "pexels_images",
         tts_provider: getVal("tts-provider-select") || currentConfig.tts_provider || "edge-tts",
         voice_id: getVal("voice-select") || currentConfig.voice_id || "en-US-ChristopherNeural",
@@ -293,23 +405,33 @@ async function saveAllSettings() {
         kb_zoom_end: parseFloat(getVal("kb-zoom-end-slider")) || currentConfig.kb_zoom_end || 1.15,
         music_enabled: document.getElementById("music-enabled-check") ? document.getElementById("music-enabled-check").checked : (currentConfig.music_enabled !== false),
         subtitles_enabled: document.getElementById("subtitles-enabled-check") ? document.getElementById("subtitles-enabled-check").checked : (currentConfig.subtitles_enabled !== false),
-
         channel_name: getVal("channel-name-input") || currentConfig.channel_name || "",
         channel_description: getVal("channel-desc-input") || currentConfig.channel_description || "",
         youtube_privacy: getVal("yt-default-privacy") || currentConfig.youtube_privacy || "private",
         youtube_category_id: getVal("yt-default-category") || currentConfig.youtube_category_id || "28"
     };
 
+    const gKey = cleanKey(getVal("gemini-api-key"));
+    if (gKey !== undefined) payload.gemini_api_key = gKey;
+    const grKey = cleanKey(getVal("groq-api-key"));
+    if (grKey !== undefined) payload.groq_api_key = grKey;
+    const pxKey = cleanKey(getVal("pexels-api-key"));
+    if (pxKey !== undefined) payload.pexels_api_key = pxKey;
+    const pbKey = cleanKey(getVal("pixabay-api-key"));
+    if (pbKey !== undefined) payload.pixabay_api_key = pbKey;
+    const elKey = cleanKey(getVal("elevenlabs-api-key"));
+    if (elKey !== undefined) payload.elevenlabs_api_key = elKey;
+
     try {
-        const resp = await fetch("/api/settings/save", {
+        const resp = await fetch("/api/channels/save", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
         const res = await resp.json();
         if (res.ok) {
-            currentConfig = res.config;
-            showToast("Settings permanently saved!", "success");
+            showToast("Settings permanently saved for active channel!", "success");
+            await loadSettings();
         } else {
             showToast(`Save failed: ${res.error}`, "error");
         }
@@ -321,7 +443,7 @@ async function saveAllSettings() {
 // ── YOUTUBE STATUS & CREDENTIALS ──
 async function loadYouTubeStatus() {
     try {
-        const resp = await fetch("/api/youtube/status");
+        const resp = await fetch(`/api/youtube/status?channel_id=${encodeURIComponent(currentChannelId)}`);
         const yt = await resp.json();
 
         const badge = document.getElementById("yt-auth-badge");
@@ -376,7 +498,7 @@ async function loadSecretFromPath() {
         const resp = await fetch("/api/youtube/load-secret-path", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ filepath: filepath })
+            body: JSON.stringify({ filepath: filepath, channel_id: currentChannelId })
         });
         const res = await resp.json();
         if (res.ok) {
@@ -392,8 +514,12 @@ async function loadSecretFromPath() {
 
 async function triggerYouTubeAuth() {
     try {
-        showToast("Opening Google Sign-In in your browser...", "info");
-        const resp = await fetch("/api/youtube/authenticate", { method: "POST" });
+        showToast(`Opening Google Sign-In in browser for channel '${currentChannelId}'...`, "info");
+        const resp = await fetch("/api/youtube/authenticate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ channel_id: currentChannelId })
+        });
         const res = await resp.json();
         if (res.ok) {
             showToast("Complete authorization in the browser window.", "success");
@@ -401,7 +527,7 @@ async function triggerYouTubeAuth() {
             let checks = 0;
             const checkInterval = setInterval(async () => {
                 checks++;
-                const statusResp = await fetch("/api/youtube/status");
+                const statusResp = await fetch(`/api/youtube/status?channel_id=${encodeURIComponent(currentChannelId)}`);
                 const ytData = await statusResp.json();
                 if (ytData.token_valid || checks > 30) {
                     clearInterval(checkInterval);
@@ -485,6 +611,7 @@ function startPipeline() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+            channel_id: currentChannelId,
             steps: steps,
             topic: topic,
             focus_angle: angle,
@@ -634,6 +761,7 @@ async function uploadToYouTubeDirect() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+                channel_id: currentChannelId,
                 privacy: privacy,
                 category_id: category,
                 publish_at: schedule || null,

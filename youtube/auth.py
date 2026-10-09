@@ -1,14 +1,18 @@
 """
 YouTube OAuth & Channel Authentication Manager
-Manages credentials, OAuth2 browser authorization, token persistence, and channel diagnostics.
+Manages credentials, OAuth2 browser authorization, token persistence, and channel diagnostics
+with full multi-channel isolation support.
 """
 import os
 import json
 import pickle
 import threading
 import time
+import shutil
 from pathlib import Path
 from config import CLIENT_SECRET_PATH, TOKEN_PATH, load_config
+from core.credential_manager import get_youtube_token_path, get_client_secret_path
+from core.channel_registry import registry
 from core.logger import log_info, log_warn, log_success, log_error
 
 # Comprehensive scopes for upload and reading channel details
@@ -19,11 +23,16 @@ YOUTUBE_SCOPES = [
 
 _auth_lock = threading.Lock()
 _auth_in_progress = False
-_last_refresh_attempt = 0
+_last_refresh_by_channel = {}
 
 
-def auto_detect_client_secret() -> str | None:
-    """Find client_secret.json in current or neighboring directories."""
+def auto_detect_client_secret(channel_id: str = None) -> str | None:
+    """Find client_secret.json in channel credentials or standard project locations."""
+    if channel_id:
+        chan_path = get_client_secret_path(channel_id)
+        if chan_path.exists():
+            return str(chan_path)
+
     candidates = [
         CLIENT_SECRET_PATH,
         CLIENT_SECRET_PATH.parent.parent / "client_secret.json",
@@ -35,7 +44,7 @@ def auto_detect_client_secret() -> str | None:
     return None
 
 
-def load_client_secret_from_path(filepath: str) -> tuple[bool, str]:
+def load_client_secret_from_path(filepath: str, channel_id: str = None) -> tuple[bool, str]:
     """Load and copy client_secret.json from a custom or default path."""
     p = Path(filepath.strip())
     if not p.exists():
@@ -45,29 +54,42 @@ def load_client_secret_from_path(filepath: str) -> tuple[bool, str]:
             data = json.load(f)
         if "installed" not in data and "web" not in data:
             return False, "Invalid OAuth format (missing 'installed' or 'web' section)"
-        with open(CLIENT_SECRET_PATH, "w", encoding="utf-8") as f:
+
+        # Save to channel credentials directory if channel specified
+        cid = channel_id or registry.get_active_channel_id()
+        dest_path = get_client_secret_path(cid)
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(dest_path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
-        log_success(f"Loaded client_secret.json from: {filepath}")
+
+        # Also write to root for backward compatibility if the primary channel
+        if cid == "the-ai-brief-it":
+            with open(CLIENT_SECRET_PATH, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2)
+
+        log_success(f"Loaded client_secret.json for '{cid}' from: {filepath}")
         return True, "Loaded and saved client_secret.json successfully!"
     except Exception as e:
         return False, f"Error reading file: {e}"
 
 
-def check_auth_status() -> dict:
+def check_auth_status(channel_id: str = None) -> dict:
     """
-    Check OAuth configuration and token validity.
+    Check OAuth configuration and token validity for a specific channel.
     Returns channel info if authenticated.
     """
-    global _last_refresh_attempt
+    cid = channel_id or registry.get_active_channel_id()
+    token_path = get_youtube_token_path(cid)
+    secret_path = get_client_secret_path(cid)
 
-    # If local client secret is missing, try auto-detecting
-    if not CLIENT_SECRET_PATH.exists():
-        detected = auto_detect_client_secret()
-        if detected and detected != str(CLIENT_SECRET_PATH):
-            load_client_secret_from_path(detected)
+    # If channel secret is missing, try auto-detecting
+    if not secret_path.exists():
+        detected = auto_detect_client_secret(cid)
+        if detected and detected != str(secret_path):
+            load_client_secret_from_path(detected, cid)
 
-    has_secret = CLIENT_SECRET_PATH.exists()
-    has_token = TOKEN_PATH.exists()
+    has_secret = secret_path.exists()
+    has_token = token_path.exists()
     token_valid = False
     token_expired = False
     has_refresh = False
@@ -76,29 +98,30 @@ def check_auth_status() -> dict:
 
     if has_token:
         try:
-            with open(TOKEN_PATH, "rb") as f:
+            with open(token_path, "rb") as f:
                 creds = pickle.load(f)
             token_valid = bool(creds and creds.valid)
             token_expired = bool(creds and creds.expired)
             has_refresh = bool(creds and getattr(creds, "refresh_token", None))
             scopes = list(getattr(creds, "scopes", []))
 
-            # Only attempt refresh once every 300 seconds to avoid spamming SSL / network errors
             now = time.time()
-            if token_expired and has_refresh and (now - _last_refresh_attempt > 300):
-                _last_refresh_attempt = now
+            last_attempt = _last_refresh_by_channel.get(cid, 0)
+            if token_expired and has_refresh and (now - last_attempt > 300):
+                _last_refresh_by_channel[cid] = now
                 from google.auth.transport.requests import Request
                 import requests
-                # Use a session with a timeout to avoid hanging or unhandled SSL drops
                 sess = requests.Session()
                 try:
                     creds.refresh(Request(session=sess))
-                    with open(TOKEN_PATH, "wb") as f:
+                    with open(token_path, "wb") as f:
                         pickle.dump(creds, f)
+                    if cid == "the-ai-brief-it":
+                        with open(TOKEN_PATH, "wb") as f:
+                            pickle.dump(creds, f)
                     token_valid = True
                     token_expired = False
                 except Exception:
-                    # Token refresh failed (expired or network/SSL drop).
                     token_valid = False
                     token_expired = True
 
@@ -130,9 +153,10 @@ def check_auth_status() -> dict:
         except Exception:
             pass
 
-    detected_path = auto_detect_client_secret()
+    detected_path = auto_detect_client_secret(cid)
 
     return {
+        "channel_id": cid,
         "has_client_secret": has_secret,
         "has_token": has_token,
         "token_valid": token_valid,
@@ -140,24 +164,30 @@ def check_auth_status() -> dict:
         "has_refresh": has_refresh,
         "scopes": scopes,
         "channel": channel_info,
-        "default_secret_path": detected_path or str(CLIENT_SECRET_PATH)
+        "default_secret_path": detected_path or str(secret_path)
     }
 
 
-def save_client_secret_json(secret_data: dict) -> bool:
-    """Save client_secret.json to disk."""
+def save_client_secret_json(secret_data: dict, channel_id: str = None) -> bool:
+    """Save client_secret.json to channel credentials directory and root fallback."""
+    cid = channel_id or registry.get_active_channel_id()
+    dest_path = get_client_secret_path(cid)
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        with open(CLIENT_SECRET_PATH, "w", encoding="utf-8") as f:
+        with open(dest_path, "w", encoding="utf-8") as f:
             json.dump(secret_data, f, indent=2)
-        log_success("Saved client_secret.json successfully.")
+        if cid == "the-ai-brief-it":
+            with open(CLIENT_SECRET_PATH, "w", encoding="utf-8") as f:
+                json.dump(secret_data, f, indent=2)
+        log_success(f"Saved client_secret.json for '{cid}' successfully.")
         return True
     except Exception as e:
         log_error(f"Failed to write client_secret.json: {e}")
         return False
 
 
-def save_client_credentials(client_id: str, client_secret: str) -> bool:
-    """Construct and save standard installed OAuth format."""
+def save_client_credentials(client_id: str, client_secret: str, channel_id: str = None) -> bool:
+    """Construct and save standard installed OAuth format for channel."""
     data = {
         "installed": {
             "client_id": client_id.strip(),
@@ -169,24 +199,31 @@ def save_client_credentials(client_id: str, client_secret: str) -> bool:
             "redirect_uris": ["http://localhost"]
         }
     }
-    return save_client_secret_json(data)
+    return save_client_secret_json(data, channel_id=channel_id)
 
 
-def run_oauth_flow(port: int = 8095) -> dict:
+def run_oauth_flow(port: int = 8095, channel_id: str = None) -> dict:
     """
-    Launch interactive Google OAuth flow in user's browser.
-    Saves the acquired credentials to youtube_token.pickle.
+    Launch interactive Google OAuth flow in user's browser for a specific channel.
+    Saves the acquired credentials to that channel's token path.
     """
     global _auth_in_progress
     if _auth_in_progress:
         return {"ok": False, "error": "Authentication is already in progress"}
 
-    if not CLIENT_SECRET_PATH.exists():
-        detected = auto_detect_client_secret()
+    cid = channel_id or registry.get_active_channel_id()
+    secret_path = get_client_secret_path(cid)
+
+    if not secret_path.exists():
+        detected = auto_detect_client_secret(cid)
         if detected:
-            load_client_secret_from_path(detected)
+            load_client_secret_from_path(detected, cid)
+            secret_path = get_client_secret_path(cid)
         else:
-            return {"ok": False, "error": f"client_secret.json not found at {CLIENT_SECRET_PATH}"}
+            return {"ok": False, "error": f"client_secret.json not found for channel '{cid}'"}
+
+    token_path = get_youtube_token_path(cid)
+    token_path.parent.mkdir(parents=True, exist_ok=True)
 
     from google_auth_oauthlib.flow import InstalledAppFlow
 
@@ -194,17 +231,20 @@ def run_oauth_flow(port: int = 8095) -> dict:
         global _auth_in_progress
         _auth_in_progress = True
         try:
-            log_info("Starting Google OAuth in browser...")
-            flow = InstalledAppFlow.from_client_secrets_file(str(CLIENT_SECRET_PATH), YOUTUBE_SCOPES)
+            log_info(f"Starting Google OAuth in browser for channel '{cid}'...")
+            flow = InstalledAppFlow.from_client_secrets_file(str(secret_path), YOUTUBE_SCOPES)
             creds = flow.run_local_server(port=port, prompt="consent")
-            with open(TOKEN_PATH, "wb") as f:
+            with open(token_path, "wb") as f:
                 pickle.dump(creds, f)
-            log_success("YouTube OAuth authorization completed and token saved!")
+            if cid == "the-ai-brief-it":
+                with open(TOKEN_PATH, "wb") as f:
+                    pickle.dump(creds, f)
+            log_success(f"YouTube OAuth authorization completed for '{cid}' and token saved!")
         except Exception as e:
-            log_error(f"YouTube OAuth authorization failed: {e}")
+            log_error(f"YouTube OAuth authorization failed for '{cid}': {e}")
         finally:
             _auth_in_progress = False
 
     t = threading.Thread(target=_auth_worker, daemon=True)
     t.start()
-    return {"ok": True, "message": "OAuth server launched. Complete login in browser window."}
+    return {"ok": True, "message": f"OAuth server launched for channel '{cid}'. Complete login in browser window."}

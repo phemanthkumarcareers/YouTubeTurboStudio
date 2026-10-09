@@ -2,13 +2,18 @@
 Pipeline Orchestrator
 Sequences and executes the agentic video generation pipeline.
 Supports step-by-step modular execution or 1-click full automated flow.
+Now carries explicit ChannelContext throughout the entire lifecycle.
 """
 import os
 import json
 import threading
+from typing import Optional, List, Dict, Any
 from config import load_config, OUTPUT_DIR
 from core.state import state, update_state, set_stage, reset_pipeline_state
 from core.logger import log_info, log_success, log_warn, log_error, log_stage
+from core.channel_context import ChannelContext
+from core.channel_registry import registry
+from core.credential_manager import load_channel_credentials
 from agents.researcher import research_topic
 from agents.scriptwriter import write_script
 from audio.edge_tts_engine import generate_speech
@@ -32,22 +37,40 @@ def is_stopped() -> bool:
     return _stop_event.is_set()
 
 
-def execute_pipeline(steps: list[str] = None, topic_override: str = "",
-                     focus_angle: str = "", video_type: str = "normal",
-                     custom_script: dict = None):
+def execute_pipeline(
+    steps: Optional[List[str]] = None,
+    topic_override: str = "",
+    focus_angle: str = "",
+    video_type: str = "normal",
+    custom_script: Optional[Dict[str, Any]] = None,
+    channel_context: Optional[ChannelContext] = None
+):
     """
-    Run pipeline in background thread.
-    steps: list like ['research', 'script', 'narration', 'media', 'video', 'thumbnail']
+    Run pipeline in background thread with explicit ChannelContext.
     """
     if steps is None:
         steps = ["research", "script", "narration", "media", "video", "thumbnail"]
 
+    if channel_context is None:
+        channel_context = registry.get_active_channel()
+
     _stop_event.clear()
     reset_pipeline_state(video_type=video_type)
+    update_state(channel_id=channel_context.channel_id)
 
     def _worker():
         try:
-            cfg = load_config()
+            # Resolve channel-scoped config and credentials
+            creds = load_channel_credentials(channel_context.channel_id)
+            cfg = channel_context.to_pipeline_config(creds)
+            # Also merge with disk config defaults as fallback
+            base_cfg = load_config()
+            for k, v in base_cfg.items():
+                if k not in cfg or cfg[k] is None or cfg[k] == "":
+                    cfg[k] = v
+
+            log_info(f"Pipeline started for channel: '{channel_context.name}' (ID: {channel_context.channel_id})")
+
             research_data = state.get("research_data")
             script_data = custom_script or state.get("script_data")
 
@@ -161,7 +184,7 @@ def execute_pipeline(steps: list[str] = None, topic_override: str = "",
 
             # ── 7. AUTO UPLOAD (IF ENABLED) ────────────────────────────────
             if cfg.get("auto_upload") and video_file and os.path.exists(video_file):
-                log_info("Auto-upload enabled in configuration. Commencing YouTube upload...")
+                log_info(f"Auto-upload enabled for '{channel_context.name}'. Commencing YouTube upload...")
                 upload_video_to_youtube(
                     video_path=video_file,
                     title=script_data.get("title", "Cinematic Video"),
@@ -169,14 +192,17 @@ def execute_pipeline(steps: list[str] = None, topic_override: str = "",
                     tags=state.get("tags", script_data.get("tags", [])),
                     privacy=cfg.get("youtube_privacy", "private"),
                     category_id=cfg.get("youtube_category_id", "28"),
-                    thumb_path=state.get("thumb_path")
+                    thumb_path=state.get("thumb_path"),
+                    channel_id=channel_context.channel_id,
+                    expected_youtube_channel_id=cfg.get("expected_youtube_channel_id"),
+                    made_for_kids=cfg.get("made_for_kids", False)
                 )
 
-            log_success("Pipeline finished successfully! Video is ready in the Review Studio.")
+            log_success(f"Pipeline finished successfully for '{channel_context.name}'! Video is ready in the Review Studio.")
 
         except Exception as e:
             err_msg = str(e)
-            log_error(f"Pipeline error: {err_msg}")
+            log_error(f"Pipeline error [{channel_context.name}]: {err_msg}")
             update_state(error=err_msg)
             # Mark running stages as error
             for s in state["stages"]:

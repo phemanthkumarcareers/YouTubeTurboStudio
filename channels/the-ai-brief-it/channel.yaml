@@ -1,0 +1,68 @@
+id: the-ai-brief-it
+name: The AI Brief It
+engine: media_video
+enabled: true
+audience:
+  type: science_enthusiasts
+  age_group: 16-55
+video:
+  default_format: normal
+  allow_short: true
+  allow_long: true
+  width: 1920
+  height: 1080
+  fps: 30
+  kb_zoom_start: 1.0
+  kb_zoom_end: 1.15
+  subtitles_enabled: false
+  render_preset: ultrafast
+credentials:
+  llm_provider: gemini
+  gemini_model: gemini-3.5-flash-lite
+  groq_model: openai/gpt-oss-120b
+  openai_model: gpt-4o-mini
+  video_source: pexels_images
+youtube:
+  channel_id: ''
+  oauth_profile: the-ai-brief-it
+  privacy: public
+  category_id: '28'
+  made_for_kids: false
+  auto_upload: false
+pipeline:
+  auto_topic: true
+  auto_publish: false
+  minimum_quality_score: 85
+prompts:
+  niche: Mind-bending science, deep cosmic mysteries, ancient paradoxes, existential
+    psychology, and theoretical physics.
+  description: 'Channel niche: Mind-bending science, deep cosmic mysteries, ancient
+    paradoxes, existential psychology, and theoretical physics.
+
+    Tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
+
+    Pacing: Engaging hook in the first 5 seconds, followed by escalating revelation
+    and a memorable conclusion.'
+  default_tags:
+  - science
+  - mystery
+  - space
+  - documentary
+  - physics
+  - universe
+  - philosophy
+  tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
+  pacing: Engaging hook in the first 5 seconds, followed by escalating revelation
+    and a memorable conclusion.
+  banned_topics:
+  - The Boltzmann Brain
+  - Simulation Theory
+  - Quantum Immortality
+voice:
+  tts_provider: edge-tts
+  voice_id: en-GB-SoniaNeural
+  voice_rate: +0%
+  voice_pitch: +0Hz
+  elevenlabs_voice_id: 21m00Tcm4TlvDq8ikWAM
+  music_enabled: true
+  music_volume: 0.2

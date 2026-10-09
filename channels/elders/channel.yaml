@@ -1,0 +1,64 @@
+id: elders
+name: Golden Stories & Wisdom
+engine: animation
+enabled: true
+
+audience:
+  type: mature_adults
+  age_group: "45-75"
+
+video:
+  default_format: normal
+  allow_short: true
+  allow_long: true
+  width: 1920
+  height: 1080
+  fps: 30
+  kb_zoom_start: 1.0
+  kb_zoom_end: 1.10
+  subtitles_enabled: true
+  render_preset: ultrafast
+
+credentials:
+  llm_provider: gemini
+  gemini_model: gemini-2.5-flash
+  groq_model: openai/gpt-oss-120b
+  openai_model: gpt-4o-mini
+  video_source: animation_engine
+
+voice:
+  tts_provider: edge-tts
+  voice_id: en-US-ChristopherNeural
+  voice_rate: "-3%"
+  voice_pitch: "-2Hz"
+  elevenlabs_voice_id: ""
+  music_enabled: true
+  music_volume: 0.12
+
+youtube:
+  channel_id: ""
+  oauth_profile: elders
+  privacy: private
+  category_id: "24"
+  made_for_kids: false
+  auto_upload: false
+
+pipeline:
+  auto_topic: true
+  auto_publish: false
+  minimum_quality_score: 88
+
+prompts:
+  niche: Heartfelt life lessons, generational stories, nostalgic reflections, and emotional family wisdom.
+  description: |-
+    Channel niche: Deep, heartwarming life stories, emotional moments, and philosophical reflections for older adults.
+    Tone: Calm, empathetic, nostalgic, dignified, and emotionally resonant.
+    Pacing: Unhurried, poetic, contemplative, with rich character moments and meaningful payoffs.
+  default_tags:
+    - life lessons
+    - wisdom
+    - nostalgic stories
+    - family
+    - inspiration
+    - golden years
+    - life stories

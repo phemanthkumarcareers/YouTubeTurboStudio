@@ -1,0 +1,60 @@
+# Channel Configuration Template
+# Duplicate this folder to channels/<channel_id>/ and rename to channel.yaml
+
+id: my-new-channel
+name: My New Channel
+engine: media_video  # "media_video" or "animation"
+enabled: true
+
+audience:
+  type: general
+  age_group: "18-45"
+
+video:
+  default_format: normal  # "normal" (16:9) or "shorts" (9:16)
+  allow_short: true
+  allow_long: true
+  width: 1920
+  height: 1080
+  fps: 30
+  kb_zoom_start: 1.0
+  kb_zoom_end: 1.15
+  subtitles_enabled: true
+  render_preset: ultrafast
+
+credentials:
+  llm_provider: gemini
+  gemini_model: gemini-2.5-flash
+  groq_model: openai/gpt-oss-120b
+  openai_model: gpt-4o-mini
+  video_source: pexels_images
+
+voice:
+  tts_provider: edge-tts
+  voice_id: en-US-ChristopherNeural
+  voice_rate: "+0%"
+  voice_pitch: "+0Hz"
+  elevenlabs_voice_id: ""
+  music_enabled: true
+  music_volume: 0.15
+
+youtube:
+  channel_id: ""  # Expected YouTube Channel ID (e.g. UCxxxxxxxx)
+  oauth_profile: my-new-channel
+  privacy: private
+  category_id: "28"
+  made_for_kids: false
+  auto_upload: false
+
+pipeline:
+  auto_topic: true
+  auto_publish: false
+  minimum_quality_score: 85
+
+prompts:
+  niche: Channel niche topic description.
+  description: |-
+    Channel overview, tone, pacing, and audience expectations.
+  default_tags:
+    - example_tag_1
+    - example_tag_2

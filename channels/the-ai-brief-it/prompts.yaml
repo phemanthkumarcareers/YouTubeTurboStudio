@@ -1,0 +1,19 @@
+niche: Mind-bending science, deep cosmic mysteries, ancient paradoxes, existential psychology, and theoretical physics.
+tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
+pacing: Engaging hook in the first 5 seconds, followed by escalating revelation and a memorable conclusion.
+description: |-
+  Channel niche: Mind-bending science, deep cosmic mysteries, ancient paradoxes, existential psychology, and theoretical physics.
+  Tone: Thoughtful, immersive, cinematic, provocative, authoritative yet accessible.
+  Pacing: Engaging hook in the first 5 seconds, followed by escalating revelation and a memorable conclusion.
+default_tags:
+  - science
+  - mystery
+  - space
+  - documentary
+  - physics
+  - universe
+  - philosophy
+banned_topics:
+  - The Boltzmann Brain
+  - Simulation Theory
+  - Quantum Immortality

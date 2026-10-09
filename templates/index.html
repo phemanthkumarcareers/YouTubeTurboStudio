@@ -20,6 +20,15 @@
       <div class="brand-title">YouTube <span>Turbo</span> Studio</div>
     </div>
     <div class="header-badges">
+      <!-- DYNAMIC CHANNEL SELECTOR -->
+      <div class="channel-selector-container">
+        <label for="active-channel-select" class="channel-selector-label">Channel:</label>
+        <select id="active-channel-select" class="form-select channel-select-dropdown">
+          <option value="the-ai-brief-it">The AI Brief It</option>
+        </select>
+        <span id="active-engine-badge" class="engine-badge engine-media">Media Video</span>
+      </div>
+
       <div id="yt-auth-badge" class="status-pill">
         <span class="status-dot dot-idle"></span> Checking YouTube Auth...
       </div>
@@ -92,8 +101,9 @@
           
           <!-- Col 1: Generation Configuration -->
           <div class="card">
-            <div class="card-header">
+            <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
               <div class="card-title">⚡ Video Generation Studio</div>
+              <div id="target-channel-pill" class="badge-channel">Channel: <span id="target-channel-name">The AI Brief It</span></div>
             </div>
 
             <div class="form-group">
@@ -324,8 +334,9 @@
 
             <!-- Publishing & YouTube Upload -->
             <div class="card">
-              <div class="card-header">
+              <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <div class="card-title">🚀 YouTube Upload & Schedule</div>
+                <div class="badge-channel">Target: <span id="review-target-channel-name">The AI Brief It</span></div>
               </div>
 
               <div class="grid-2">
