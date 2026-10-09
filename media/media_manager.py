@@ -90,26 +90,26 @@ def fetch_media_for_script(script: dict, video_type: str = "normal", source: Opt
 
         # 1. Try Pexels
         if not sec_paths and pexels_key:
-            if "video" in effective_source:
+            if "video" in effective_source or is_nano_selected:
                 urls = pexels_videos(query, pexels_key, orientation=orientation, count=target_count)
             else:
                 urls = pexels_photos(query, pexels_key, orientation=orientation, count=target_count)
 
             for i, u in enumerate(urls):
-                ext = ".mp4" if "video" in effective_source else ".jpg"
+                ext = ".mp4" if ("video" in effective_source or is_nano_selected) else ".jpg"
                 dest = str(img_dir / f"sec_{sec_id}_px_{i}{ext}")
                 if download_file(u, dest):
                     sec_paths.append(dest)
 
         # 2. Try Pixabay if Pexels returned nothing or if pixabay configured
         if not sec_paths and pixabay_key:
-            if "video" in effective_source:
+            if "video" in effective_source or is_nano_selected:
                 urls = search_pixabay_videos(query, pixabay_key, orientation=orientation, count=target_count)
             else:
                 urls = search_pixabay_photos(query, pixabay_key, orientation=orientation, count=target_count)
 
             for i, u in enumerate(urls):
-                ext = ".mp4" if "video" in effective_source else ".jpg"
+                ext = ".mp4" if ("video" in effective_source or is_nano_selected) else ".jpg"
                 dest = str(img_dir / f"sec_{sec_id}_pb_{i}{ext}")
                 if download_file(u, dest):
                     sec_paths.append(dest)
