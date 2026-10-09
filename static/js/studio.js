@@ -744,6 +744,18 @@ async function loadAllChannelSettings() {
             const provRadio = document.querySelector(`input[name="ai_provider_radio_${cid}"][value="${cfg.llm_provider || 'gemini'}"]`);
             if (provRadio) provRadio.checked = true;
 
+            // Publishing Defaults
+            const catVal = (cData.channel && cData.channel.youtube && cData.channel.youtube.category_id) || cfg.youtube_category_id || "28";
+            const privVal = (cData.channel && cData.channel.youtube && cData.channel.youtube.privacy) || cfg.youtube_privacy || "private";
+            setSelectVal(`yt-cat-${cid}`, catVal);
+            setSelectVal(`yt-priv-${cid}`, privVal);
+
+            // Sync with Review & Publish tab if this is current channel
+            if (cid === currentChannelId) {
+                setSelectVal("publish-category-select", catVal);
+                setSelectVal("publish-privacy-select", privVal);
+            }
+
             // YouTube Status
             const detailsEl = document.getElementById(`yt-details-${cid}`);
             const nameEl = document.getElementById(`yt-name-${cid}`);
@@ -843,6 +855,11 @@ async function saveChannelYtSettings(channelId) {
         const res = await resp.json();
         if (res.ok) {
             showToast(`YouTube settings saved for ${channelId}!`, "success");
+            await loadAllChannelSettings();
+            if (channelId === currentChannelId) {
+                setSelectVal("publish-category-select", cat || "28");
+                setSelectVal("publish-privacy-select", priv || "private");
+            }
         } else {
             showToast(`Failed saving YouTube settings: ${res.error}`, "error");
         }
