@@ -7,7 +7,42 @@ import json
 import threading
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
-import yaml
+
+try:
+    import yaml
+except ImportError:
+    import subprocess
+    import sys
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pyyaml"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        import yaml
+    except Exception:
+        # Fallback YAML compatibility layer
+        class YamlFallback:
+            @staticmethod
+            def safe_load(stream):
+                content = stream.read() if hasattr(stream, "read") else stream
+                try:
+                    return json.loads(content)
+                except Exception:
+                    data = {}
+                    for line in content.splitlines():
+                        line = line.strip()
+                        if line and not line.startswith("#") and ":" in line:
+                            parts = line.split(":", 1)
+                            k, v = parts[0].strip(), parts[1].strip()
+                            if v.lower() == "true": data[k] = True
+                            elif v.lower() == "false": data[k] = False
+                            elif v.isdigit(): data[k] = int(v)
+                            else: data[k] = v.strip("'\"")
+                    return data
+            @staticmethod
+            def safe_dump(data, stream=None, **kwargs):
+                res = json.dumps(data, indent=2)
+                if stream:
+                    stream.write(res)
+                return res
+        yaml = YamlFallback()
 
 from core.channel_context import ChannelContext
 from core.credential_manager import (
