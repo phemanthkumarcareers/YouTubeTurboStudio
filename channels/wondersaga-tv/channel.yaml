@@ -36,46 +36,46 @@ pipeline:
   auto_publish: false
   minimum_quality_score: 88
 prompts:
-  niche: Fascinating myths, legendary tales, mysterious events, unexplained phenomena, amazing discoveries, incredible facts, and inspiring stories from around the world.
-  description: |-
-    Welcome to Wonder Saga TV — where imagination meets discovery!
-
-    Explore fascinating myths, legendary tales, mysterious events, unexplained phenomena, amazing discoveries, incredible facts, and inspiring stories from around the world.
-
-    From ancient civilizations and forgotten secrets to mind-blowing discoveries and powerful life lessons, every video takes you on a journey beyond the ordinary.
-
-    ✨ New wonders. Incredible stories. Endless curiosity.
-
-    **Wonder Saga TV — Every Story Holds a Wonder.**
+  niche: Fascinating myths, legendary tales, mysterious events, unexplained phenomena,
+    amazing discoveries, incredible facts, and inspiring stories from around the world.
+  description: "Welcome to Wonder Saga TV \u2014 where imagination meets discovery!\n\
+    \nExplore fascinating myths, legendary tales, mysterious events, unexplained phenomena,\
+    \ amazing discoveries, incredible facts, and inspiring stories from around the\
+    \ world.\n\nFrom ancient civilizations and forgotten secrets to mind-blowing discoveries\
+    \ and powerful life lessons, every video takes you on a journey beyond the ordinary.\n\
+    \n\u2728 New wonders. Incredible stories. Endless curiosity.\n\n**Wonder Saga\
+    \ TV \u2014 Every Story Holds a Wonder.**"
   focus_angles:
-    - Fascinating Myths & Legendary Tales
-    - Mysterious Events & Unexplained Phenomena
-    - Ancient Civilizations & Forgotten Secrets
-    - Mind-Blowing Archaeological Discoveries
-    - Inspiring True Stories & Life Lessons
-    - World Folklore, Epics & Lost Kingdoms
-    - Wonders of Ancient Architecture
-    - Extraordinary Natural Phenomena & Enigmas
+  - Fascinating Myths & Legendary Tales
+  - Mysterious Events & Unexplained Phenomena
+  - Ancient Civilizations & Forgotten Secrets
+  - Mind-Blowing Archaeological Discoveries
+  - Inspiring True Stories & Life Lessons
+  - World Folklore, Epics & Lost Kingdoms
+  - Wonders of Ancient Architecture
+  - Extraordinary Natural Phenomena & Enigmas
   default_tags:
-    - myths and legends
-    - ancient mysteries
-    - discoveries
-    - inspiring stories
-    - wonder saga
-    - forgotten history
-    - unexplained phenomena
-    - world folklore
+  - myths and legends
+  - ancient mysteries
+  - discoveries
+  - inspiring stories
+  - wonder saga
+  - forgotten history
+  - unexplained phenomena
+  - world folklore
   tone: Epic, immersive, wonder-filled, thoughtful, dignified, and emotionally resonant.
-  pacing: Cinematic, captivating opening hook, rich narrative progression, and inspiring conclusion.
+  pacing: Cinematic, captivating opening hook, rich narrative progression, inspiring
+    conclusion, ending with "Please like, share, subscribe, and follow me".
   banned_topics:
-    - cynicism
-    - trivial clickbait
-    - hyperactive memes
+  - cynicism
+  - trivial clickbait
+  - hyperactive memes
+  call_to_action: Please like, share, subscribe, and follow me for more wonder stories!
 voice:
   tts_provider: openai-tts
-  voice_id: en-US-ChristopherNeural
+  voice_id: en-GB-SoniaNeural
   voice_rate: -3%
   voice_pitch: -2Hz
   elevenlabs_voice_id: ''
   music_enabled: true
-  music_volume: 0.12
+  music_volume: 0.2

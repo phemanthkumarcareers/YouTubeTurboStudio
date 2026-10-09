@@ -57,12 +57,13 @@ def mix_voice_and_bgm(voice_path: str, output_path: str = None) -> str:
 
         # Audio ducking: ensure background music is balanced and never overpowers narration
         effective_bgm_vol = min(0.18, max(0.04, bgm_volume * 0.70))
-        bgm_clip = bgm_clip.volumex(effective_bgm_vol)
+        # Ensure BGM is precisely trimmed to voice narration duration
+        bgm_clip = bgm_clip.subclip(0, target_duration).volumex(effective_bgm_vol)
         boosted_voice = voice_clip.volumex(1.15)
         if target_duration > 3.0:
             bgm_clip = bgm_clip.audio_fadein(1.2).audio_fadeout(2.0)
 
-        composite = CompositeAudioClip([bgm_clip, boosted_voice])
+        composite = CompositeAudioClip([bgm_clip, boosted_voice]).set_duration(target_duration)
         # MoviePy 1.0.3 fix: CompositeAudioClip doesn't inherit fps — set it explicitly
         composite.fps = getattr(voice_clip, "fps", None) or getattr(bgm_clip, "fps", None) or 44100
         composite.write_audiofile(output_path, fps=composite.fps, logger=None)

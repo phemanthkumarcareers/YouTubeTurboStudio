@@ -230,6 +230,12 @@ def render_video(script: dict, media_map: dict[int, list[str]], audio_path: str,
     audio_clip = AudioFileClip(audio_path)
     total_duration = audio_clip.duration
 
+    # YouTube Shorts strict duration limit: Maximum 60 seconds (clamp to 58.5s for safety)
+    if is_shorts and total_duration > 59.0:
+        log_warn(f"Audio duration ({total_duration:.1f}s) exceeds YouTube Shorts 60s limit. Trimming to 58.5s.")
+        audio_clip = audio_clip.subclip(0, 58.5)
+        total_duration = 58.5
+
     cues = _parse_srt(srt_path) if show_subtitles else []
     sections = script.get("sections", [])
     if not sections:
@@ -310,8 +316,10 @@ def render_video(script: dict, media_map: dict[int, list[str]], audio_path: str,
         fps=FPS,
         codec="libx264",
         audio_codec="aac",
+        bitrate="5000k" if is_shorts else "8000k",
         preset=preset,
         threads=cpu_threads,
+        ffmpeg_params=["-tune", "fastdecode"],
         logger=None
     )
 
