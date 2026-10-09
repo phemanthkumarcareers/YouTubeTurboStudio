@@ -122,8 +122,8 @@ class EldersStoryGenerator:
                 {
                     "scene_id": 3,
                     "title": "Evening Benediction",
-                    "narration": "Trust where you are on your journey today. May your evening be filled with peace, gratitude, and a restful heart.",
-                    "duration": 6.0,
+                    "narration": "Trust where you are on your journey today. May your evening be filled with peace, gratitude, and a restful heart. Please like, share, subscribe, and follow me for more wonder stories!",
+                    "duration": 6.5,
                     "bg_style": "cozy_study",
                     "character": character,
                     "prop": "reading_glasses"

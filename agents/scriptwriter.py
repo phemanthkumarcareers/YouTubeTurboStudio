@@ -63,6 +63,9 @@ Requirements:
    - "narration": Exact spoken voiceover words. Cinematic, natural speech cadence. No markdown formatting or sound effect cues.
    - "visual_query": 2 to 4 English keywords best suited for searching stock videos/photos on Pexels/Pixabay (e.g. "deep space galaxy", "cyberpunk neural network", "ancient ruins desert", "ocean storm lightning").
 
+5. MANDATORY CALL TO ACTION: In the final section's narration, the voiceover MUST explicitly state: "Please like, share, subscribe, and follow me for more amazing videos!"
+6. In the description, also include: "Please like, share, subscribe, and follow me for more videos!"
+
 Output strictly valid JSON with this structure:
 {{
   "title": "Title here",
@@ -83,5 +86,19 @@ Do NOT output any markdown backticks, explanations, or commentary. Only the raw 
     raw_resp = generate(prompt, json_mode=True)
     script_data = clean_json_response(raw_resp)
     script_data["video_type"] = video_type
+
+    # Guarantee mandatory CTA across all generated scripts
+    cta_phrase = "Please like, share, subscribe, and follow me"
+    sections = script_data.get("sections", [])
+    if sections:
+        last_sec = sections[-1]
+        last_narr = last_sec.get("narration", "")
+        if "like" not in last_narr.lower() or "subscribe" not in last_narr.lower():
+            last_sec["narration"] = (last_narr.rstrip(".!? ") + f". {cta_phrase} for more!").strip()
+
+    desc = script_data.get("description", "")
+    if "subscribe" not in desc.lower():
+        script_data["description"] = (desc + f"\n\n👉 {cta_phrase}!").strip()
+
     log_success(f"Script created with {len(script_data.get('sections', []))} sections: '{script_data.get('title')}'")
     return script_data

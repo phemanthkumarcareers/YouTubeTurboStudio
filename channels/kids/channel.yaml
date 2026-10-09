@@ -65,14 +65,15 @@ prompts:
   - numbers
   - kids songs
   tone: Joyful, encouraging, musical, gentle, and highly visual.
-  pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive
-    emotional reinforcement.
+  pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, positive emotional
+    reinforcement, ending with "Please like, share, subscribe, and follow me".
   banned_topics:
   - scary monsters
   - violence
   - horror
   - dangerous stunts
   - adult themes
+  call_to_action: Please like, share, subscribe, and follow me for more fun learning!
 voice:
   tts_provider: edge-tts
   voice_id: en-US-JennyNeural

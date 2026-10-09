@@ -67,12 +67,13 @@ prompts:
   - discovery
   - documentary
   tone: Engaging, fast-paced, insightful, provocative, and inspiring.
-  pacing: Irresistible hook in the first 3 seconds, dynamic pacing, and memorable
-    climax.
+  pacing: Irresistible hook in the first 3 seconds, dynamic pacing, memorable climax,
+    ending with "Please like, share, subscribe, and follow me".
   banned_topics:
   - The Boltzmann Brain
   - Simulation Theory
   - Quantum Immortality
+  call_to_action: Please like, share, subscribe, and follow me for more videos!
 voice:
   tts_provider: edge-tts
   voice_id: en-GB-SoniaNeural
