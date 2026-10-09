@@ -17,14 +17,24 @@ import tempfile
 import unittest
 from PIL import Image
 
-from elders.profiles import (
-    ELDERS_CATEGORIES,
-    ELDERS_VOICES,
-    get_elders_pacing_profile
-)
-from elders.characters import elders_characters
-from elders.story_generator import elders_story_generator
-from elders.qc import elders_qc
+try:
+    from wondersaga_tv.profiles import (
+        ELDERS_CATEGORIES,
+        ELDERS_VOICES,
+        get_elders_pacing_profile
+    )
+    from wondersaga_tv.characters import elders_characters
+    from wondersaga_tv.story_generator import elders_story_generator
+    from wondersaga_tv.qc import elders_qc
+except ImportError:
+    from elders.profiles import (
+        ELDERS_CATEGORIES,
+        ELDERS_VOICES,
+        get_elders_pacing_profile
+    )
+    from elders.characters import elders_characters
+    from elders.story_generator import elders_story_generator
+    from elders.qc import elders_qc
 from animation.schema import SceneGraph, Scene, CharacterPlacement, PropPlacement, CameraMove
 from animation.character_manager import character_manager
 from animation.props import props_manager

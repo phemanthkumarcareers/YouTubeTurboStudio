@@ -5,7 +5,7 @@ covering life lessons, nostalgic recollections, and generational wisdom.
 Supports both Long-form (16:9) and Shorts (9:16).
 """
 from typing import Dict, Any, Optional
-from elders.profiles import get_elders_pacing_profile
+from wondersaga_tv.profiles import get_elders_pacing_profile
 
 
 class EldersStoryGenerator:

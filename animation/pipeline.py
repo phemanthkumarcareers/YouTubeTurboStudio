@@ -124,8 +124,11 @@ def execute_animation_pipeline(
                                 }
                             ]
                         }
-                    elif channel_context.channel_id == "elders" or "elder" in channel_context.channel_id:
-                        from elders.story_generator import elders_story_generator
+                    elif channel_context.channel_id in ("wondersaga-tv", "elders") or "wondersaga" in channel_context.channel_id or "elder" in channel_context.channel_id:
+                        try:
+                            from wondersaga_tv.story_generator import elders_story_generator
+                        except ImportError:
+                            from elders.story_generator import elders_story_generator
                         script_data = elders_story_generator.generate_story(
                             topic=current_topic,
                             format_type=video_type
@@ -218,8 +221,11 @@ def execute_animation_pipeline(
                         script_data=script_data,
                         channel_metadata={"youtube": channel_context.youtube}
                     )
-                elif channel_context.channel_id == "elders" or "elder" in channel_context.channel_id:
-                    from elders.qc import elders_qc
+                elif channel_context.channel_id in ("wondersaga-tv", "elders") or "wondersaga" in channel_context.channel_id or "elder" in channel_context.channel_id:
+                    try:
+                        from wondersaga_tv.qc import elders_qc
+                    except ImportError:
+                        from elders.qc import elders_qc
                     qc_report = elders_qc.evaluate(
                         scene_graph=scene_graph,
                         video_path=final_mp4_path,

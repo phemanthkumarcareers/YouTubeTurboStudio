@@ -55,8 +55,11 @@ class CharacterManager:
                 walk_cycle=walk_cycle
             )
         else:
-            from elders.characters import elders_characters
-            char_key = style if style not in ("elders", "adult") else character_id
+            try:
+                from wondersaga_tv.characters import elders_characters
+            except ImportError:
+                from elders.characters import elders_characters
+            char_key = style if style not in ("wondersaga_tv", "elders", "adult") else character_id
             elders_characters.render_character(
                 character_id=char_key,
                 cx=cx,
