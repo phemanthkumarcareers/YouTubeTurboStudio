@@ -124,30 +124,22 @@ def execute_animation_pipeline(
                                 }
                             ]
                         }
+                    elif channel_context.channel_id == "elders" or "elder" in channel_context.channel_id:
+                        from elders.story_generator import elders_story_generator
+                        script_data = elders_story_generator.generate_story(
+                            topic=current_topic,
+                            format_type=video_type
+                        )
                     else:
                         script_data = {
                             "title": current_topic,
                             "scenes": [
                                 {
                                     "scene_id": 1,
-                                    "title": "Warm Welcome",
-                                    "narration": f"Welcome back. Today let us sit together and reflect upon {current_topic}.",
-                                    "duration": 5.5,
+                                    "title": "Scene 1",
+                                    "narration": f"Exploring {current_topic}.",
+                                    "duration": 5.0,
                                     "bg_style": "cozy_study"
-                                },
-                                {
-                                    "scene_id": 2,
-                                    "title": "Cherished Wisdom",
-                                    "narration": "In an ever-rushing world, the gentlest moments often leave the deepest warmth in our hearts.",
-                                    "duration": 6.0,
-                                    "bg_style": "sunset_porch"
-                                },
-                                {
-                                    "scene_id": 3,
-                                    "title": "Parting Reflection",
-                                    "narration": "May today bring you quiet peace, a warm cup of tea, and gratitude for the journey.",
-                                    "duration": 5.5,
-                                    "bg_style": "warm_hearth"
                                 }
                             ]
                         }
@@ -225,6 +217,13 @@ def execute_animation_pipeline(
                         video_path=final_mp4_path,
                         script_data=script_data,
                         channel_metadata={"youtube": channel_context.youtube}
+                    )
+                elif channel_context.channel_id == "elders" or "elder" in channel_context.channel_id:
+                    from elders.qc import elders_qc
+                    qc_report = elders_qc.evaluate(
+                        scene_graph=scene_graph,
+                        video_path=final_mp4_path,
+                        script_data=script_data
                     )
                 else:
                     qc_report = animation_qc.evaluate(

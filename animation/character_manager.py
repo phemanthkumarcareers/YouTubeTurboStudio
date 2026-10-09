@@ -55,8 +55,20 @@ class CharacterManager:
                 walk_cycle=walk_cycle
             )
         else:
-            self._render_elders_character(
-                draw, cx, cy, w, h, mouth_open_pct, eye_blink_pct, gesture, motion, walk_cycle
+            from elders.characters import elders_characters
+            char_key = style if style not in ("elders", "adult") else character_id
+            elders_characters.render_character(
+                character_id=char_key,
+                cx=cx,
+                cy=cy,
+                w=w,
+                h=h,
+                draw=draw,
+                mouth_open=mouth_open_pct,
+                blink=eye_blink_pct,
+                gesture=gesture,
+                motion=motion,
+                walk_cycle=walk_cycle
             )
 
         # Apply head tilt if needed

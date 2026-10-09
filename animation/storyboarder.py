@@ -143,11 +143,15 @@ class Storyboarder:
                 gesture = "wave" if i == 0 else ("hold_prop" if i == 1 else "point")
                 cam_type = "slow_zoom_in" if i % 2 == 0 else "static"
 
+                char_id = sc.get("character") or "arthur_storyteller"
+                char_style = sc.get("style", "elders")
+                char_name = "Grandma Eleanor" if "eleanor" in char_id else ("Uncle Walter" if "walter" in char_id else "Grandpa Arthur")
+
                 chars = [
                     CharacterPlacement(
-                        character_id="arthur_storyteller",
-                        name="Grandpa Arthur",
-                        style="elders",
+                        character_id=char_id,
+                        name=char_name,
+                        style=char_style,
                         x_percent=0.50 if is_shorts else 0.45,
                         y_percent=0.62 if is_shorts else 0.58,
                         scale=1.1 if is_shorts else 1.25,
@@ -158,7 +162,7 @@ class Storyboarder:
                 ]
 
                 # Props
-                prop_type = elders_props[i % len(elders_props)]
+                prop_type = sc.get("prop") or elders_props[i % len(elders_props)]
                 prop_action = "held" if gesture == "hold_prop" else "static"
                 props = [
                     PropPlacement(
