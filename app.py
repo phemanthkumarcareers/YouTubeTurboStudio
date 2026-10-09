@@ -545,6 +545,155 @@ def api_youtube_upload():
     return jsonify({"ok": True, "message": f"Upload commenced for {chan_ctx.name} in background."})
 
 
+# ── PHASE 6: AUTOMATION, SCHEDULING & ANALYTICS ROUTES ─────────────────────
+
+@app.route("/api/jobs", methods=["GET", "POST"])
+def api_jobs():
+    from automation.job_queue import job_queue
+    if request.method == "POST":
+        body = request.get_json(force=True) or {}
+        cid = body.get("channel_id") or registry.get_active_channel().channel_id
+        topic = body.get("topic", "")
+        vtype = body.get("video_type", "shorts")
+        if not topic:
+            return jsonify({"ok": False, "error": "Topic is required to enqueue a job."}), 400
+        job = job_queue.enqueue(channel_id=cid, topic=topic, video_type=vtype, metadata=body.get("metadata", {}))
+        return jsonify({"ok": True, "job": job.to_dict()})
+
+    cid = request.args.get("channel_id")
+    status = request.args.get("status")
+    limit = int(request.args.get("limit", 50))
+    jobs = job_queue.list_jobs(channel_id=cid, status=status, limit=limit)
+    return jsonify({"ok": True, "jobs": [j.to_dict() for j in jobs]})
+
+
+@app.route("/api/jobs/<job_id>", methods=["GET"])
+def api_get_job(job_id):
+    from automation.job_queue import job_queue
+    job = job_queue.get_job(job_id)
+    if not job:
+        return jsonify({"ok": False, "error": "Job not found."}), 404
+    return jsonify({"ok": True, "job": job.to_dict()})
+
+
+@app.route("/api/jobs/<job_id>/retry", methods=["POST"])
+def api_retry_job(job_id):
+    from automation.job_queue import job_queue
+    job = job_queue.retry_job(job_id)
+    if not job:
+        return jsonify({"ok": False, "error": "Job not found."}), 404
+    return jsonify({"ok": True, "job": job.to_dict()})
+
+
+@app.route("/api/jobs/<job_id>/cancel", methods=["POST"])
+def api_cancel_job(job_id):
+    from automation.job_queue import job_queue
+    ok = job_queue.cancel_job(job_id)
+    return jsonify({"ok": ok})
+
+
+@app.route("/api/review-queue", methods=["GET"])
+def api_review_queue():
+    from automation.review_queue import review_queue
+    cid = request.args.get("channel_id")
+    pending = review_queue.list_pending(channel_id=cid)
+    return jsonify({"ok": True, "review_queue": pending})
+
+
+@app.route("/api/review-queue/<job_id>/approve", methods=["POST"])
+def api_review_approve(job_id):
+    from automation.review_queue import review_queue
+    body = request.get_json(force=True) or {}
+    notes = body.get("notes", "")
+    ok = review_queue.approve(job_id, notes=notes)
+    return jsonify({"ok": ok})
+
+
+@app.route("/api/review-queue/<job_id>/reject", methods=["POST"])
+def api_review_reject(job_id):
+    from automation.review_queue import review_queue
+    body = request.get_json(force=True) or {}
+    notes = body.get("notes", "")
+    ok = review_queue.reject(job_id, notes=notes)
+    return jsonify({"ok": ok})
+
+
+@app.route("/api/schedules", methods=["GET", "POST"])
+def api_schedules():
+    from automation.scheduler import auto_scheduler
+    if request.method == "POST":
+        body = request.get_json(force=True) or {}
+        cid = body.get("channel_id") or registry.get_active_channel().channel_id
+        enabled = bool(body.get("enabled", True))
+        interval = float(body.get("interval_hours", 24.0))
+        cron_expr = body.get("cron_expression", "0 10 * * *")
+        vtype = body.get("video_type", "shorts")
+        sched = auto_scheduler.configure_schedule(
+            channel_id=cid, enabled=enabled, interval_hours=interval,
+            cron_expression=cron_expr, video_type=vtype
+        )
+        return jsonify({"ok": True, "schedule": sched})
+
+    cid = request.args.get("channel_id")
+    if cid:
+        sched = auto_scheduler.get_schedule(cid)
+        return jsonify({"ok": True, "schedule": sched})
+    schedules = auto_scheduler.list_schedules()
+    return jsonify({"ok": True, "schedules": schedules})
+
+
+@app.route("/api/schedules/trigger", methods=["POST"])
+def api_schedules_trigger():
+    from automation.scheduler import auto_scheduler
+    body = request.get_json(force=True) or {}
+    cid = body.get("channel_id") or registry.get_active_channel().channel_id
+    job = auto_scheduler.trigger_scheduled_run(cid)
+    return jsonify({"ok": True, "job": job.to_dict()})
+
+
+@app.route("/api/analytics", methods=["GET", "POST"])
+def api_analytics():
+    from automation.analytics import analytics_manager
+    if request.method == "POST":
+        body = request.get_json(force=True) or {}
+        rowid = analytics_manager.ingest_metrics(
+            channel_id=body.get("channel_id"),
+            video_id=body.get("video_id"),
+            title=body.get("title", ""),
+            format_type=body.get("format", "shorts"),
+            views=int(body.get("views", 0)),
+            likes=int(body.get("likes", 0)),
+            comments=int(body.get("comments", 0)),
+            watch_time_hours=float(body.get("watch_time_hours", 0.0)),
+            avg_view_duration_sec=float(body.get("avg_view_duration_sec", 0.0)),
+            avg_view_pct=float(body.get("avg_view_pct", 0.0)),
+            subscribers_gained=int(body.get("subscribers_gained", 0))
+        )
+        return jsonify({"ok": True, "id": rowid})
+
+    cid = request.args.get("channel_id") or registry.get_active_channel().channel_id
+    summary = analytics_manager.get_channel_summary(cid)
+    metrics = analytics_manager.get_channel_metrics(cid, limit=25)
+    return jsonify({"ok": True, "summary": summary, "metrics": metrics})
+
+
+@app.route("/api/dashboard", methods=["GET"])
+def api_dashboard():
+    from automation.dashboard import dashboard_service
+    cid = request.args.get("channel_id") or registry.get_active_channel().channel_id
+    data = dashboard_service.get_channel_dashboard(cid)
+    return jsonify({"ok": True, "dashboard": data})
+
+
+@app.route("/api/learning-loop", methods=["GET"])
+def api_learning_loop():
+    from automation.learning_loop import learning_loop
+    cid = request.args.get("channel_id") or registry.get_active_channel().channel_id
+    strategy = learning_loop.get_strategy_recommendation(cid)
+    return jsonify({"ok": True, "strategy": strategy})
+
+
+
 
 # ── ENTRY POINT ─────────────────────────────────────────────────────────────
 
