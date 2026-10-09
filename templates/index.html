@@ -116,13 +116,13 @@
                   <input type="radio" name="content_mode" value="long" checked id="mode-long">
                   <span><strong>Long Video</strong> (16:9 Standard, eligible parent)</span>
                 </label>
+                <label id="lbl-mode-shorts-linked" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="content_mode" value="shorts_linked" id="mode-shorts-linked">
+                  <span><strong>Shorts - Link Long Video</strong> (9:16 Associated with active channel Long video)</span>
+                </label>
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                   <input type="radio" name="content_mode" value="shorts" id="mode-shorts">
                   <span><strong>Shorts</strong> (9:16 Standalone, no parent link)</span>
-                </label>
-                <label id="lbl-mode-shorts-linked" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="radio" name="content_mode" value="shorts_linked" id="mode-shorts-linked">
-                  <span><strong>Shorts - Link Long Video</strong> (Associated with active channel Long video)</span>
                 </label>
               </div>
               <div id="shorts-linked-locked-msg" class="badge-warning" style="display:none; margin-top:8px; font-size:12px; padding:6px 10px; border-radius:4px; background:rgba(234,179,8,0.15); color:#eab308; border:1px solid rgba(234,179,8,0.3);">
@@ -177,7 +177,6 @@
               <label class="form-label">Custom Topic (Optional)</label>
               <input type="text" id="gen-topic-input" class="form-input" placeholder="e.g. What if Earth had two moons? Or leave blank for AI viral research...">
               <div class="form-help">If empty, AI Research Agent discovers a high-retention trending concept in your niche.</div>
-              <div id="suggested-topics-container" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;"></div>
             </div>
 
             <div class="form-group">

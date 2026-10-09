@@ -121,36 +121,7 @@ function updateChannelGenerationOptions(channelId) {
         topicInput.placeholder = meta.topicPlaceholder;
     }
 
-    // Render suggested topic clickable pills
-    const topicsBox = document.getElementById("suggested-topics-container");
-    if (topicsBox && meta.suggestedTopics) {
-        topicsBox.innerHTML = "";
-        const label = document.createElement("span");
-        label.style.fontSize = "11.5px";
-        label.style.color = "var(--text-muted)";
-        label.style.width = "100%";
-        label.style.marginBottom = "2px";
-        label.textContent = `💡 Suggested ${meta.name} Topics (Click to fill):`;
-        topicsBox.appendChild(label);
-
-        meta.suggestedTopics.forEach(top => {
-            const pill = document.createElement("button");
-            pill.type = "button";
-            pill.className = "btn btn-secondary";
-            pill.style.fontSize = "11px";
-            pill.style.padding = "3px 8px";
-            pill.style.borderRadius = "12px";
-            pill.style.cursor = "pointer";
-            pill.textContent = top;
-            pill.addEventListener("click", () => {
-                if (topicInput) {
-                    topicInput.value = top;
-                    showToast(`Topic selected: "${top}"`, "info");
-                }
-            });
-            topicsBox.appendChild(pill);
-        });
-    }
+    // (Suggested topic pills section removed)
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
