@@ -306,7 +306,19 @@ async function switchChannel(channelId) {
 async function loadSettings() {
     try {
         const resp = await fetch("/api/settings");
+        if (!resp.ok) {
+            const errText = await resp.text();
+            let errMsg = `Server error (${resp.status})`;
+            try {
+                const parsed = JSON.parse(errText);
+                if (parsed.error) errMsg = parsed.error;
+            } catch (_) {}
+            throw new Error(errMsg);
+        }
         const data = await resp.json();
+        if (!data || !data.config) {
+            throw new Error("Invalid configuration received from server");
+        }
         currentConfig = data.config;
 
         // Populate API Keys

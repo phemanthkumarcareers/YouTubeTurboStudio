@@ -99,7 +99,7 @@ class ChannelContext:
         yt = self.youtube
         voi = self.voice
         prm = self.prompts
-        crd_meta = self.credentials
+        cred_meta = self.credentials
 
         return {
             "channel_id": self.channel_id,
@@ -117,7 +117,7 @@ class ChannelContext:
             # Stock media
             "pexels_api_key": creds.get("pexels_api_key", ""),
             "pixabay_api_key": creds.get("pixabay_api_key", ""),
-            "video_source": crd_meta.get("video_source", "pexels_images"),
+            "video_source": cred_meta.get("video_source", "pexels_images"),
             # Voice & Audio
             "tts_provider": voi.get("tts_provider", "edge-tts"),
             "voice_id": voi.get("voice_id", "en-US-ChristopherNeural"),

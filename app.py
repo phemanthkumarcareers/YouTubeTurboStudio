@@ -363,24 +363,29 @@ def api_regenerate_thumbnail():
 
 @app.route("/api/settings", methods=["GET"])
 def api_get_settings():
-    chan = registry.get_active_channel()
-    creds = load_channel_credentials(chan.channel_id)
-    cfg = chan.to_pipeline_config(creds)
-    # Merge with base config for backwards compatibility
-    global_cfg = load_config()
-    for k, v in global_cfg.items():
-        if k not in cfg or cfg[k] is None or cfg[k] == "":
-            cfg[k] = v
+    try:
+        chan = registry.get_active_channel()
+        creds = load_channel_credentials(chan.channel_id)
+        cfg = chan.to_pipeline_config(creds)
+        # Merge with base config for backwards compatibility
+        global_cfg = load_config()
+        for k, v in global_cfg.items():
+            if k not in cfg or cfg[k] is None or cfg[k] == "":
+                cfg[k] = v
 
-    banned = chan.prompts.get("banned_topics") or load_banned_topics()
-    return jsonify({
-        "config": cfg,
-        "active_channel": chan.to_dict(),
-        "masked_credentials": get_masked_channel_credentials(chan.channel_id),
-        "voices": POPULAR_VOICES,
-        "categories": YOUTUBE_CATEGORIES,
-        "banned_topics": banned
-    })
+        banned = chan.prompts.get("banned_topics") or load_banned_topics()
+        return jsonify({
+            "ok": True,
+            "config": cfg,
+            "active_channel": chan.to_dict(),
+            "masked_credentials": get_masked_channel_credentials(chan.channel_id),
+            "voices": POPULAR_VOICES,
+            "categories": YOUTUBE_CATEGORIES,
+            "banned_topics": banned
+        })
+    except Exception as e:
+        log_error(f"Error loading settings: {e}")
+        return jsonify({"ok": False, "error": str(e)}), 500
 
 
 @app.route("/api/settings/save", methods=["POST"])
