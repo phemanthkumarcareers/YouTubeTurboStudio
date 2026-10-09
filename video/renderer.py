@@ -161,23 +161,13 @@ def _draw_subtitles_and_overlay(frame_img: Image.Image, subtitle: str, W: int, H
 
         line_h = font_size + 14
         total_h = len(lines) * line_h
-        y_pos = int(H * 0.72) if is_shorts else (H - total_h - 75)
+        # Safe margin from YouTube UI (bottom 32% for Shorts, bottom 15% for normal)
+        y_pos = int(H * 0.68) if is_shorts else (H - total_h - 85)
 
-        # High-contrast vibrant colors for modern engaging dynamic subtitles
-        palette = [
-            (253, 224, 71),   # Electric Yellow
-            (56, 189, 248),   # Cyber Cyan / Sky Blue
-            (74, 222, 128),   # Neon Lime Green
-            (244, 114, 182),  # Hot Pink / Magenta
-            (251, 146, 60),   # Radiant Sunset Orange
-            (192, 132, 252),  # Vivid Violet / Purple
-            (255, 255, 255),  # Pure Crisp White
-            (254, 240, 138),  # Warm Gold
-            (147, 197, 253),  # Ice Blue
-            (253, 164, 175)   # Bright Coral
-        ]
-        # Hash text so the color is consistently vibrant for the phrase without frame-by-frame flickering
-        base_color_idx = abs(hash(subtitle)) % len(palette)
+        # Professional captions styling: Crisp White with controlled Amber Gold accent
+        # Strictly compliant with MASTER_ARCHITECTURE.md Section 20 (no rainbow colors!)
+        PRIMARY_COLOR = (255, 255, 255)     # Crisp White (#FFFFFF)
+        ACCENT_COLOR = (251, 191, 36)       # Amber Gold (#FBBF24)
 
         for l_idx, line_str in enumerate(lines):
             l_bbox = draw.textbbox((0, 0), line_str, font=sub_font)
@@ -185,8 +175,9 @@ def _draw_subtitles_and_overlay(frame_img: Image.Image, subtitle: str, W: int, H
             x_pos = (W - l_w) // 2
             cur_y = y_pos + (l_idx * line_h)
 
-            fill_color = palette[(base_color_idx + l_idx) % len(palette)]
-            # Fast compiled stroke in C for ultra-sharp outline
+            # Accent color on final punchline line, crisp white on all others
+            fill_color = ACCENT_COLOR if (l_idx == len(lines) - 1 and len(lines) > 1) else PRIMARY_COLOR
+            # High-contrast 4px black outline stroke for maximum readability
             draw.text((x_pos, cur_y), line_str, font=sub_font, fill=fill_color, stroke_width=4, stroke_fill=(0, 0, 0))
 
     return np.array(frame_img.convert("RGB"))
@@ -257,6 +248,34 @@ def render_video(script: dict, media_map: dict[int, list[str]], audio_path: str,
         paths = media_map.get(sec_id, [])
 
         img_path = paths[0] if paths else None
+        is_video_asset = bool(img_path and img_path.lower().endswith(".mp4") and os.path.exists(img_path))
+        if is_video_asset:
+            try:
+                v_clip = VideoFileClip(img_path)
+                v_w, v_h = v_clip.size
+                if v_w / v_h > W / H:
+                    v_clip = v_clip.resize(height=H)
+                else:
+                    v_clip = v_clip.resize(width=W)
+                v_clip = v_clip.crop(x_center=v_clip.w / 2, y_center=v_clip.h / 2, width=W, height=H)
+                if v_clip.duration < sec_dur:
+                    from moviepy.editor import vfx
+                    v_clip = v_clip.fx(vfx.loop, duration=sec_dur)
+                else:
+                    v_clip = v_clip.subclip(0, sec_dur)
+
+                def make_vid_frame(get_frame, t, start_t=sec_start_t, title=sec_title, show_sub=show_subtitles):
+                    base_f = Image.fromarray(get_frame(t))
+                    global_t = start_t + t
+                    sub_text = _find_cue_at_time(cues, global_t) if show_sub else ""
+                    return _draw_subtitles_and_overlay(base_f, sub_text, W, H, is_shorts, title, show_subtitles=show_sub)
+
+                clip = v_clip.fl(make_vid_frame)
+                clips.append(clip)
+                continue
+            except Exception as vid_err:
+                log_warn(f"Failed to load video file {img_path}: {vid_err}. Using image fallback.")
+
         if img_path and os.path.exists(img_path) and not img_path.lower().endswith(".mp4"):
             raw_img = Image.open(img_path).convert("RGB")
         else:

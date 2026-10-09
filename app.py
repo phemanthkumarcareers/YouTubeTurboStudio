@@ -245,8 +245,33 @@ def api_get_script():
     return jsonify({
         "script": script,
         "description": st.get("description") or (script.get("description") if script else ""),
-        "tags": st.get("tags") or (script.get("tags") if script else [])
+        "tags": st.get("tags") or (script.get("tags") if script else []),
+        "hook_tournament": st.get("hook_data"),
+        "critique": st.get("critique_data"),
+        "fact_check": st.get("fact_check_data")
     })
+
+
+@app.route("/api/qc/report", methods=["GET"])
+def api_get_qc_report():
+    st = get_state()
+    qc = st.get("qc_report")
+    if not qc:
+        p = OUTPUT_DIR / "qc_report.json"
+        if p.exists():
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    qc = json.load(f)
+            except Exception:
+                pass
+    if not qc:
+        qc = {
+            "score": 0,
+            "status": "Pending",
+            "passed": False,
+            "details": ["No video evaluated yet."]
+        }
+    return jsonify({"ok": True, "report": qc})
 
 
 @app.route("/api/script/save", methods=["POST"])

@@ -666,6 +666,26 @@ async function loadReviewData() {
             thumbImg.style.display = "block";
             document.getElementById("no-thumb-placeholder").style.display = "none";
         }
+
+        // Load QC Report
+        try {
+            const qcResp = await fetch("/api/qc/report");
+            const qcData = await qcResp.json();
+            if (qcData.ok && qcData.report) {
+                const rep = qcData.report;
+                const qcBadge = document.getElementById("qc-badge");
+                const qcDetails = document.getElementById("qc-details-box");
+                if (qcBadge && rep.score > 0) {
+                    qcBadge.innerText = `QC Score: ${rep.score}/100 [${rep.status}]`;
+                    qcBadge.style.color = rep.passed ? "var(--accent-emerald)" : "var(--accent-amber)";
+                }
+                if (qcDetails && rep.details && rep.details.length > 0) {
+                    qcDetails.innerHTML = rep.details.map(d => `<div>• ${d}</div>`).join("");
+                }
+            }
+        } catch (qcErr) {
+            console.error("Error fetching QC report:", qcErr);
+        }
     } catch (e) {
         console.error("Error loading review data:", e);
     }
