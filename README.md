@@ -1,132 +1,249 @@
 # 🎬 YouTube Turbo Studio
 
-**An all-in-one agentic AI faceless video generation platform and YouTube publishing studio.**
+**An Autonomous Multi-Channel Agentic AI Video Studio & YouTube Publishing Engine.**
 
-Combines the viral intelligence, agentic topic research, cinematic Ken Burns rendering, and YouTube OAuth automation of **YouTube AI Agent Studio** with the versatile multi-LLM, multi-stock provider, and rich voiceover catalog of **MoneyPrinterTurbo**.
+Combines the viral topic intelligence, hook tournaments, cinematic Ken Burns rendering, and automated YouTube OAuth workflows of **YouTube AI Agent Studio** with the versatile multi-LLM, multi-engine stock/animation capabilities of **MoneyPrinterTurbo**, powered by a **Sky Blue & YouTube Red Mix Theme** and the **Section 3/4 Originality & Content Guard Gate**.
 
----
-
-## ✨ Highlights & Capabilities
-
-### 🧠 1. Agentic AI Research & Scriptwriting
-- **AI Trend Discovery**: Brainstorms high-retention viral concepts tailored to your channel niche and focus angles (Fermi Paradox, Quantum Mechanics, Frightening AI Horizons, Space Colonization, Paradoxes, etc.).
-- **Multi-LLM Provider Engine**: Seamlessly switch between **Google Gemini** (Gemini 2.5 Flash, 2.0 Flash, 1.5 Flash, 2.5 Pro with automatic fallback chain) and **OpenAI / OpenAI-Compatible endpoints** (DeepSeek, Groq, Ollama, OpenRouter, Claude gateways).
-- **Cinematic Script Generation**: Generates hook questions, segmented narration, visual stock footage search queries, and tags in structured JSON.
-- **Negative Filters**: Built-in banned topic management to avoid topic duplication.
-
-### 🖼️ 2. Multi-Source Footage & Visual Engine
-- **Orientation & Format Awareness**: Switch between **Standard 16:9 Landscape (1920×1080)** for long-form YouTube explainers and **Vertical 9:16 Shorts (1080×1920)**.
-- **Stock Media Sources**: Supports **Pexels HD Photos & Videos**, **Pixabay HD Photos & Videos**, or synthetic atmospheric gradient backgrounds.
-- **Cinematic Ken Burns Effect**: Dynamic smooth pan and zoom animations into stock images with adjustable intensity.
-- **Synced Subtitles**: Burned-in word-level synchronized subtitles with heavy contrast outlines and custom TTF typography (`BeVietnamPro-Bold.ttf`, etc.).
-
-### 🎙️ 3. Audio & Voiceover Engine
-- **100% Free Edge-TTS**: Deep catalog of natural neural voices across English (US, UK, India, Australia), Spanish, French, German, and Hindi.
-- **Word-Boundary Subtitle Sync**: Generates word-level timestamped `.srt` files matching the exact voice cadence.
-- **Live Voice Preview**: Test and listen to voice samples in the UI with a single click.
-- **Background Music & Ducking**: Automatically mixes, loops, and ducks background music from `resources/songs/` with configurable volume.
-
-### 📺 4. Full YouTube Integration via UI
-- **Live OAuth Status**: Displays your YouTube channel connection state, channel title, channel ID, subscriber count, and upload authorization.
-- **One-Click Browser Authorization**: Launch the Google OAuth login flow directly from the UI without touching the command line.
-- **Client Secret Management**: Upload `client_secret.json` directly from your browser, or paste your `Client ID` and `Client Secret` in the settings UI.
-- **Direct YouTube Upload**: Upload videos directly to YouTube with automated or custom title, description, tags, category, and privacy settings (Public, Unlisted, Private).
-- **Scheduled Publishing**: Pick a publication date/time in the UI to schedule video releases.
-- **Thumbnail Generator**: Auto-generates high-CTR 1280×720 YouTube thumbnails with bold typography, dark gradients, and channel branding.
+![YouTube Turbo Studio Dashboard](docs/images/studio_dashboard_preview.jpg)
 
 ---
 
-## 🚀 Quick Start
+## 🌟 Key Highlights & Capabilities
 
-### 1. Launch the Studio
-Simply run the launcher script:
-```powershell
-# In PowerShell:
-cd C:\Users\PC\Turbo\Youtube\YouTubeTurboStudio
+### ⚡ 1. Three Content Modes & Content Family Model
+- **`Long Video` (16:9 Standard)**: Generates complete long-form explainer documentaries. Upon rendering, automatically registers into the channel's `content_history` as an eligible parent for derived Shorts.
+- **`Shorts` (9:16 Standalone)**: Generates standalone vertical videos. Guarantees zero parent video requirement and never receives parent URLs or CTAs.
+- **`Shorts - Link Long Video`**: Generates purpose-built Shorts derived from the strongest subtopics, moments, or lessons of an eligible Long video:
+  - **Dynamic Lock State**: Automatically disabled with a protective badge (`🔒 Generate, import, or publish an eligible Long video first`) until an eligible Long video exists on the active channel.
+  - **Channel Isolation**: Parent dropdown strictly filters to active-channel Long videos. Cross-channel linking (e.g. Kids Short linking to Science Long video) is rejected server-side.
+  - **Lineage Tracking**: Stores `parent_content_id` and `content_family_id`.
+  - **Dynamic Real URL Injection**: Injects the verified YouTube URL (`Watch the full video: https://youtube.com/watch?v=...`) into the Short description once the parent is published. **Never fabricates placeholder URLs** if the parent is not yet published.
+
+---
+
+### 🛡️ 2. Originality Engine & Hard Publishing Gate
+Successful rendering does not automatically qualify a video for upload. Every generated video is evaluated against historical channel content to eliminate template repetition, spam, and content duplication.
+
+![Review & Publish Studio with Internal Readiness Panel](docs/images/review_studio_preview.jpg)
+
+- **Discrete Originality Score (0–100, Default Threshold: 85)**:
+  - **Script Similarity**: N-gram shingle overlap against channel history.
+  - **Concept Similarity**: Topic and keyword repetition detection.
+  - **Hook Repetition**: Opening phrase and psychological angle diversity.
+  - **Story Structure**: Plot beat pattern detection.
+  - **Visual & Scene Reuse**: Detects excessive sequence duplication.
+  - **Animation Action Reuse**: Checks for repeated character action chains.
+  - **Metadata & Value-Add**: Validates informational and educational substance.
+  - **Recurring Character Exception**: Allows recurring characters (e.g., *Toby the Tiger* or *Dr. Silas*) while penalizing identical story templates.
+- **Separate Production Quality Score (Default Threshold: 90)**:
+  - Distinct from originality, auditing audio quality, pacing, text legibility, and technical resolution.
+- **Internal Readiness & Content Guard Panel**:
+  - Live audit table in the Review Studio checking Production Quality, Originality, Technical QC, Content Compliance, Channel Validation, and Kids Safety.
+  - Displays internal status: `READY FOR REVIEW` or `BLOCKED` *(includes explicit monetization disclaimer)*.
+- **Targeted Stage Regeneration**:
+  - Automatically isolates and re-runs only the failing component (hook, script rewrite, story structure, visual beats, audio narration, or subtitles) without rebuilding the entire pipeline from scratch.
+
+---
+
+### 🏛️ 3. Dual Engine Architecture & Multi-Channel Management
+- **Media Video Engine** (*The AI Brief It*): Stock footage hierarchy (Pexels HD Video first, Pexels Photos with Ken Burns pan/zoom fallback), word-synchronized animated subtitles, and audio ducking.
+- **Shared Animation Engine** (*Kids Wonder Lab* & *Golden Stories & Wisdom*): Programmatic scene composition, character sprite animations, and stage choreography.
+  - **Kids Safeguards Gate**: Mandatory age verification, safe visual/language scanning, educational accuracy checks, and Made-for-Kids declarations.
+  - **Elders Channel**: Adult character pack, unhurried narration pacing, and nostalgic environments without inheriting child-specific constraints.
+- **Zero Cross-Channel Contamination**: Distinct OAuth credentials, API keys, video engines, and settings isolated in `channels/<channel_id>/`.
+
+---
+
+### ⚙️ 4. Automation & Background Heavy Worker
+- **Single Heavy Render Worker**: Runs background encoding with `max_workers = 1` concurrency to prevent CPU/GPU encoding thrashing.
+- **Human-in-the-Loop Review Queue**: Renders that pass all gates enter a pending queue requiring review before live publishing.
+- **Channel-Partitioned Analytics & Learning Loop**: Tracks view retention, likes, and watch time strictly per channel to discover winning topic pillars and formats.
+
+---
+
+## 💻 Installation & Setup
+
+### Prerequisites
+1. **Python 3.10 to 3.12** installed on your system.
+2. **FFmpeg** installed and accessible in your system `PATH` (required for MoviePy rendering):
+   - **Windows**: `winget install Gyan.FFmpeg` or download from [ffmpeg.org](https://ffmpeg.org).
+   - **macOS**: `brew install ffmpeg`
+   - **Linux**: `sudo apt install ffmpeg`
+3. **Git** installed.
+
+---
+
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/hemanthkumar/YouTubeTurboStudio.git
+cd YouTubeTurboStudio
+```
+
+---
+
+### Step 2: Create and Activate a Virtual Environment
+```bash
+# Windows (PowerShell)
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Windows (Command Prompt)
+python -m venv .venv
+.\.venv\Scripts\activate.bat
+
+# macOS / Linux
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+---
+
+### Step 3: Install Dependencies
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+---
+
+### Step 4: Configure API Keys & Environment
+Create a `.env` file in the root directory (or configure keys directly through the **API Keys & AI** tab in the web UI):
+
+```ini
+# Primary LLM Provider: 'gemini' | 'groq' | 'openai'
+LLM_PROVIDER=gemini
+
+# Google Gemini API Key (Get free at https://aistudio.google.com)
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.0-flash
+
+# Groq API Key (Optional free high-speed LLaMA at https://console.groq.com)
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+
+# Free Stock Media API Keys
+PEXELS_API_KEY=your_pexels_api_key_here
+PIXABAY_API_KEY=your_pixabay_api_key_here
+```
+
+---
+
+### Step 5: Start YouTube Turbo Studio
+
+```bash
+# Direct Python Launch:
+python app.py
+
+# Or via Windows Launcher:
 .\run.ps1
-
-# Or in Windows Command Prompt:
+# or
 run.bat
 ```
-The studio will automatically start and open in your default browser at:
-**`http://localhost:7860`**
+
+The studio will start and automatically open in your default browser at:  
+👉 **`http://localhost:7860`**
 
 ---
 
-## 🔑 Updating API Keys & YouTube Settings in the UI
+## 🔑 YouTube OAuth Setup (Per Channel)
 
-You never need to edit configuration files manually. Everything is controllable through the web interface:
+You can connect one or more YouTube channels directly through the UI:
 
-### 1. Update API Keys
-1. Open the **API Keys & AI** tab.
-2. Enter your **Google Gemini API Key** and/or **OpenAI API Key**.
-3. Enter your **Pexels API Key** and **Pixabay API Key**.
-4. Click **Test Key** to verify connectivity with instant visual feedback.
-5. Click **Save All API Keys & Settings** (automatically updates `.env` and `config_data.json`).
-
-### 2. Configure YouTube Authentication & Channel
-1. Open the **YouTube OAuth & Config** tab.
-2. In **Client Secret Setup**, either:
-   - Upload your `client_secret.json` using the file picker, OR
-   - Enter your `Client ID` and `Client Secret` and click **Save Manual Credentials**.
+1. Open the **YouTube OAuth & Config** tab in the studio.
+2. In **Client Secret Setup**:
+   - Upload your `client_secret.json` obtained from [Google Cloud Console](https://console.cloud.google.com/apis/credentials), **OR**
+   - Paste your **Client ID** and **Client Secret** and click **Save Credentials**.
 3. Click **Connect YouTube Channel** to trigger Google Sign-In in your browser.
-4. Once authorized, the status badge will display **Connected & Authorized** along with your channel details!
-5. Configure your default video privacy, default category, and channel niche description.
+4. Accept permissions. The badge will immediately switch to **Connected & Authorized** displaying your channel name and subscriber count!
+5. Repeat for any other channel by selecting the channel from the top header dropdown. Credentials remain strictly isolated in `channels/<channel_id>/.env`.
 
 ---
 
-## 📁 Project Structure
+## 🧪 Testing the Pipeline
+
+Run the comprehensive test suite to verify all engine features, channels, gates, and relationship lineages:
+
+```bash
+# Run all 72 automated test cases
+python -m unittest discover -s tests
+
+# Or run the Content Guard & Addendum V1 tests specifically
+python -m unittest tests/test_content_guard.py
+```
+
+*Note: Automated tests run with simulated mock YouTube fixtures. Zero live videos are published or uploaded during testing.*
+
+---
+
+## 📂 Project Architecture
 
 ```
 YouTubeTurboStudio/
-├── app.py                      # Flask web server & REST API
-├── config.py                   # Centralized configuration & .env sync
-├── run.bat                     # 1-click Windows batch launcher
-├── run.ps1                     # PowerShell launcher
+├── app.py                      # Flask REST API server & web routes
+├── config.py                   # Central configuration & .env sync
 ├── requirements.txt            # Python dependencies
-├── config_data.json            # Persistent studio configuration
-├── client_secret.json          # Google OAuth credentials
-├── youtube_token.pickle        # YouTube OAuth token
-├── banned_topics.txt           # Banned topics list
+├── run.ps1 / run.bat           # 1-click launch scripts
 │
 ├── core/
-│   ├── pipeline.py             # Pipeline orchestrator
-│   ├── state.py                # Global state tracker
-│   └── logger.py               # Real-time logger & SSE streamer
+│   ├── channel_registry.py     # Multi-channel registry (Science, Kids, Elders)
+│   ├── channel_context.py      # Isolated per-channel execution context
+│   ├── credential_manager.py   # Secure per-channel credential encryption/storage
+│   ├── content_family.py       # Content Family lineage & parent URL resolver
+│   ├── originality_engine.py   # 9-dimension originality & anti-spam engine
+│   ├── compliance_gate.py      # Hard publishing gate & internal readiness audit
+│   ├── targeted_regeneration.py# Stage-level targeted regeneration engine
+│   ├── pipeline_router.py      # Routes generation to Stock or Animation engine
+│   └── pipeline.py             # Phase 2 Media Video Engine pipeline
 │
-├── agents/
-│   ├── llm_client.py           # Multi-provider LLM (Gemini + OpenAI/DeepSeek)
-│   ├── researcher.py           # Topic research agent
-│   └── scriptwriter.py         # Scriptwriting agent
+├── animation/
+│   ├── renderer.py             # Shared MoviePy animation compositor
+│   ├── storyboarder.py         # Script-to-scene-graph generator
+│   └── qc.py                   # Animation quality control checks
 │
-├── media/
-│   ├── pexels_client.py        # Pexels stock downloader & validator
-│   ├── pixabay_client.py       # Pixabay stock downloader & validator
-│   └── media_manager.py        # Section asset coordinator & fallback generator
+├── kids/                       # Kids Wonder Lab channel package
+│   ├── characters.py           # Kids characters (Toby the Tiger, Pip the Panda)
+│   └── safeguards.py           # Mandatory child safety & educational validator
 │
-├── audio/
-│   ├── edge_tts_engine.py      # Edge-TTS synthesizer & SRT generator
-│   └── music_manager.py        # BGM manager & audio mixer
+├── elders/                     # Golden Stories & Wisdom channel package
+│   ├── characters.py           # Adult character pack (Dr. Silas, Arthur, Martha)
+│   └── qc.py                   # Pacing & clarity validation
 │
-├── video/
-│   ├── renderer.py             # MoviePy 1.0.3 + Pillow video composer
-│   └── thumbnail_generator.py  # 1280x720 YouTube thumbnail maker
+├── automation/
+│   ├── db.py                   # SQLite persistence (jobs, review queue, content history)
+│   ├── job_queue.py            # Channel-immutable job queue
+│   ├── worker.py               # Single Heavy Render Worker (max_workers=1)
+│   ├── review_queue.py         # Human-in-the-loop review queue
+│   └── analytics.py            # Channel-partitioned metrics store
 │
 ├── youtube/
-│   ├── auth.py                 # OAuth manager & channel diagnostic
-│   └── uploader.py             # Resumable video & thumbnail uploader
-│
-├── resources/
-│   ├── fonts/                  # TrueType fonts
-│   └── songs/                  # Background music tracks
+│   ├── auth.py                 # OAuth2 PKCE login & refresh manager
+│   ├── channel_verifier.py     # Channel identity security verifier
+│   └── uploader.py             # Resumable video uploader with parent URL injection
 │
 ├── static/
-│   ├── css/studio.css          # Modern dark-mode styling
-│   └── js/studio.js            # Client-side SPA controller
+│   ├── css/studio.css          # Sky Blue & YouTube Red Mix Design System
+│   └── js/studio.js            # Studio frontend, parent selector, readiness UI
 │
 ├── templates/
-│   └── index.html              # Studio single-page application
+│   └── index.html              # Studio web interface
 │
-└── output/                     # Generated videos, scripts, audio, thumbnails
+└── docs/
+    ├── MASTER_ARCHITECTURE.md  # V2 Master Architecture specification
+    ├── ARCHITECTURE_ADDENDUM_CONTENT_GUARD.md # Addendum V1 specification
+    └── images/                 # Studio UI screenshots
 ```
-# YouTubeTurboStudio
+
+---
+
+## 🎨 Design System
+
+YouTube Turbo Studio features a custom **Sky Blue & YouTube Red Mix Theme**:
+- **Primary Interactive**: Vibrant Sky Blue (`#0ea5e9` / `#38bdf8`) for controls, focus states, and research flows.
+- **YouTube Accent**: Iconic YouTube Red (`#ff0033` / `#cc0029`) for video upload buttons, running indicators, and active navigation bars.
+- **Canvas**: Midnight Slate (`#060913` and `#0c1322`) for high-contrast readability.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License — see the LICENSE file for details.
