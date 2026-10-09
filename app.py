@@ -699,6 +699,8 @@ def api_youtube_upload():
     tags = st.get("tags") or script.get("tags", [])
     thumb_path = st.get("thumb_path") or str(OUTPUT_DIR / "thumbnail.jpg")
 
+    video_type = script.get("video_type") or st.get("video_type", "shorts")
+
     def _upload_async():
         try:
             upload_video_to_youtube(
@@ -712,7 +714,8 @@ def api_youtube_upload():
                 thumb_path=thumb_path,
                 channel_id=cid,
                 expected_youtube_channel_id=exp_id,
-                made_for_kids=chan_ctx.youtube.get("made_for_kids", False)
+                made_for_kids=chan_ctx.youtube.get("made_for_kids", False),
+                video_type=video_type
             )
         except Exception as e:
             log_error(f"YouTube upload failed: {e}")

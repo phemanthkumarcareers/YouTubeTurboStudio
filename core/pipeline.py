@@ -336,7 +336,8 @@ def execute_pipeline(
                     made_for_kids=cfg.get("made_for_kids", False),
                     content_id=registered_content["content_id"],
                     relationship_type=rel_type,
-                    readiness_report=readiness
+                    readiness_report=readiness,
+                    video_type=video_type
                 )
 
             log_success(f"Pipeline finished successfully for '{channel_context.name}'! Ready in Review Studio.")

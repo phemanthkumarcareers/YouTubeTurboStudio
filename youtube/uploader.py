@@ -54,7 +54,8 @@ def upload_video_to_youtube(
     content_id: Optional[str] = None,
     parent_content_id: Optional[str] = None,
     relationship_type: str = "STANDALONE",
-    readiness_report: Optional[dict] = None
+    readiness_report: Optional[dict] = None,
+    video_type: Optional[str] = None
 ) -> str:
     """
     Resumable video upload with progress callback, channel verification,
@@ -84,6 +85,34 @@ def upload_video_to_youtube(
     update_state(uploading=True, upload_pct=0, channel_id=cid)
     yt = get_youtube_service(cid)
 
+    # Detect if video is a YouTube Short (either explicitly passed or vertical aspect ratio / duration <= 60s)
+    is_shorts_video = (video_type == "shorts")
+    try:
+        from moviepy.editor import VideoFileClip
+        v_clip_meta = VideoFileClip(video_path)
+        if v_clip_meta.w < v_clip_meta.h or v_clip_meta.duration <= 60.0:
+            is_shorts_video = True
+        v_clip_meta.close()
+    except Exception:
+        pass
+
+    # YouTube Shorts Algorithm Enforcement:
+    # YouTube requires vertical aspect ratio AND recommends #Shorts in title & description
+    if is_shorts_video:
+        if "#Shorts" not in title and "#shorts" not in title:
+            # Preserve title length under 100 chars
+            if len(title) > 91:
+                title = title[:91].strip() + " #Shorts"
+            else:
+                title = f"{title.strip()} #Shorts"
+
+        if "#Shorts" not in description and "#shorts" not in description:
+            description = f"#Shorts\n\n{description}"
+
+        tags = list(tags or [])
+        if "Shorts" not in tags and "shorts" not in tags and "#Shorts" not in tags:
+            tags.insert(0, "Shorts")
+
     # Build short description with parent URL if derived
     description = content_family_mgr.build_short_description(
         base_description=description,
@@ -111,7 +140,7 @@ def upload_video_to_youtube(
     if publish_at:
         body["status"]["publishAt"] = publish_at
 
-    log_info(f"Initiating YouTube upload for '{title}' (Channel: {cid}, Privacy: {body['status']['privacyStatus']})...")
+    log_info(f"Initiating YouTube upload for '{title}' (Channel: {cid}, Privacy: {body['status']['privacyStatus']}, IsShorts: {is_shorts_video})...")
 
     media = MediaFileUpload(
         video_path,
@@ -135,12 +164,42 @@ def upload_video_to_youtube(
             log_info(f"YouTube upload progress: {pct}%")
 
     video_id = response.get("id")
-    yt_url = f"https://www.youtube.com/watch?v={video_id}"
-    update_state(upload_pct=100, yt_url=yt_url)
-    log_success(f"Video successfully uploaded to YouTube! Watch link: {yt_url}")
+    # Provide direct Shorts link for vertical videos and standard watch link
+    yt_watch_url = f"https://www.youtube.com/watch?v={video_id}"
+    yt_shorts_url = f"https://www.youtube.com/shorts/{video_id}" if is_shorts_video else None
+    primary_yt_url = yt_shorts_url if is_shorts_video else yt_watch_url
+
+    # Resolve channel's featured / handle URL: https://www.youtube.com/<@channelname>/featured
+    chan_handle = (chan_ctx.youtube.get("handle") if chan_ctx else "") or ""
+    if not chan_handle:
+        # Check channel's custom_url from live OAuth profile if available
+        try:
+            from youtube.channel_verifier import get_channel_youtube_info
+            ch_info = get_channel_youtube_info(cid)
+            chan_handle = ch_info.get("channel", {}).get("custom_url", "")
+        except Exception:
+            pass
+
+    if chan_handle:
+        if not chan_handle.startswith("@"):
+            chan_handle = f"@{chan_handle.lstrip('/')}"
+        featured_url = f"https://www.youtube.com/{chan_handle}/featured"
+    elif exp_id:
+        featured_url = f"https://www.youtube.com/channel/{exp_id}/featured"
+    else:
+        featured_url = f"https://www.youtube.com/featured"
+
+    update_state(
+        upload_pct=100,
+        yt_url=primary_yt_url,
+        yt_watch_url=yt_watch_url,
+        yt_shorts_url=yt_shorts_url,
+        channel_featured_url=featured_url
+    )
+    log_success(f"Video successfully uploaded to YouTube! Link: {primary_yt_url} | Channel Featured: {featured_url}")
 
     if content_id:
-        content_family_mgr.update_youtube_publish(content_id, video_id, yt_url)
+        content_family_mgr.update_youtube_publish(content_id, video_id, primary_yt_url)
 
     # Set custom thumbnail if available
     if thumb_path and os.path.exists(thumb_path):

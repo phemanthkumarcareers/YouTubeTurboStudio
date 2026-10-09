@@ -334,12 +334,30 @@ function updateStatusUI(status) {
         }
     }
 
-    // Direct YouTube link
+    // Direct YouTube link and Channel Featured URL
     if (status.yt_url) {
         const ytLinkBox = document.getElementById("yt-published-link");
         if (ytLinkBox) {
             ytLinkBox.style.display = "block";
-            ytLinkBox.innerHTML = `🎉 Video Published: <a href="${status.yt_url}" target="_blank" style="color:var(--accent-emerald);">${status.yt_url}</a>`;
+            const featuredUrl = status.channel_featured_url || "https://www.youtube.com/featured";
+            const isShorts = status.yt_shorts_url || (status.yt_url && status.yt_url.includes("/shorts/"));
+            const badge = isShorts ? `<span class="badge" style="background:var(--accent-red); color:#fff; margin-right:6px;">⚡ Shorts</span>` : `<span class="badge" style="background:var(--accent-blue); color:#fff; margin-right:6px;">🎬 Video</span>`;
+            
+            ytLinkBox.innerHTML = `
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="font-size:13px; font-weight:600; display:flex; align-items:center;">
+                        ${badge} 🎉 Video Published Successfully!
+                    </div>
+                    <div style="font-size:12px;">
+                        <strong>Direct Video Link:</strong> 
+                        <a href="${status.yt_url}" target="_blank" style="color:var(--accent-emerald); text-decoration:underline; font-weight:500;">${status.yt_url}</a>
+                    </div>
+                    <div style="font-size:12px;">
+                        <strong>Channel Featured Page:</strong> 
+                        <a href="${featuredUrl}" target="_blank" style="color:var(--accent-amber); text-decoration:underline; font-weight:500;">${featuredUrl}</a>
+                    </div>
+                </div>
+            `;
         }
     }
 }
