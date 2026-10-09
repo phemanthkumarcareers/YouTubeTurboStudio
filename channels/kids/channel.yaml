@@ -2,11 +2,9 @@ id: kids
 name: Kids Wonder Lab
 engine: animation
 enabled: true
-
 audience:
   type: children
-  age_group: "3-6"
-
+  age_group: 3-6
 video:
   default_format: shorts
   allow_short: true
@@ -15,50 +13,58 @@ video:
   height: 1920
   fps: 30
   kb_zoom_start: 1.0
-  kb_zoom_end: 1.10
+  kb_zoom_end: 1.1
   subtitles_enabled: true
   render_preset: ultrafast
-
 credentials:
-  llm_provider: gemini
+  llm_provider: groq
   gemini_model: gemini-2.5-flash
   groq_model: openai/gpt-oss-120b
   openai_model: gpt-4o-mini
   video_source: animation_engine
-
-voice:
-  tts_provider: edge-tts
-  voice_id: en-US-JennyNeural
-  voice_rate: "-5%"
-  voice_pitch: "+5Hz"
-  elevenlabs_voice_id: ""
-  music_enabled: true
-  music_volume: 0.15
-
 youtube:
-  channel_id: ""
+  channel_id: ''
   oauth_profile: kids
   privacy: private
-  category_id: "27"
+  category_id: '27'
   made_for_kids: true
   auto_upload: false
-
 pipeline:
   auto_topic: true
   auto_publish: false
   minimum_quality_score: 92
-
 prompts:
-  niche: Fun educational rhymes, counting games, animal facts, bedtime stories, and moral adventures.
-  description: |-
-    Channel niche: Engaging, wholesome, and educational content for preschool and kindergarten kids.
+  niche: Fun educational rhymes, counting games, animal facts, bedtime stories, and
+    moral adventures.
+  description: 'Channel niche: Engaging, wholesome, and educational content for preschool
+    and kindergarten kids.
+
     Tone: Joyful, encouraging, musical, gentle, and highly visual.
-    Pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive emotional reinforcement.
+
+    Pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive
+    emotional reinforcement.'
   default_tags:
-    - kids
-    - animation
-    - rhymes
-    - preschool
-    - counting
-    - animals
-    - bedtime stories
+  - kids
+  - animation
+  - rhymes
+  - preschool
+  - counting
+  - animals
+  - bedtime stories
+  tone: Joyful, encouraging, musical, gentle, and highly visual.
+  pacing: Cheerful rhythmic beats, colorful clarity, simple vocabulary, and positive
+    emotional reinforcement.
+  banned_topics:
+  - scary monsters
+  - violence
+  - horror
+  - dangerous stunts
+  - adult themes
+voice:
+  tts_provider: edge-tts
+  voice_id: en-US-JennyNeural
+  voice_rate: -5%
+  voice_pitch: +5Hz
+  elevenlabs_voice_id: ''
+  music_enabled: true
+  music_volume: 0.15

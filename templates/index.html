@@ -24,9 +24,12 @@
       <div class="channel-selector-container">
         <label for="active-channel-select" class="channel-selector-label">Channel:</label>
         <select id="active-channel-select" class="form-select channel-select-dropdown">
-          <option value="the-ai-brief-it">The AI Brief It</option>
+          <option value="the-ai-brief-it">🎬 The AI Brief It (Media Video)</option>
+          <option value="kids">🎨 Kids Wonder Lab (Animation · Kids Only)</option>
+          <option value="elders">📖 Golden Stories & Wisdom (Animation · Elders)</option>
         </select>
         <span id="active-engine-badge" class="engine-badge engine-media">Media Video</span>
+        <span id="active-audience-badge" class="audience-badge audience-general">General</span>
       </div>
 
       <div id="yt-auth-badge" class="status-pill">
@@ -241,7 +244,8 @@
               <label class="form-label">TTS Provider</label>
               <select id="tts-provider-select" class="form-select">
                 <option value="edge-tts">Microsoft Edge-TTS (Free, High Quality)</option>
-                <option value="elevenlabs">ElevenLabs (Requires API Key)</option>
+                <option value="elevenlabs">ElevenLabs (High Fidelity Voice AI)</option>
+                <option value="openai-tts">OpenAI TTS (tts-1 / tts-1-hd)</option>
               </select>
             </div>
 
@@ -259,12 +263,13 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Footage Source</label>
+              <label class="form-label">Footage / Visual Source</label>
               <select id="video-source-select" class="form-select">
                 <option value="pexels_images">Pexels HD Photos + Ken Burns Motion</option>
                 <option value="pexels_videos">Pexels HD Video Clips</option>
                 <option value="pixabay_images">Pixabay Photos</option>
                 <option value="pixabay_videos">Pixabay Videos</option>
+                <option value="nano_banana">Nano Banana AI Generative Visuals</option>
               </select>
             </div>
 
@@ -480,230 +485,687 @@
         </div>
       </div>
 
-      <!-- TAB 3: API KEYS & AI PROVIDERS -->
+      <!-- TAB 3: API KEYS & AI PROVIDERS (3 INDIVIDUAL CHANNEL UIs) -->
       <div id="tab-api-keys" class="tab-pane">
         
-        <!-- Primary AI Brain Selector (Radio Buttons) -->
-        <div class="card" style="border: 1px solid var(--primary); background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(16,185,129,0.08) 100%);">
-          <div class="card-header">
-            <div class="card-title">🤖 Active AI Engine for Topic Research & Scriptwriting</div>
-          </div>
-          <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
-            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; font-size:15px; color:var(--text-main);">
-              <input type="radio" name="ai_provider_radio" value="gemini" id="radio-provider-gemini" checked style="width:20px; height:20px; accent-color:var(--primary); cursor:pointer;">
-              <span>🧠 Google Gemini AI</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; font-size:15px; color:var(--accent-emerald);">
-              <input type="radio" name="ai_provider_radio" value="groq" id="radio-provider-groq" style="width:20px; height:20px; accent-color:var(--accent-emerald); cursor:pointer;">
-              <span>⚡ Groq AI (Free, 100+ tokens/sec)</span>
-            </label>
-          </div>
-          <div class="form-help" style="margin-top:6px;">
-            Select which AI provider will generate research, scripts, titles, descriptions, and tags.
-          </div>
+        <!-- Channel Sub-Tabs Navigation for API Keys -->
+        <div class="channel-subtabs-nav">
+          <button class="channel-subtab-btn active" data-subchannel="the-ai-brief-it">
+            <span>🎬</span> The AI Brief It <em>(Media Video)</em>
+          </button>
+          <button class="channel-subtab-btn" data-subchannel="kids">
+            <span>🎨</span> Kids Wonder Lab <em>(Animation · Kids Only)</em>
+          </button>
+          <button class="channel-subtab-btn" data-subchannel="elders">
+            <span>📖</span> Golden Stories & Wisdom <em>(Animation · Elders)</em>
+          </button>
         </div>
 
-        <!-- Google Gemini Configuration -->
-        <div class="card" id="gemini-card">
-          <div class="card-header">
-            <div class="card-title">🧠 Google Gemini AI Provider</div>
-            <button id="btn-test-gemini" class="btn btn-secondary" style="font-size:12px;">Test Gemini Key</button>
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">Gemini API Key</label>
-              <input type="password" id="gemini-api-key" class="form-input" placeholder="AQ.Ab8RN6I_...">
-              <div class="form-help">Get free key from <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--primary);">Google AI Studio</a>.</div>
+        <!-- ═════════ 1. THE AI BRIEF IT (MEDIA VIDEO) ═════════ -->
+        <div id="subpane-api-the-ai-brief-it" class="channel-subpane">
+          <div class="card" style="border: 1px solid var(--sky-blue); background: linear-gradient(135deg, rgba(56,189,248,0.12) 0%, rgba(15,23,42,0.6) 100%);">
+            <div class="card-header">
+              <div class="card-title">🎬 The AI Brief It — Media Video Engine</div>
+              <span class="engine-badge engine-media">Stock Media & Ken Burns</span>
             </div>
-            <div class="form-group">
-              <label class="form-label">Preferred Gemini Model</label>
-              <select id="gemini-model-select" class="form-select">
-                <option value="gemini-3.8-flash">gemini-3.8-flash (Latest & Best Quality)</option>
-                <option value="gemini-3.7-flash">gemini-3.7-flash (High Quality)</option>
-                <option value="gemini-3.6-flash">gemini-3.6-flash (Balanced)</option>
-                <option value="gemini-3.5-flash">gemini-3.5-flash (Balanced)</option>
-                <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Fast)</option>
-                <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (Fast & Reliable)</option>
-                <option value="gemini-2.5-flash">gemini-2.5-flash (Gemini 2.5 Flash)</option>
-                <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Gemini 2.5 Flash Lite)</option>
-                <option value="gemini-2.5-pro">gemini-2.5-pro (Gemini 2.5 Pro)</option>
-                <option value="gemini-flash-latest">gemini-flash-latest (Auto Latest Flash)</option>
-                <option value="gemini-flash-lite-latest">gemini-flash-lite-latest (Auto Latest Lite)</option>
-                <option value="gemini-pro-latest">gemini-pro-latest (Pro Tier)</option>
-              </select>
-              <div class="form-help">Studio automatically rotates across backup Gemini models if any model is rate-limited.</div>
+            <div style="font-size:12.5px; color:var(--text-secondary);">
+              This channel creates cinematic documentaries using high-resolution stock video footage (Pexels / Pixabay) and voice narration.
             </div>
           </div>
-        </div>
 
-        <!-- Groq AI Configuration -->
-        <div class="card" id="groq-card" style="border: 1px solid rgba(16,185,129,0.4);">
-          <div class="card-header">
-            <div class="card-title">⚡ Groq AI Provider (100% Free, Ultra-Fast LLaMA 3.3)</div>
-            <div style="display:flex; gap:8px;">
-              <a href="https://console.groq.com/keys" target="_blank" class="btn btn-secondary" style="font-size:11px;">Get Free Key ↗</a>
-              <button id="btn-test-groq" class="btn btn-secondary" style="font-size:12px;">Test Groq Key</button>
+          <!-- AI Brain Provider Selection -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🤖 AI Brain for The AI Brief It</div>
+            </div>
+            <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="ai_provider_radio_the-ai-brief-it" value="gemini" checked>
+                <span>🧠 Google Gemini AI</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:var(--accent-emerald);">
+                <input type="radio" name="ai_provider_radio_the-ai-brief-it" value="groq">
+                <span>⚡ Groq AI (Free LLaMA)</span>
+              </label>
             </div>
           </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">Groq API Key</label>
-              <input type="password" id="groq-api-key" class="form-input" placeholder="gsk_...">
-              <div class="form-help">Free at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent-emerald);">console.groq.com</a> — Instant activation, no credit card.</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Groq Model</label>
-              <select id="groq-model-select" class="form-select">
-                <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Recommended - 120B Model)</option>
-                <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (Ultra Fast 20B)</option>
-                <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b (Qwen 27B)</option>
-                <option value="allam-2-7b">allam-2-7b (Fast 7B)</option>
-              </select>
-              <div class="form-help">Ultra-fast inference with no daily limit bottlenecks.</div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Stock Footage API Keys -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">🖼️ Stock Footage Provider Keys</div>
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <label class="form-label" style="margin-bottom:0;">Pexels API Key</label>
-                <button id="btn-test-pexels" class="btn btn-secondary" style="font-size:11px; padding:2px 8px;">Test Pexels</button>
+          <!-- Gemini Configuration -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🧠 Google Gemini API (The AI Brief It)</div>
+              <button class="btn btn-secondary btn-test-gemini" data-chan="the-ai-brief-it" style="font-size:12px;">Test Gemini Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Gemini API Key</label>
+                <input type="password" id="gemini-api-key-the-ai-brief-it" class="form-input gemini-key-input" placeholder="AQ.Ab8RN6I_...">
+                <div class="form-help">Individual key for The AI Brief It from <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--primary);">Google AI Studio</a>.</div>
               </div>
-              <input type="password" id="pexels-api-key" class="form-input" placeholder="Pexels Key">
-              <div class="form-help">Free key at <a href="https://www.pexels.com/api/" target="_blank" style="color:var(--primary);">pexels.com/api</a></div>
-            </div>
-
-            <div class="form-group">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                <label class="form-label" style="margin-bottom:0;">Pixabay API Key</label>
-                <button id="btn-test-pixabay" class="btn btn-secondary" style="font-size:11px; padding:2px 8px;">Test Pixabay</button>
+              <div class="form-group">
+                <label class="form-label">Gemini Model</label>
+                <select id="gemini-model-the-ai-brief-it" class="form-select">
+                  <option value="gemini-3.8-flash">gemini-3.8-flash (Recommended)</option>
+                  <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Fast)</option>
+                  <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                  <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                </select>
               </div>
-              <input type="password" id="pixabay-api-key" class="form-input" placeholder="Pixabay Key">
-              <div class="form-help">Free key at <a href="https://pixabay.com/api/docs/" target="_blank" style="color:var(--primary);">pixabay.com/api/docs</a></div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">ElevenLabs API Key (Optional)</label>
-            <input type="password" id="elevenlabs-api-key" class="form-input" placeholder="ElevenLabs Key (Leave empty to use 100% free Edge-TTS)">
+          <!-- Groq Configuration -->
+          <div class="card" style="border: 1px solid rgba(16,185,129,0.35);">
+            <div class="card-header">
+              <div class="card-title">⚡ Groq API (The AI Brief It)</div>
+              <button class="btn btn-secondary btn-test-groq" data-chan="the-ai-brief-it" style="font-size:12px;">Test Groq Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Groq API Key</label>
+                <input type="password" id="groq-api-key-the-ai-brief-it" class="form-input groq-key-input" placeholder="gsk_...">
+                <div class="form-help">Free key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent-emerald);">console.groq.com</a>.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Groq Model</label>
+                <select id="groq-model-the-ai-brief-it" class="form-select">
+                  <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Recommended)</option>
+                  <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (Ultra Fast)</option>
+                  <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b</option>
+                </select>
+              </div>
+            </div>
           </div>
+
+          <!-- Nano Banana AI Generative Visuals Card -->
+          <div class="card" style="border: 1px solid rgba(234, 179, 8, 0.35);">
+            <div class="card-header">
+              <div class="card-title">🍌 Nano Banana AI Generative Visuals (The AI Brief It)</div>
+              <button class="btn btn-secondary btn-test-nano-banana" data-chan="the-ai-brief-it" style="font-size:12px;">Test Nano Banana</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Nano Banana API Key</label>
+                <input type="password" id="nano-banana-api-key-the-ai-brief-it" class="form-input nano-banana-key-input" placeholder="nano_...">
+                <div class="form-help">Generates photorealistic & cinematic scenes and thumbnails.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select id="nano-banana-model-the-ai-brief-it" class="form-select">
+                  <option value="nano-banana-flux">Nano Banana FLUX (Cinematic & High Detail)</option>
+                  <option value="nano-banana-sdxl">Nano Banana SDXL (Fast High-Res)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stock Media Keys (Pexels / Pixabay) -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🖼️ Stock Footage Provider Keys (Required for Media Video)</div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <label class="form-label" style="margin-bottom:0;">Pexels API Key</label>
+                  <button class="btn btn-secondary btn-test-pexels" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test Pexels</button>
+                </div>
+                <input type="password" id="pexels-api-key-the-ai-brief-it" class="form-input" placeholder="Pexels Key">
+                <div class="form-help">Free key at <a href="https://www.pexels.com/api/" target="_blank" style="color:var(--primary);">pexels.com/api</a></div>
+              </div>
+              <div class="form-group">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                  <label class="form-label" style="margin-bottom:0;">Pixabay API Key</label>
+                  <button class="btn btn-secondary btn-test-pixabay" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test Pixabay</button>
+                </div>
+                <input type="password" id="pixabay-api-key-the-ai-brief-it" class="form-input" placeholder="Pixabay Key">
+                <div class="form-help">Free key at <a href="https://pixabay.com/api/docs/" target="_blank" style="color:var(--primary);">pixabay.com/api/docs</a></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-Provider Voice & Audio Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🎙️ Audio & Voice Generation (The AI Brief It)</div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-test-elevenlabs" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test ElevenLabs</button>
+                <button class="btn btn-secondary btn-test-openai-tts" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test OpenAI TTS</button>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">ElevenLabs API Key (Optional)</label>
+                <input type="password" id="elevenlabs-api-key-the-ai-brief-it" class="form-input elevenlabs-key-input" placeholder="ElevenLabs Key (Leave empty to use Microsoft Edge-TTS)">
+              </div>
+              <div class="form-group">
+                <label class="form-label">ElevenLabs Voice ID</label>
+                <input type="text" id="elevenlabs-voice-id-the-ai-brief-it" class="form-input" placeholder="TxGEqnHWrfWFTfGW9XjX (Josh)">
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-save-channel-keys" data-chan="the-ai-brief-it" style="width:100%; margin-top:8px;">
+            💾 Save API Keys for The AI Brief It
+          </button>
         </div>
 
-        <button id="btn-save-settings" class="btn btn-primary" style="width:100%; margin-top:10px;">
-          💾 Save All API Keys & Settings
-        </button>
+        <!-- ═════════ 2. KIDS WONDER LAB (ANIMATION · KIDS ONLY) ═════════ -->
+        <div id="subpane-api-kids" class="channel-subpane" style="display:none;">
+          <div class="coppa-banner">
+            <span style="font-size:28px;">👶</span>
+            <div>
+              <div style="font-weight:700; font-size:14px; color:#34d399;">KIDS WONDER LAB — ANIMATION ENGINE & COPPA ENFORCED</div>
+              <div style="font-size:12px; color:var(--text-secondary);">
+                Operates exclusively in Made-for-Kids mode. Generates colorful, uplifting 2D cartoon scenes and rhymes.
+              </div>
+            </div>
+          </div>
+
+          <div class="animation-callout">
+            <div style="font-weight:700; color:#ff4d6d; margin-bottom:4px;">🎨 Dedicated Cartoon Animation Engine Active</div>
+            <div style="font-size:12.5px; color:var(--text-secondary);">
+              This channel uses the built-in <strong>Animation Engine</strong> to render procedural and AI-illustrated 2D cartoon plates, smiling characters, rainbow arcs, and rolling meadows. <strong>Stock footage APIs (Pexels / Pixabay) are NOT needed or used.</strong>
+            </div>
+          </div>
+
+          <!-- AI Brain Provider Selection -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🤖 AI Brain for Kids Wonder Lab</div>
+            </div>
+            <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="ai_provider_radio_kids" value="gemini" checked>
+                <span>🧠 Google Gemini AI</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:var(--accent-emerald);">
+                <input type="radio" name="ai_provider_radio_kids" value="groq">
+                <span>⚡ Groq AI (Free LLaMA)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Gemini Configuration -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🧠 Google Gemini API (Kids Wonder Lab)</div>
+              <button class="btn btn-secondary btn-test-gemini" data-chan="kids" style="font-size:12px;">Test Gemini Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Gemini API Key</label>
+                <input type="password" id="gemini-api-key-kids" class="form-input gemini-key-input" placeholder="Individual Gemini Key for Kids (or leave empty)">
+                <div class="form-help">Individual key for Kids channel. Will not leak to other channels.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Gemini Model</label>
+                <select id="gemini-model-kids" class="form-select">
+                  <option value="gemini-2.5-flash">gemini-2.5-flash (Fast & Creative)</option>
+                  <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+                  <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Groq Configuration -->
+          <div class="card" style="border: 1px solid rgba(16,185,129,0.35);">
+            <div class="card-header">
+              <div class="card-title">⚡ Groq API (Kids Wonder Lab)</div>
+              <button class="btn btn-secondary btn-test-groq" data-chan="kids" style="font-size:12px;">Test Groq Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Groq API Key</label>
+                <input type="password" id="groq-api-key-kids" class="form-input groq-key-input" placeholder="Individual Groq Key for Kids">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Groq Model</label>
+                <select id="groq-model-kids" class="form-select">
+                  <option value="openai/gpt-oss-120b">openai/gpt-oss-120b</option>
+                  <option value="openai/gpt-oss-20b">openai/gpt-oss-20b</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nano Banana AI Cartoon Generator Card -->
+          <div class="card" style="border: 1px solid rgba(234, 179, 8, 0.35);">
+            <div class="card-header">
+              <div class="card-title">🍌 Nano Banana AI Cartoon Visuals (Kids Wonder Lab)</div>
+              <button class="btn btn-secondary btn-test-nano-banana" data-chan="kids" style="font-size:12px;">Test Nano Banana</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Nano Banana API Key</label>
+                <input type="password" id="nano-banana-api-key-kids" class="form-input nano-banana-key-input" placeholder="Individual Nano Banana key for Kids">
+                <div class="form-help">Generates colorful 2D animated characters & scenes.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select id="nano-banana-model-kids" class="form-select">
+                  <option value="nano-banana-cartoon-v1">Nano Banana Cartoon 2D (Preschool & Kids)</option>
+                  <option value="nano-banana-flux">Nano Banana FLUX</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kids Multi-Character Dialogue & Audio -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🎙️ Multi-Character Voice Studio (Kids Wonder Lab)</div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-test-elevenlabs" data-chan="kids" style="font-size:11px; padding:2px 8px;">Test ElevenLabs</button>
+                <button class="btn btn-secondary btn-test-openai-tts" data-chan="kids" style="font-size:11px; padding:2px 8px;">Test OpenAI TTS</button>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Story Narrator Voice</label>
+                <select id="voice-select-kids" class="form-select">
+                  <option value="en-US-AnaNeural">en-US-AnaNeural (Youthful Child / Teacher)</option>
+                  <option value="en-US-JennyNeural">en-US-JennyNeural (Warm Female Storyteller)</option>
+                  <option value="nova">OpenAI Nova (Bright, Cheerful)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Character 1 (Pip the Bunny / Curious)</label>
+                <select id="char1-voice-kids" class="form-select">
+                  <option value="en-US-AriaNeural">en-US-AriaNeural (Bubbly, Playful Character)</option>
+                  <option value="fable">OpenAI Fable (Animated Storybook)</option>
+                </select>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Character 2 (Barnaby the Bear / Gentle)</label>
+                <select id="char2-voice-kids" class="form-select">
+                  <option value="en-US-GuyNeural">en-US-GuyNeural (Gentle Companion, Deep)</option>
+                  <option value="alloy">OpenAI Alloy (Warm, Balanced)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ElevenLabs API Key (Optional)</label>
+                <input type="password" id="elevenlabs-api-key-kids" class="form-input elevenlabs-key-input" placeholder="Optional ElevenLabs Key">
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-save-channel-keys" data-chan="kids" style="width:100%; margin-top:8px;">
+            💾 Save API Keys for Kids Wonder Lab
+          </button>
+        </div>
+
+        <!-- ═════════ 3. GOLDEN STORIES & WISDOM (ANIMATION · ELDERS) ═════════ -->
+        <div id="subpane-api-elders" class="channel-subpane" style="display:none;">
+          <div class="card" style="border: 1px solid rgba(245,158,11,0.4); background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(15,23,42,0.6) 100%);">
+            <div class="card-header">
+              <div class="card-title">📖 Golden Stories & Wisdom — Animation Engine</div>
+              <span class="audience-badge audience-elders">Mature Adults (45-75)</span>
+            </div>
+            <div style="font-size:12.5px; color:var(--text-secondary);">
+              Generates dignified, heartfelt storybook animations, nostalgic reflections, and emotional life wisdom.
+            </div>
+          </div>
+
+          <div class="animation-callout">
+            <div style="font-weight:700; color:#fbbf24; margin-bottom:4px;">📖 Dedicated Storybook Animation Engine Active</div>
+            <div style="font-size:12.5px; color:var(--text-secondary);">
+              This channel uses the built-in <strong>Animation Engine</strong> to render warm watercolor illustrations, golden hour sunsets, and parchment story plates. <strong>Stock footage APIs (Pexels / Pixabay) are NOT needed or used.</strong>
+            </div>
+          </div>
+
+          <!-- AI Brain Provider Selection -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🤖 AI Brain for Golden Stories & Wisdom</div>
+            </div>
+            <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700;">
+                <input type="radio" name="ai_provider_radio_elders" value="gemini" checked>
+                <span>🧠 Google Gemini AI</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:var(--accent-emerald);">
+                <input type="radio" name="ai_provider_radio_elders" value="groq">
+                <span>⚡ Groq AI (Free LLaMA)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Gemini Configuration -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🧠 Google Gemini API (Golden Stories)</div>
+              <button class="btn btn-secondary btn-test-gemini" data-chan="elders" style="font-size:12px;">Test Gemini Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Gemini API Key</label>
+                <input type="password" id="gemini-api-key-elders" class="form-input gemini-key-input" placeholder="Individual Gemini Key for Elders">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Gemini Model</label>
+                <select id="gemini-model-elders" class="form-select">
+                  <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                  <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+                  <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Groq Configuration -->
+          <div class="card" style="border: 1px solid rgba(16,185,129,0.35);">
+            <div class="card-header">
+              <div class="card-title">⚡ Groq API (Golden Stories)</div>
+              <button class="btn btn-secondary btn-test-groq" data-chan="elders" style="font-size:12px;">Test Groq Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Groq API Key</label>
+                <input type="password" id="groq-api-key-elders" class="form-input groq-key-input" placeholder="Individual Groq Key for Elders">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Groq Model</label>
+                <select id="groq-model-elders" class="form-select">
+                  <option value="openai/gpt-oss-120b">openai/gpt-oss-120b</option>
+                  <option value="openai/gpt-oss-20b">openai/gpt-oss-20b</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nano Banana AI Storybook Generator Card -->
+          <div class="card" style="border: 1px solid rgba(234, 179, 8, 0.35);">
+            <div class="card-header">
+              <div class="card-title">🍌 Nano Banana AI Storybook Visuals (Golden Stories)</div>
+              <button class="btn btn-secondary btn-test-nano-banana" data-chan="elders" style="font-size:12px;">Test Nano Banana</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Nano Banana API Key</label>
+                <input type="password" id="nano-banana-api-key-elders" class="form-input nano-banana-key-input" placeholder="Individual Nano Banana key for Elders">
+                <div class="form-help">Generates watercolor storybook illustrations and portraits.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Model</label>
+                <select id="nano-banana-model-elders" class="form-select">
+                  <option value="nano-banana-storybook-v1">Nano Banana Storybook (Watercolor & Nostalgic)</option>
+                  <option value="nano-banana-flux">Nano Banana FLUX</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Elders Voice & Audio -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🎙️ Narration Voice (Golden Stories)</div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-test-elevenlabs" data-chan="elders" style="font-size:11px; padding:2px 8px;">Test ElevenLabs</button>
+                <button class="btn btn-secondary btn-test-openai-tts" data-chan="elders" style="font-size:11px; padding:2px 8px;">Test OpenAI TTS</button>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Narrator Voice</label>
+                <select id="voice-select-elders" class="form-select">
+                  <option value="en-GB-RyanNeural">en-GB-RyanNeural (Dignified, Nostalgic UK)</option>
+                  <option value="en-US-ChristopherNeural">en-US-ChristopherNeural (Deep, Calm, Dignified)</option>
+                  <option value="en-US-GuyNeural">en-US-GuyNeural (Thoughtful, Warm Explainer)</option>
+                  <option value="onyx">OpenAI Onyx (Deep, Authoritative)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">ElevenLabs API Key (Optional)</label>
+                <input type="password" id="elevenlabs-api-key-elders" class="form-input elevenlabs-key-input" placeholder="Optional ElevenLabs Key">
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-save-channel-keys" data-chan="elders" style="width:100%; margin-top:8px;">
+            💾 Save API Keys for Golden Stories & Wisdom
+          </button>
+        </div>
 
       </div>
 
 
+      <!-- TAB 4: YOUTUBE OAUTH & CONFIG (3 INDIVIDUAL CHANNEL UIs) -->
       <div id="tab-youtube" class="tab-pane">
+        
+        <!-- Channel Sub-Tabs Navigation for YouTube -->
+        <div class="channel-subtabs-nav">
+          <button class="channel-subtab-btn active" data-subchannel-yt="the-ai-brief-it">
+            <span>🎬</span> The AI Brief It <em>(YouTube OAuth)</em>
+          </button>
+          <button class="channel-subtab-btn" data-subchannel-yt="kids">
+            <span>🎨</span> Kids Wonder Lab <em>(YouTube OAuth · Kids Only)</em>
+          </button>
+          <button class="channel-subtab-btn" data-subchannel-yt="elders">
+            <span>📖</span> Golden Stories & Wisdom <em>(YouTube OAuth · Elders)</em>
+          </button>
+        </div>
 
-        <!-- Connection Card -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📺 YouTube Account Authorization</div>
-            <button id="btn-yt-authenticate" class="btn btn-primary">Connect YouTube Channel</button>
+        <!-- ═════════ 1. YOUTUBE OAUTH: THE AI BRIEF IT ═════════ -->
+        <div id="subpane-yt-the-ai-brief-it" class="channel-subpane-yt">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📺 The AI Brief It — YouTube Account Authorization</div>
+              <button class="btn btn-primary btn-yt-auth" data-chan="the-ai-brief-it">Connect The AI Brief It</button>
+            </div>
+            
+            <div id="yt-details-the-ai-brief-it" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <span style="font-size:32px;">🔴</span>
+                <div>
+                  <div id="yt-name-the-ai-brief-it" style="font-size:16px; font-weight:700;">Channel</div>
+                  <div id="yt-id-the-ai-brief-it" style="font-size:12px; color:var(--text-muted);">ID: </div>
+                  <div id="yt-subs-the-ai-brief-it" style="font-size:12px; color:var(--accent-emerald);"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-help">
+              Connect Google OAuth specifically for <strong>The AI Brief It</strong>. Access tokens are stored strictly in <code>runtime/credentials/the-ai-brief-it/</code>.
+            </div>
           </div>
-          
-          <div id="yt-channel-details" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
-            <div style="display:flex; align-items:center; gap:14px;">
-              <span style="font-size:32px;">🔴</span>
-              <div>
-                <div id="yt-channel-name" style="font-size:16px; font-weight:700;">Channel</div>
-                <div id="yt-channel-id" style="font-size:12px; color:var(--text-muted);">ID: </div>
-                <div id="yt-channel-subs" style="font-size:12px; color:var(--accent-emerald);"></div>
+
+          <!-- Client Secret for The AI Brief It -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🔑 Client Secret (The AI Brief It)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload client_secret.json</label>
+              <input type="file" class="form-input yt-secret-file" data-chan="the-ai-brief-it" accept=".json">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label">Or File Path to client_secret.json</label>
+              <div style="display:flex; gap:10px;">
+                <input type="text" id="yt-secret-path-the-ai-brief-it" class="form-input" placeholder="C:\path\to\client_secret.json">
+                <button class="btn btn-secondary btn-load-secret-path" data-chan="the-ai-brief-it">📁 Load</button>
               </div>
             </div>
           </div>
 
-          <div class="form-help">
-            Clicking <strong>Connect YouTube Channel</strong> will open your Google Account authentication page in your browser.
-            Once you grant permission, your OAuth token is saved automatically.
-          </div>
-        </div>
-
-        <!-- Client Secret Setup -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">🔑 Upload or Configure OAuth Client Secret</div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Option A: Upload client_secret.json</label>
-            <input type="file" id="yt-secret-file-input" class="form-input" accept=".json">
-            <div class="form-help">Download from Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client IDs.</div>
-          </div>
-
-          <div class="form-group" style="margin-top:10px;">
-            <label class="form-label">Option A2: Or Default File Path to client_secret.json</label>
-            <div style="display:flex; gap:10px;">
-              <input type="text" id="yt-secret-path-input" class="form-input" placeholder="e.g. C:\Users\PC\Turbo\Youtube\client_secret.json">
-              <button id="btn-load-secret-path" class="btn btn-secondary" style="white-space:nowrap;">📁 Load from Path</button>
+          <!-- Defaults for The AI Brief It -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚙️ Publishing Defaults (The AI Brief It)</div>
             </div>
-            <div class="form-help">Enter the path to your existing client_secret.json and click Load.</div>
-          </div>
-
-          <div style="text-align:center; color:var(--text-muted); font-size:12px; margin:14px 0;">— OR —</div>
-
-          <div class="form-group">
-            <label class="form-label">Option B: Enter Client ID and Client Secret Manually</label>
             <div class="grid-2">
-              <input type="text" id="manual-client-id" class="form-input" placeholder="Client ID (e.g. 123...apps.googleusercontent.com)">
-              <input type="password" id="manual-client-secret" class="form-input" placeholder="Client Secret">
+              <div class="form-group">
+                <label class="form-label">Default Category</label>
+                <select id="yt-cat-the-ai-brief-it" class="form-select">
+                  <option value="28" selected>Science & Technology (28)</option>
+                  <option value="27">Education (27)</option>
+                  <option value="24">Entertainment (24)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Default Privacy</label>
+                <select id="yt-priv-the-ai-brief-it" class="form-select">
+                  <option value="public">Public</option>
+                  <option value="private" selected>Private</option>
+                  <option value="unlisted">Unlisted</option>
+                </select>
+              </div>
             </div>
-            <button id="btn-save-manual-creds" class="btn btn-secondary" style="margin-top:10px;">
-              Save Manual Credentials
+            <button class="btn btn-primary btn-save-yt-settings" data-chan="the-ai-brief-it" style="width:100%; margin-top:10px;">
+              💾 Save YouTube Settings for The AI Brief It
             </button>
           </div>
         </div>
 
-        <!-- YouTube Defaults -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">⚙️ Channel Profile & Publishing Defaults</div>
-          </div>
-
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="form-label">Channel Name / Branding</label>
-              <input type="text" id="channel-name-input" class="form-input" placeholder="e.g. The AI Brief It">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Default Privacy</label>
-              <select id="yt-default-privacy" class="form-select">
-                <option value="public">Public</option>
-                <option value="private">Private</option>
-                <option value="unlisted">Unlisted</option>
-              </select>
+        <!-- ═════════ 2. YOUTUBE OAUTH: KIDS WONDER LAB ═════════ -->
+        <div id="subpane-yt-kids" class="channel-subpane-yt" style="display:none;">
+          <div class="coppa-banner">
+            <span style="font-size:28px;">👶</span>
+            <div>
+              <div style="font-weight:700; font-size:14px; color:#34d399;">COPPA CHILD SAFETY ENFORCED: MADE FOR KIDS = ON</div>
+              <div style="font-size:12px; color:var(--text-secondary);">
+                All uploads to Kids Wonder Lab pass <code>selfDeclaredMadeForKids: True</code> to YouTube API. Content is automatically targeted strictly to kids viewers on YouTube Kids.
+              </div>
             </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Default Category</label>
-            <select id="yt-default-category" class="form-select">
-              <option value="28">Science & Technology</option>
-              <option value="27">Education</option>
-              <option value="24">Entertainment</option>
-              <option value="1">Film & Animation</option>
-              <option value="20">Gaming</option>
-              <option value="22">People & Blogs</option>
-            </select>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📺 Kids Wonder Lab — YouTube Account Authorization</div>
+              <button class="btn btn-primary btn-yt-auth" data-chan="kids">Connect Kids Wonder Lab</button>
+            </div>
+            
+            <div id="yt-details-kids" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <span style="font-size:32px;">👶</span>
+                <div>
+                  <div id="yt-name-kids" style="font-size:16px; font-weight:700;">Kids Channel</div>
+                  <div id="yt-id-kids" style="font-size:12px; color:var(--text-muted);">ID: </div>
+                  <div id="yt-subs-kids" style="font-size:12px; color:var(--accent-emerald);"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-help">
+              OAuth token for <strong>Kids Wonder Lab</strong> is strictly isolated in <code>runtime/credentials/kids/</code>.
+            </div>
           </div>
 
-          <div class="form-group">
-            <label class="form-label">Channel Niche & Audience Description (Guides AI Research)</label>
-            <textarea id="channel-desc-input" class="form-textarea" placeholder="Describe your channel tone, niche, audience..."></textarea>
+          <!-- Client Secret for Kids -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🔑 Client Secret (Kids Wonder Lab)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload client_secret.json</label>
+              <input type="file" class="form-input yt-secret-file" data-chan="kids" accept=".json">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label">Or File Path to client_secret.json</label>
+              <div style="display:flex; gap:10px;">
+                <input type="text" id="yt-secret-path-kids" class="form-input" placeholder="C:\path\to\kids_client_secret.json">
+                <button class="btn btn-secondary btn-load-secret-path" data-chan="kids">📁 Load</button>
+              </div>
+            </div>
           </div>
 
-          <button id="btn-save-youtube" class="btn btn-primary" style="width:100%; margin-top:14px;">
-            💾 Save YouTube Settings
-          </button>
+          <!-- Defaults for Kids -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚙️ Publishing Defaults (Kids Wonder Lab)</div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Default Category</label>
+                <select id="yt-cat-kids" class="form-select">
+                  <option value="27" selected>Education (27)</option>
+                  <option value="1">Film & Animation (1)</option>
+                  <option value="24">Entertainment (24)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Made For Kids (COPPA)</label>
+                <input type="text" class="form-input" value="✅ YES (Enforced for Kids Channel)" disabled style="color:#34d399; font-weight:700;">
+              </div>
+            </div>
+            <button class="btn btn-primary btn-save-yt-settings" data-chan="kids" style="width:100%; margin-top:10px;">
+              💾 Save YouTube Settings for Kids Wonder Lab
+            </button>
+          </div>
+        </div>
+
+        <!-- ═════════ 3. YOUTUBE OAUTH: GOLDEN STORIES ═════════ -->
+        <div id="subpane-yt-elders" class="channel-subpane-yt" style="display:none;">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📺 Golden Stories & Wisdom — YouTube Account Authorization</div>
+              <button class="btn btn-primary btn-yt-auth" data-chan="elders">Connect Golden Stories</button>
+            </div>
+            
+            <div id="yt-details-elders" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
+              <div style="display:flex; align-items:center; gap:14px;">
+                <span style="font-size:32px;">📖</span>
+                <div>
+                  <div id="yt-name-elders" style="font-size:16px; font-weight:700;">Golden Stories Channel</div>
+                  <div id="yt-id-elders" style="font-size:12px; color:var(--text-muted);">ID: </div>
+                  <div id="yt-subs-elders" style="font-size:12px; color:var(--accent-emerald);"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-help">
+              OAuth token for <strong>Golden Stories & Wisdom</strong> is strictly isolated in <code>runtime/credentials/elders/</code>.
+            </div>
+          </div>
+
+          <!-- Client Secret for Elders -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🔑 Client Secret (Golden Stories & Wisdom)</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload client_secret.json</label>
+              <input type="file" class="form-input yt-secret-file" data-chan="elders" accept=".json">
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label">Or File Path to client_secret.json</label>
+              <div style="display:flex; gap:10px;">
+                <input type="text" id="yt-secret-path-elders" class="form-input" placeholder="C:\path\to\elders_client_secret.json">
+                <button class="btn btn-secondary btn-load-secret-path" data-chan="elders">📁 Load</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Defaults for Elders -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">⚙️ Publishing Defaults (Golden Stories)</div>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Default Category</label>
+                <select id="yt-cat-elders" class="form-select">
+                  <option value="24" selected>Entertainment (24)</option>
+                  <option value="22">People & Blogs (22)</option>
+                  <option value="27">Education (27)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Default Privacy</label>
+                <select id="yt-priv-elders" class="form-select">
+                  <option value="private" selected>Private</option>
+                  <option value="public">Public</option>
+                  <option value="unlisted">Unlisted</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-save-yt-settings" data-chan="elders" style="width:100%; margin-top:10px;">
+              💾 Save YouTube Settings for Golden Stories
+            </button>
+          </div>
         </div>
 
       </div>

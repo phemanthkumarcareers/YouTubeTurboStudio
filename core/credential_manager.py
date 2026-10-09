@@ -90,25 +90,30 @@ def get_youtube_token_path(channel_id: str) -> Path:
 def get_client_secret_path(channel_id: str) -> Path:
     """
     Return path to channel-specific client_secret.json.
-    Falls back to root client_secret.json if channel does not have a dedicated one.
+    Strictly uses runtime/credentials/<channel_id>/client_secret.json.
+    Root client_secret.json is ONLY used as fallback for 'the-ai-brief-it' legacy migration.
+    All other channels require their own dedicated client_secret.json for full OAuth isolation.
     """
     chan_secret = get_channel_credentials_dir(channel_id) / "client_secret.json"
     root_secret = BASE_DIR / "client_secret.json"
 
     if chan_secret.exists():
         return chan_secret
-    if root_secret.exists():
+    if channel_id == "the-ai-brief-it" and root_secret.exists():
         return root_secret
     return chan_secret
 
 
-def load_channel_credentials(channel_id: str) -> Dict[str, str]:
+def load_channel_credentials(channel_id: str, allow_global_fallback: bool = False) -> Dict[str, str]:
     """
-    Load resolved credentials for channel following precedence:
-    1. channels/<channel_id>/.env
-    2. Root .env / os.environ
+    Load resolved credentials for channel following strict isolation:
+    1. channels/<channel_id>/.env (Primary channel-specific source)
+    2. Root .env fallback is ONLY used for 'the-ai-brief-it' backwards compatibility,
+       or when allow_global_fallback is explicitly True.
+    For all other channels ('kids', 'elders', custom channels), keys default to empty strings
+    so channels maintain isolated API keys.
     """
-    creds = {}
+    creds = {k: "" for k in KEY_TO_ENV_NAME.keys()}
     channel_env_file = get_channel_env_path(channel_id)
     chan_env_vars = {}
     if channel_env_file.exists():
@@ -118,7 +123,8 @@ def load_channel_credentials(channel_id: str) -> Dict[str, str]:
             chan_env_vars = {}
 
     root_env_vars = {}
-    if GLOBAL_ENV_PATH.exists():
+    is_primary = (channel_id == "the-ai-brief-it")
+    if (allow_global_fallback or is_primary) and GLOBAL_ENV_PATH.exists():
         try:
             root_env_vars = dotenv_values(GLOBAL_ENV_PATH)
         except Exception:
@@ -127,19 +133,22 @@ def load_channel_credentials(channel_id: str) -> Dict[str, str]:
     for cfg_key, env_var in KEY_TO_ENV_NAME.items():
         # 1. Channel .env
         val = chan_env_vars.get(env_var)
-        if val and str(val).strip():
+        if val is not None and str(val).strip():
             creds[cfg_key] = str(val).strip()
             continue
 
-        # 2. Global .env
-        val = root_env_vars.get(env_var)
-        if val and str(val).strip():
-            creds[cfg_key] = str(val).strip()
-            continue
+        # 2. Global fallback only if primary channel or explicitly requested
+        if allow_global_fallback or is_primary:
+            val = root_env_vars.get(env_var)
+            if val is not None and str(val).strip():
+                creds[cfg_key] = str(val).strip()
+                continue
+            val = os.getenv(env_var, "")
+            if val and str(val).strip():
+                creds[cfg_key] = str(val).strip()
+                continue
 
-        # 3. Process environment
-        val = os.getenv(env_var, "")
-        creds[cfg_key] = str(val).strip() if val else ""
+        creds[cfg_key] = ""
 
     return creds
 
@@ -147,7 +156,7 @@ def load_channel_credentials(channel_id: str) -> Dict[str, str]:
 def save_channel_credentials(channel_id: str, new_creds: Dict[str, Any]) -> bool:
     """
     Save channel-specific credentials to channels/<channel_id>/.env.
-    Only writes non-empty, non-masked values.
+    Writes non-masked values. If value is empty string, clears the variable.
     """
     channel_env_file = get_channel_env_path(channel_id)
     channel_env_file.parent.mkdir(parents=True, exist_ok=True)
@@ -158,7 +167,7 @@ def save_channel_credentials(channel_id: str, new_creds: Dict[str, Any]) -> bool
     for cfg_key, val in new_creds.items():
         if cfg_key in KEY_TO_ENV_NAME and val is not None:
             s_val = str(val).strip()
-            # Do not save masked string or empty placeholder
+            # Do not save masked placeholder string
             if "••••" in s_val:
                 continue
             env_var = KEY_TO_ENV_NAME[cfg_key]

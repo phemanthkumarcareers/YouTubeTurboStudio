@@ -188,8 +188,25 @@ def test_groq_connection(api_key: str, model: str = "openai/gpt-oss-120b") -> tu
         return False, f"Groq connection failed: {str(e)}"
 
 
+def _generate_openai(prompt: str, config: dict, json_mode: bool = False) -> str:
+    """Generate content via OpenAI or OpenAI-compatible endpoint."""
+    from openai import OpenAI
+    key = config.get("openai_api_key", "").strip()
+    if not key:
+        raise ValueError("OpenAI API Key is missing. Configure it in the Settings tab.")
+    base_url = config.get("openai_base_url", "https://api.openai.com/v1").strip() or "https://api.openai.com/v1"
+    model = config.get("openai_model", "gpt-4o-mini").strip() or "gpt-4o-mini"
+    client = OpenAI(api_key=key, base_url=base_url)
+    log_info(f"Generating content with OpenAI ({model})...")
+    kwargs = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.8}
+    if json_mode:
+        kwargs["response_format"] = {"type": "json_object"}
+    resp = client.chat.completions.create(**kwargs)
+    return resp.choices[0].message.content.strip()
+
+
 def generate(prompt: str, json_mode: bool = False) -> str:
-    """Unified text generation routing to configured LLM provider (Gemini or Groq)."""
+    """Unified text generation routing with cross-provider fallback across Gemini, Groq, and OpenAI."""
     cfg = load_config()
     provider = cfg.get("llm_provider", "gemini").lower()
 
@@ -201,12 +218,23 @@ def generate(prompt: str, json_mode: bool = False) -> str:
                 log_warn(f"Groq failed ({e}). Auto-falling back to Google Gemini...")
                 return _generate_gemini(prompt, cfg, json_mode=json_mode)
             raise e
+    elif provider == "openai":
+        try:
+            return _generate_openai(prompt, cfg, json_mode=json_mode)
+        except Exception as e:
+            if cfg.get("gemini_api_key"):
+                log_warn(f"OpenAI failed ({e}). Auto-falling back to Google Gemini...")
+                return _generate_gemini(prompt, cfg, json_mode=json_mode)
+            raise e
     else:
-        # Default to Gemini with automatic cross-provider fallback to Groq if quota is exhausted
+        # Default to Gemini with automatic cross-provider fallback to Groq or OpenAI
         try:
             return _generate_gemini(prompt, cfg, json_mode=json_mode)
         except Exception as e:
             if cfg.get("groq_api_key"):
                 log_warn(f"Gemini quota/error ({e}). Auto-falling back to Groq LLaMA 3.3...")
                 return _generate_groq(prompt, cfg, json_mode=json_mode)
+            elif cfg.get("openai_api_key"):
+                log_warn(f"Gemini quota/error ({e}). Auto-falling back to OpenAI...")
+                return _generate_openai(prompt, cfg, json_mode=json_mode)
             raise e

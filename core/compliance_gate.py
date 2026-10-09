@@ -47,7 +47,11 @@ class ComplianceGateManager:
             pq_thresh = float(chan_ctx.settings.get("production_quality_threshold", pq_thresh))
             orig_thresh = float(chan_ctx.settings.get("originality_threshold", orig_thresh))
 
-        is_kids_channel = (channel_id == "little-curious-minds" or (chan_ctx and chan_ctx.youtube.get("made_for_kids", False)))
+        is_kids_channel = (
+            channel_id in ("kids", "little-curious-minds") or
+            (chan_ctx and chan_ctx.audience.get("type") in ("children", "kids")) or
+            (chan_ctx and chan_ctx.youtube.get("made_for_kids", False))
+        )
 
         # 1. Production Quality Gate
         pq_pass = production_quality_score >= pq_thresh

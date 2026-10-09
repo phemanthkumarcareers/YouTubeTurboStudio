@@ -31,7 +31,10 @@ from core.pipeline import execute_pipeline, request_stop
 from agents.llm_client import test_gemini_connection, test_groq_connection, generate
 from media.pexels_client import test_pexels_key
 from media.pixabay_client import test_pixabay_key
+from media.nano_banana_client import test_nano_banana_connection
 from audio.edge_tts_engine import preview_voice_sample
+from audio.audio_service import test_elevenlabs_connection, test_openai_tts_connection
+from audio.voice_profiles import CHANNEL_VOICE_PROFILES, SUPPORTED_AUDIO_PROVIDERS, PROVIDER_VOICES
 from video.thumbnail_generator import generate_thumbnail
 from youtube.auth import check_auth_status, save_client_secret_json, save_client_credentials, run_oauth_flow, load_client_secret_from_path
 from youtube.uploader import upload_video_to_youtube
@@ -367,11 +370,12 @@ def api_get_settings():
         chan = registry.get_active_channel()
         creds = load_channel_credentials(chan.channel_id)
         cfg = chan.to_pipeline_config(creds)
-        # Merge with base config for backwards compatibility
+        # Merge non-credential base config for backwards compatibility
         global_cfg = load_config()
         for k, v in global_cfg.items():
-            if k not in cfg or cfg[k] is None or cfg[k] == "":
-                cfg[k] = v
+            if k not in cfg or cfg[k] is None:
+                if not (k.endswith("_api_key") or k in ("openai_base_url",)):
+                    cfg[k] = v
 
         banned = chan.prompts.get("banned_topics") or load_banned_topics()
         return jsonify({
@@ -386,6 +390,64 @@ def api_get_settings():
     except Exception as e:
         log_error(f"Error loading settings: {e}")
         return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/api/channels/all-settings", methods=["GET"])
+def api_get_all_channel_settings():
+    """Return configurations, credentials, and YouTube OAuth status for all channels."""
+    channels_map = {}
+    for chan_meta in registry.list_channels():
+        cid = chan_meta.get("channel_id") or chan_meta.get("id")
+        chan = registry.get_channel(cid)
+        if not chan:
+            continue
+        creds = load_channel_credentials(cid)
+        masked_creds = get_masked_channel_credentials(cid)
+        yt_status = check_auth_status(cid)
+        channels_map[cid] = {
+            "channel": chan.to_dict(),
+            "config": chan.to_pipeline_config(creds),
+            "credentials": creds,
+            "masked_credentials": masked_creds,
+            "youtube_status": yt_status
+        }
+    return jsonify({
+        "ok": True,
+        "active_channel_id": registry.get_active_channel_id(),
+        "channels": channels_map
+    })
+
+
+@app.route("/api/channels/<channel_id>/credentials", methods=["GET", "POST"])
+def api_channel_credentials(channel_id):
+    chan = registry.get_channel(channel_id)
+    if not chan:
+        return jsonify({"ok": False, "error": f"Channel '{channel_id}' not found"}), 404
+
+    if request.method == "POST":
+        body = request.get_json(force=True) or {}
+        save_channel_credentials(channel_id, body)
+        # Update channel model preferences if present
+        crd_updates = {}
+        for k in ("llm_provider", "gemini_model", "groq_model", "openai_model", "video_source"):
+            if k in body:
+                crd_updates[k] = body[k]
+        if crd_updates:
+            registry.save_channel(channel_id, {"credentials": crd_updates})
+        log_success(f"Credentials updated strictly for channel '{channel_id}'.")
+        return jsonify({
+            "ok": True,
+            "message": f"Credentials saved for '{chan.name}'",
+            "masked_credentials": get_masked_channel_credentials(channel_id)
+        })
+
+    creds = load_channel_credentials(channel_id)
+    return jsonify({
+        "ok": True,
+        "channel_id": channel_id,
+        "credentials": creds,
+        "masked_credentials": get_masked_channel_credentials(channel_id)
+    })
 
 
 @app.route("/api/settings/save", methods=["POST"])
@@ -435,6 +497,47 @@ def api_test_pixabay():
     return jsonify({"ok": ok, "message": msg})
 
 
+@app.route("/api/settings/test-nano-banana", methods=["POST"])
+def api_test_nano_banana():
+    body = request.get_json(force=True) or {}
+    key = body.get("nano_banana_api_key", "")
+    model = body.get("nano_banana_model", "nano-banana-flux")
+    base_url = body.get("nano_banana_base_url", "")
+    ok, msg = test_nano_banana_connection(key, model=model, base_url=base_url)
+    return jsonify({"ok": ok, "message": msg})
+
+
+@app.route("/api/settings/test-elevenlabs", methods=["POST"])
+def api_test_elevenlabs():
+    body = request.get_json(force=True) or {}
+    key = body.get("elevenlabs_api_key", "")
+    voice_id = body.get("elevenlabs_voice_id", "")
+    ok, msg = test_elevenlabs_connection(key, voice_id)
+    return jsonify({"ok": ok, "message": msg})
+
+
+@app.route("/api/settings/test-openai-tts", methods=["POST"])
+def api_test_openai_tts():
+    body = request.get_json(force=True) or {}
+    key = body.get("openai_api_key", "")
+    model = body.get("openai_tts_model", "tts-1")
+    voice = body.get("openai_tts_voice", "alloy")
+    ok, msg = test_openai_tts_connection(key, model=model, voice=voice)
+    return jsonify({"ok": ok, "message": msg})
+
+
+@app.route("/api/audio/profiles", methods=["GET"])
+def api_audio_profiles():
+    channel_id = request.args.get("channel_id") or registry.get_active_channel_id()
+    return jsonify({
+        "ok": True,
+        "providers": SUPPORTED_AUDIO_PROVIDERS,
+        "provider_voices": PROVIDER_VOICES,
+        "channel_profiles": CHANNEL_VOICE_PROFILES,
+        "active_profile": CHANNEL_VOICE_PROFILES.get(channel_id, CHANNEL_VOICE_PROFILES.get("the-ai-brief-it"))
+    })
+
+
 @app.route("/api/settings/banned-topics", methods=["POST"])
 def api_save_banned_topics():
     body = request.get_json(force=True) or {}
@@ -450,6 +553,14 @@ def api_save_banned_topics():
 def api_youtube_status():
     cid = request.args.get("channel_id") or registry.get_active_channel_id()
     return jsonify(check_auth_status(channel_id=cid))
+
+
+@app.route("/api/youtube/status/all", methods=["GET"])
+def api_youtube_status_all():
+    statuses = {}
+    for chan in registry.list_channels():
+        statuses[chan.channel_id] = check_auth_status(channel_id=chan.channel_id)
+    return jsonify({"ok": True, "statuses": statuses})
 
 
 @app.route("/api/youtube/save-secret-json", methods=["POST"])

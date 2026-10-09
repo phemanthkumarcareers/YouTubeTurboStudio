@@ -797,3 +797,121 @@ input[type="checkbox"]:checked {
 input[type="range"] {
   accent-color: var(--sky-blue);
 }
+
+/* ── ENHANCED CHANNEL DROPDOWN & SUB-TABS ── */
+.channel-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.channel-selector-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.channel-select-dropdown {
+  font-size: 14.5px !important;
+  font-weight: 700 !important;
+  height: 42px !important;
+  min-width: 290px !important;
+  padding: 6px 14px !important;
+  background: #0c1527 !important;
+  color: #f1f5f9 !important;
+  border: 2px solid var(--sky-blue) !important;
+  border-radius: var(--radius-sm) !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25) !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.channel-select-dropdown:hover, .channel-select-dropdown:focus {
+  border-color: var(--yt-red) !important;
+  box-shadow: 0 0 14px rgba(255, 0, 51, 0.35) !important;
+}
+
+.audience-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.audience-kids {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.audience-elders {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.5);
+}
+
+.audience-general {
+  background: rgba(56, 189, 248, 0.2);
+  color: var(--sky-blue);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+}
+
+.channel-subtabs-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.channel-subtab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.channel-subtab-btn:hover {
+  color: #ffffff;
+  border-color: var(--sky-blue);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.channel-subtab-btn.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(255, 0, 51, 0.2));
+  border-color: var(--sky-blue);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+}
+
+.coppa-banner {
+  background: linear-gradient(90deg, rgba(16, 185, 129, 0.15), rgba(56, 189, 248, 0.1));
+  border: 1.5px solid rgba(16, 185, 129, 0.5);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.animation-callout {
+  background: linear-gradient(90deg, rgba(255, 0, 51, 0.1), rgba(168, 85, 247, 0.1));
+  border: 1.5px solid rgba(255, 0, 51, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  margin-bottom: 16px;
+}

@@ -272,10 +272,49 @@ function updateChannelUI(chan) {
         }
     }
 
+    // Update audience badge
+    const audBadge = document.getElementById("active-audience-badge");
+    const audType = chan.audience?.type || "";
+    const cid = chan.id || chan.channel_id;
+    if (audBadge) {
+        if (audType === "children" || cid === "kids") {
+            audBadge.innerText = "👶 Kids Only (COPPA)";
+            audBadge.className = "audience-badge audience-kids";
+        } else if (audType === "mature_adults" || cid === "elders") {
+            audBadge.innerText = "📖 Elders (45-75)";
+            audBadge.className = "audience-badge audience-elders";
+        } else {
+            audBadge.innerText = "General Audience";
+            audBadge.className = "audience-badge audience-general";
+        }
+    }
+
+    // Synchronize sub-tabs in API Keys and YouTube
+    switchSubTab("api", cid);
+    switchSubTab("yt", cid);
+
     // Set format radio button if specified in channel defaults
     const defFormat = chan.video?.default_format || (chan.default_format || "normal");
     const fmtRadio = document.querySelector(`input[name="video_format"][value="${defFormat}"]`);
     if (fmtRadio) fmtRadio.checked = true;
+}
+
+function switchSubTab(type, channelId) {
+    if (type === "api") {
+        document.querySelectorAll(".channel-subtab-btn[data-subchannel]").forEach(btn => {
+            btn.classList.toggle("active", btn.getAttribute("data-subchannel") === channelId);
+        });
+        document.querySelectorAll(".channel-subpane").forEach(pane => {
+            pane.style.display = (pane.id === `subpane-api-${channelId}`) ? "block" : "none";
+        });
+    } else if (type === "yt") {
+        document.querySelectorAll(".channel-subtab-btn[data-subchannel-yt]").forEach(btn => {
+            btn.classList.toggle("active", btn.getAttribute("data-subchannel-yt") === channelId);
+        });
+        document.querySelectorAll(".channel-subpane-yt").forEach(pane => {
+            pane.style.display = (pane.id === `subpane-yt-${channelId}`) ? "block" : "none";
+        });
+    }
 }
 
 async function switchChannel(channelId) {
@@ -405,6 +444,7 @@ async function loadSettings() {
             voice: currentConfig.voice_id,
             provider: currentConfig.llm_provider
         });
+        await loadAllChannelSettings();
     } catch (e) {
         showToast(`Failed loading settings: ${e.message}`, "error");
     }
@@ -490,6 +530,209 @@ async function saveAllSettings() {
         }
     } catch (e) {
         showToast(`Error saving settings: ${e.message}`, "error");
+    }
+}
+
+// ── PER-CHANNEL MULTI-VIEW LOGIC ──
+async function loadAllChannelSettings() {
+    try {
+        const resp = await fetch("/api/channels/all-settings");
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (!data.ok || !data.channels) return;
+
+        for (const [cid, cData] of Object.entries(data.channels)) {
+            const creds = cData.credentials || {};
+            const yt = cData.youtube_status || {};
+            const cfg = cData.config || {};
+
+            // API Keys
+            setVal(`gemini-api-key-${cid}`, creds.gemini_api_key || "");
+            setVal(`groq-api-key-${cid}`, creds.groq_api_key || "");
+            setVal(`nano-banana-api-key-${cid}`, creds.nano_banana_api_key || "");
+            setVal(`pexels-api-key-${cid}`, creds.pexels_api_key || "");
+            setVal(`pixabay-api-key-${cid}`, creds.pixabay_api_key || "");
+            setVal(`elevenlabs-api-key-${cid}`, creds.elevenlabs_api_key || "");
+            setVal(`elevenlabs-voice-id-${cid}`, creds.elevenlabs_voice_id || "");
+
+            setSelectVal(`gemini-model-${cid}`, cfg.gemini_model || "gemini-3.8-flash");
+            setSelectVal(`groq-model-${cid}`, cfg.groq_model || "openai/gpt-oss-120b");
+            setSelectVal(`nano-banana-model-${cid}`, cfg.nano_banana_model || "");
+            setSelectVal(`voice-select-${cid}`, cfg.voice_id || "");
+
+            const provRadio = document.querySelector(`input[name="ai_provider_radio_${cid}"][value="${cfg.llm_provider || 'gemini'}"]`);
+            if (provRadio) provRadio.checked = true;
+
+            // YouTube Status
+            const detailsEl = document.getElementById(`yt-details-${cid}`);
+            const nameEl = document.getElementById(`yt-name-${cid}`);
+            const idEl = document.getElementById(`yt-id-${cid}`);
+            const subsEl = document.getElementById(`yt-subs-${cid}`);
+            const secretPathInput = document.getElementById(`yt-secret-path-${cid}`);
+
+            if (secretPathInput && yt.default_secret_path) {
+                secretPathInput.value = yt.default_secret_path;
+            }
+
+            if (yt.token_valid && yt.channel) {
+                if (detailsEl) detailsEl.style.display = "block";
+                if (nameEl) nameEl.innerText = yt.channel.title || "Authenticated Channel";
+                if (idEl) idEl.innerText = `ID: ${yt.channel.id || ""}`;
+                if (subsEl) subsEl.innerText = `Subscribers: ${yt.channel.subscribers || "Active"}`;
+            } else if (detailsEl) {
+                detailsEl.style.display = "none";
+            }
+        }
+    } catch (e) {
+        console.error("Failed loading all channel settings:", e);
+    }
+}
+
+async function saveChannelKeys(channelId) {
+    const cleanKey = (val) => (val && !val.includes("••••")) ? val : "";
+    const gKey = cleanKey(getVal(`gemini-api-key-${channelId}`));
+    const grKey = cleanKey(getVal(`groq-api-key-${channelId}`));
+    const nbKey = cleanKey(getVal(`nano-banana-api-key-${channelId}`));
+    const pxKey = cleanKey(getVal(`pexels-api-key-${channelId}`));
+    const pbKey = cleanKey(getVal(`pixabay-api-key-${channelId}`));
+    const elKey = cleanKey(getVal(`elevenlabs-api-key-${channelId}`));
+    const elVoiceId = getVal(`elevenlabs-voice-id-${channelId}`);
+    const gModel = getVal(`gemini-model-${channelId}`);
+    const grModel = getVal(`groq-model-${channelId}`);
+    const nbModel = getVal(`nano-banana-model-${channelId}`);
+    const provider = document.querySelector(`input[name="ai_provider_radio_${channelId}"]:checked`)?.value || "gemini";
+    const voiceId = getVal(`voice-select-${channelId}`);
+
+    const payload = {
+        gemini_api_key: gKey,
+        groq_api_key: grKey,
+        nano_banana_api_key: nbKey,
+        pexels_api_key: pxKey,
+        pixabay_api_key: pbKey,
+        elevenlabs_api_key: elKey,
+        elevenlabs_voice_id: elVoiceId,
+        llm_provider: provider,
+        gemini_model: gModel,
+        groq_model: grModel,
+        nano_banana_model: nbModel
+    };
+    if (voiceId) {
+        payload.voice = { voice_id: voiceId };
+    }
+
+    try {
+        const resp = await fetch(`/api/channels/${channelId}/credentials`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const res = await resp.json();
+        if (res.ok) {
+            showToast(`API Keys saved permanently for ${channelId}!`, "success");
+            await loadAllChannelSettings();
+            if (channelId === currentChannelId) {
+                await loadSettings();
+            }
+        } else {
+            showToast(`Save failed: ${res.error}`, "error");
+        }
+    } catch (e) {
+        showToast(`Save error: ${e.message}`, "error");
+    }
+}
+
+async function saveChannelYtSettings(channelId) {
+    const cat = getVal(`yt-cat-${channelId}`);
+    const priv = getVal(`yt-priv-${channelId}`);
+    const payload = {
+        channel_id: channelId,
+        youtube: {
+            category_id: cat || "28",
+            privacy: priv || "private"
+        }
+    };
+    try {
+        const resp = await fetch("/api/channels/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const res = await resp.json();
+        if (res.ok) {
+            showToast(`YouTube settings saved for ${channelId}!`, "success");
+        } else {
+            showToast(`Failed saving YouTube settings: ${res.error}`, "error");
+        }
+    } catch (e) {
+        showToast(`Error: ${e.message}`, "error");
+    }
+}
+
+async function triggerChannelYouTubeAuth(channelId) {
+    showToast(`Launching YouTube OAuth for ${channelId}...`, "info");
+    try {
+        const resp = await fetch("/api/youtube/authenticate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ channel_id: channelId })
+        });
+        const res = await resp.json();
+        if (res.ok) {
+            showToast(res.message || `Successfully connected ${channelId}!`, "success");
+            await loadAllChannelSettings();
+            if (channelId === currentChannelId) {
+                await loadYouTubeStatus();
+            }
+        } else {
+            showToast(`YouTube Auth error: ${res.error}`, "error");
+        }
+    } catch (e) {
+        showToast(`Auth failed: ${e.message}`, "error");
+    }
+}
+
+async function loadSecretFromPathForChannel(channelId) {
+    const path = getVal(`yt-secret-path-${channelId}`);
+    if (!path) {
+        showToast("Please enter a file path to client_secret.json", "warning");
+        return;
+    }
+    try {
+        const resp = await fetch("/api/youtube/load-secret-path", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ filepath: path, channel_id: channelId })
+        });
+        const res = await resp.json();
+        if (res.ok) {
+            showToast(`Loaded client secret for ${channelId}!`, "success");
+            await loadAllChannelSettings();
+        } else {
+            showToast(`Failed: ${res.error}`, "error");
+        }
+    } catch (e) {
+        showToast(`Error: ${e.message}`, "error");
+    }
+}
+
+async function uploadSecretFileForChannel(file, channelId) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("channel_id", channelId);
+    try {
+        const resp = await fetch("/api/youtube/save-secret-json", {
+            method: "POST",
+            body: formData
+        });
+        const res = await resp.json();
+        if (res.ok) {
+            showToast(`Uploaded client secret for ${channelId}!`, "success");
+            await loadAllChannelSettings();
+        } else {
+            showToast(`Upload failed: ${res.error}`, "error");
+        }
+    } catch (e) {
+        showToast(`Upload error: ${e.message}`, "error");
     }
 }
 
@@ -1077,23 +1320,172 @@ function setupEventListeners() {
         if (res.ok) showToast("Banned topics updated!", "success");
     });
 
-    // YouTube Auth & Credentials
-    document.getElementById("btn-yt-authenticate").addEventListener("click", triggerYouTubeAuth);
-    document.getElementById("btn-save-manual-creds").addEventListener("click", saveManualCredentials);
+    // ── CHANNEL SUB-TABS & PER-CHANNEL CONTROLS ──
+    document.querySelectorAll(".channel-subtab-btn[data-subchannel]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cid = btn.getAttribute("data-subchannel");
+            switchSubTab("api", cid);
+        });
+    });
 
-    const loadSecretBtn = document.getElementById("btn-load-secret-path");
-    if (loadSecretBtn) {
-        loadSecretBtn.addEventListener("click", loadSecretFromPath);
-    }
+    document.querySelectorAll(".channel-subtab-btn[data-subchannel-yt]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cid = btn.getAttribute("data-subchannel-yt");
+            switchSubTab("yt", cid);
+        });
+    });
 
-    const fileInput = document.getElementById("yt-secret-file-input");
-    if (fileInput) {
-        fileInput.addEventListener("change", (e) => {
+    document.querySelectorAll(".btn-save-channel-keys").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cid = btn.getAttribute("data-chan");
+            saveChannelKeys(cid);
+        });
+    });
+
+    document.querySelectorAll(".btn-test-gemini").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`gemini-api-key-${cid}`);
+            const model = getVal(`gemini-model-${cid}`) || "gemini-3.8-flash";
+            showToast(`Testing Gemini for ${cid}...`, "info");
+            const resp = await fetch("/api/settings/test-gemini", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ gemini_api_key: key, gemini_model: model })
+            });
+            const res = await resp.json();
+            showToast(res.message, res.ok ? "success" : "error");
+        });
+    });
+
+    document.querySelectorAll(".btn-test-groq").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`groq-api-key-${cid}`);
+            const model = getVal(`groq-model-${cid}`) || "openai/gpt-oss-120b";
+            showToast(`Testing Groq for ${cid}...`, "info");
+            const resp = await fetch("/api/settings/test-groq", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ groq_api_key: key, groq_model: model })
+            });
+            const res = await resp.json();
+            showToast(res.message, res.ok ? "success" : "error");
+        });
+    });
+
+    document.querySelectorAll(".btn-test-pexels").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`pexels-api-key-${cid}`);
+            showToast(`Testing Pexels for ${cid}...`, "info");
+            const resp = await fetch("/api/settings/test-pexels", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pexels_api_key: key })
+            });
+            const res = await resp.json();
+            showToast(res.message, res.ok ? "success" : "error");
+        });
+    });
+
+    document.querySelectorAll(".btn-test-pixabay").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`pixabay-api-key-${cid}`);
+            showToast(`Testing Pixabay for ${cid}...`, "info");
+            const resp = await fetch("/api/settings/test-pixabay", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pixabay_api_key: key })
+            });
+            const res = await resp.json();
+            showToast(res.message, res.ok ? "success" : "error");
+        });
+    });
+
+    document.querySelectorAll(".btn-test-nano-banana").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`nano-banana-api-key-${cid}`);
+            const model = getVal(`nano-banana-model-${cid}`) || "nano-banana-flux";
+            showToast(`Testing Nano Banana for ${cid}...`, "info");
+            const resp = await fetch("/api/settings/test-nano-banana", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nano_banana_api_key: key, nano_banana_model: model })
+            });
+            const res = await resp.json();
+            showToast(res.message, res.ok ? "success" : "error");
+        });
+    });
+
+    document.querySelectorAll(".btn-test-elevenlabs").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`elevenlabs-api-key-${cid}`);
+            const voiceId = getVal(`elevenlabs-voice-id-${cid}`) || "";
+            showToast(`Testing ElevenLabs for ${cid}...`, "info");
+            const resp = await fetch("/api/settings/test-elevenlabs", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ elevenlabs_api_key: key, elevenlabs_voice_id: voiceId })
+            });
+            const res = await resp.json();
+            showToast(res.message, res.ok ? "success" : "error");
+        });
+    });
+
+    document.querySelectorAll(".btn-test-openai-tts").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`gemini-api-key-${cid}`) || ""; // Or global key
+            showToast(`Testing OpenAI TTS connection...`, "info");
+            const resp = await fetch("/api/settings/test-openai-tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ openai_api_key: key, openai_tts_model: "tts-1", openai_tts_voice: "alloy" })
+            });
+            const res = await resp.json();
+            showToast(res.message, res.ok ? "success" : "error");
+        });
+    });
+
+    document.querySelectorAll(".btn-yt-auth").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cid = btn.getAttribute("data-chan");
+            triggerChannelYouTubeAuth(cid);
+        });
+    });
+
+    document.querySelectorAll(".btn-load-secret-path").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cid = btn.getAttribute("data-chan");
+            loadSecretFromPathForChannel(cid);
+        });
+    });
+
+    document.querySelectorAll(".yt-secret-file").forEach(input => {
+        input.addEventListener("change", (e) => {
+            const cid = input.getAttribute("data-chan");
             if (e.target.files.length > 0) {
-                uploadSecretFile(e.target.files[0]);
+                uploadSecretFileForChannel(e.target.files[0], cid);
             }
         });
-    }
+    });
+
+    document.querySelectorAll(".btn-save-yt-settings").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const cid = btn.getAttribute("data-chan");
+            saveChannelYtSettings(cid);
+        });
+    });
+
+    // YouTube Auth legacy buttons fallback
+    const legacyYtAuth = document.getElementById("btn-yt-authenticate");
+    if (legacyYtAuth) legacyYtAuth.addEventListener("click", triggerYouTubeAuth);
+    const legacyManualCreds = document.getElementById("btn-save-manual-creds");
+    if (legacyManualCreds) legacyManualCreds.addEventListener("click", saveManualCredentials);
 }
 
 // ── UTILITY HELPERS ──

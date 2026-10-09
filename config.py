@@ -44,19 +44,25 @@ DEFAULT_CONFIG = {
     "openai_base_url": os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
     "openai_model": "gpt-4o-mini",
     
-    # Stock Media Keys & Sources
+    # Stock Media & Generative Image Keys
+    "nano_banana_api_key": os.getenv("NANO_BANANA_API_KEY", ""),
+    "nano_banana_model": "nano-banana-flux",
+    "nano_banana_base_url": os.getenv("NANO_BANANA_BASE_URL", "https://api.banana.dev/v1/generate"),
     "pexels_api_key": os.getenv("PEXELS_API_KEY", ""),
     "pixabay_api_key": os.getenv("PIXABAY_API_KEY", ""),
-    "video_source": "pexels_images", # 'pexels_images', 'pexels_videos', 'pixabay_images', 'pixabay_videos', 'local'
+    "video_source": "pexels_images", # 'pexels_images', 'pexels_videos', 'pixabay_images', 'pixabay_videos', 'nano_banana', 'local'
     "local_media_dir": str(RESOURCES_DIR / "media"),
 
-    # Voice / Audio
-    "tts_provider": "edge-tts",  # 'edge-tts' or 'elevenlabs'
+    # Voice / Audio (Multi-Provider: Edge-TTS, ElevenLabs, OpenAI TTS)
+    "tts_provider": "edge-tts",  # 'edge-tts', 'elevenlabs', 'openai-tts', 'google-tts'
     "voice_id": "en-US-ChristopherNeural",
     "voice_rate": "+0%",
     "voice_pitch": "+0Hz",
     "elevenlabs_api_key": os.getenv("ELEVENLABS_API_KEY", ""),
     "elevenlabs_voice_id": "21m00Tcm4TlvDq8ikWAM", # Rachel
+    "openai_tts_model": "tts-1",
+    "openai_tts_voice": "alloy",
+    "multi_character_audio": True,
     "music_enabled": True,
     "music_volume": 0.12,
 
@@ -152,6 +158,8 @@ def load_config() -> dict:
             cfg["pexels_api_key"] = os.getenv("PEXELS_API_KEY")
         if not cfg.get("elevenlabs_api_key") and os.getenv("ELEVENLABS_API_KEY"):
             cfg["elevenlabs_api_key"] = os.getenv("ELEVENLABS_API_KEY")
+        if not cfg.get("nano_banana_api_key") and os.getenv("NANO_BANANA_API_KEY"):
+            cfg["nano_banana_api_key"] = os.getenv("NANO_BANANA_API_KEY")
 
         return cfg
 
@@ -173,6 +181,7 @@ def save_config(updates: dict) -> dict:
         env_keys = {
             "gemini_api_key": "GEMINI_API_KEY",
             "groq_api_key": "GROQ_API_KEY",
+            "nano_banana_api_key": "NANO_BANANA_API_KEY",
             "pexels_api_key": "PEXELS_API_KEY",
             "pixabay_api_key": "PIXABAY_API_KEY",
             "elevenlabs_api_key": "ELEVENLABS_API_KEY",

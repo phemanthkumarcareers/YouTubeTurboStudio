@@ -68,8 +68,26 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
 
         log_info(f"   [Section {sec_id}] Searching '{query}'...")
 
+        # ── 0. AI Visuals: Nano Banana Generation (if configured or source is nano_banana) ──
+        nano_key = cfg.get("nano_banana_api_key", "").strip()
+        if nano_key and (source == "nano_banana" or not pexels_key):
+            try:
+                from media.nano_banana_client import generate_image_with_nano_banana
+                dest = str(img_dir / f"sec_{sec_id}_nano_banana.jpg")
+                res = generate_image_with_nano_banana(
+                    prompt=f"{query}, cinematic high resolution, 4k, photorealistic",
+                    width=w,
+                    height=h,
+                    output_path=dest,
+                    api_key=nano_key
+                )
+                if res and os.path.exists(res):
+                    sec_paths.append(res)
+            except Exception as e:
+                log_warn(f"   [Section {sec_id}] Nano Banana query failed: {e}")
+
         # ── 1. Video-First: Query Pexels HD Videos ──
-        if pexels_key:
+        if not sec_paths and pexels_key:
             try:
                 vid_urls = pexels_videos(query, pexels_key, orientation=orientation, count=target_count)
                 for i, u in enumerate(vid_urls):

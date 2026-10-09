@@ -28,7 +28,7 @@ from agents.scriptwriter import write_script
 from agents.critic import review_and_refine_script
 from agents.fact_checker import check_script_facts
 from video.visual_director import plan_visual_beats
-from audio.edge_tts_engine import generate_speech
+from core.fallback_manager import synthesize_audio_with_fallback
 from audio.music_manager import mix_voice_and_bgm
 from media.media_manager import fetch_media_for_script
 from video.renderer import render_video
@@ -120,8 +120,25 @@ def execute_pipeline(
                 if not research_data:
                     research_data = {"topic": topic_override or "Mind-Bending Phenomenon"}
 
+                instructions = ""
+                aud_type = channel_context.audience.get("type", "")
+                if aud_type in ("children", "kids"):
+                    instructions = (
+                        "TARGET AUDIENCE: Preschool & Kindergarten Children (Ages 3-6). "
+                        "Strict COPPA Child-Safety Mode: Joyful, gentle, musical rhymes, counting, friendly animals, and moral wonders. "
+                        "Simple vocabulary, happy positive reinforcement, zero scary elements, and completely child-safe."
+                    )
+                elif aud_type in ("mature_adults", "elders"):
+                    instructions = (
+                        "TARGET AUDIENCE: Mature Adults & Seniors. "
+                        "Dignified, warm, nostalgic, emotionally resonant life stories and timeless wisdom. "
+                        "Unhurried poetic pacing and meaningful philosophical reflection."
+                    )
+                elif channel_context.prompts.get("description"):
+                    instructions = channel_context.prompts.get("description")
+
                 # Draft script
-                draft_script = write_script(research_data, video_type=video_type)
+                draft_script = write_script(research_data, video_type=video_type, custom_instructions=instructions)
 
                 # Critic & Rewrite loop (11 criteria, automatic iterations)
                 script_data, critique_data = review_and_refine_script(draft_script, is_shorts=is_shorts)
@@ -165,7 +182,12 @@ def execute_pipeline(
                 set_stage("narration", "running")
 
                 full_narration = " ".join(s.get("narration", "") for s in script_data.get("sections", []))
-                raw_voice_mp3, srt_file = generate_speech(full_narration, output_prefix="narration")
+                raw_voice_mp3, srt_file = synthesize_audio_with_fallback(
+                    text=full_narration,
+                    output_prefix="narration",
+                    channel_id=channel_context.channel_id,
+                    script_data=script_data
+                )
 
                 # Mix voice with background music + audio ducking
                 mixed_audio = mix_voice_and_bgm(raw_voice_mp3, str(OUTPUT_DIR / "audio_track.mp3"))
@@ -175,13 +197,22 @@ def execute_pipeline(
                 set_stage("narration", "done")
                 log_stage("narration", "done")
 
-            # ── 4. MEDIA (VIDEO-FIRST HIERARCHY) ───────────────────────────
+            # ── 4. MEDIA (VIDEO-FIRST HIERARCHY / ANIMATION ENGINE) ────────
             media_map = {}
             if "media" in steps:
                 if is_stopped(): return
                 log_stage("media", "running")
                 set_stage("media", "running")
-                media_map = fetch_media_for_script(script_data, video_type=video_type)
+                if getattr(channel_context, "engine", "media_video") == "animation":
+                    from video.animation_engine import generate_animated_media_map
+                    media_map = generate_animated_media_map(
+                        script=script_data,
+                        channel_id=channel_context.channel_id,
+                        video_type=video_type,
+                        audience_type=channel_context.audience.get("type", "general")
+                    )
+                else:
+                    media_map = fetch_media_for_script(script_data, video_type=video_type)
                 set_stage("media", "done")
                 log_stage("media", "done")
 
