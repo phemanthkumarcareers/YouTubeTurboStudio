@@ -21,6 +21,14 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
+# Ensure PIL.Image.ANTIALIAS is shimmed globally for MoviePy 1.0.3 compatibility
+try:
+    import PIL.Image
+    if not hasattr(PIL.Image, "ANTIALIAS"):
+        PIL.Image.ANTIALIAS = getattr(PIL.Image, "Resampling", PIL.Image).LANCZOS
+except Exception:
+    pass
+
 from config import (
     load_config, save_config, load_banned_topics, save_banned_topics,
     POPULAR_VOICES, YOUTUBE_CATEGORIES, OUTPUT_DIR, CLIENT_SECRET_PATH
@@ -468,8 +476,15 @@ def api_save_settings():
 @app.route("/api/settings/test-gemini", methods=["POST"])
 def api_test_gemini():
     body = request.get_json(force=True) or {}
-    key = body.get("gemini_api_key", "")
-    model = body.get("gemini_model", "gemini-2.5-flash")
+    key = body.get("gemini_api_key", "").strip()
+    channel_id = body.get("channel_id") or registry.get_active_channel_id()
+    if not key or "••••" in key:
+        creds = load_channel_credentials(channel_id, allow_global_fallback=True)
+        key = creds.get("gemini_api_key", "")
+    model = body.get("gemini_model")
+    if not model:
+        chan = registry.get_channel(channel_id)
+        model = (chan.credentials.get("gemini_model") if chan else "") or "gemini-3.8-flash"
     ok, msg = test_gemini_connection(key, model)
     return jsonify({"ok": ok, "message": msg})
 

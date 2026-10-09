@@ -170,7 +170,7 @@ body {
 }
 
 .dot-idle { background-color: var(--text-muted); }
-.dot-running { background-color: var(--yt-red); box-shadow: 0 0 10px var(--yt-red); animation: pulse 1.2s infinite; }
+.dot-running { background-color: #f97316; box-shadow: 0 0 10px #f97316; animation: pulse 1.2s infinite; }
 .dot-success { background-color: var(--accent-emerald); box-shadow: 0 0 8px var(--accent-emerald); }
 .dot-error { background-color: var(--yt-red); box-shadow: 0 0 10px var(--yt-red); }
 
@@ -284,9 +284,9 @@ body {
 }
 
 .stage-step.running .stage-step-icon {
-  border-color: var(--yt-red);
-  color: var(--yt-red);
-  box-shadow: 0 0 8px rgba(255, 0, 51, 0.4);
+  border-color: #f97316;
+  color: #f97316;
+  box-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
   animation: spin 1.5s linear infinite;
 }
 

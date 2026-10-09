@@ -260,26 +260,44 @@ function updateStatusUI(status) {
     const chipDot = document.getElementById("status-dot");
     const chipText = document.getElementById("status-text");
 
+    const chanSelect = document.getElementById("active-channel-select");
+
     if (status.running) {
         chipDot.className = "status-dot dot-running";
         chipText.innerText = "Running Pipeline...";
         document.getElementById("btn-generate").disabled = true;
         document.getElementById("btn-stop").style.display = "inline-flex";
+        if (chanSelect) {
+            chanSelect.disabled = true;
+            chanSelect.title = "Channel selection locked while pipeline is running";
+        }
     } else if (status.error) {
         chipDot.className = "status-dot dot-error";
         chipText.innerText = "Pipeline Error";
         document.getElementById("btn-generate").disabled = false;
         document.getElementById("btn-stop").style.display = "none";
+        if (chanSelect) {
+            chanSelect.disabled = false;
+            chanSelect.title = "";
+        }
     } else if (status.stages && status.stages.video === "done") {
         chipDot.className = "status-dot dot-success";
         chipText.innerText = "Video Ready";
         document.getElementById("btn-generate").disabled = false;
         document.getElementById("btn-stop").style.display = "none";
+        if (chanSelect) {
+            chanSelect.disabled = false;
+            chanSelect.title = "";
+        }
     } else {
         chipDot.className = "status-dot dot-idle";
         chipText.innerText = "Studio Idle";
         document.getElementById("btn-generate").disabled = false;
         document.getElementById("btn-stop").style.display = "none";
+        if (chanSelect) {
+            chanSelect.disabled = false;
+            chanSelect.title = "";
+        }
     }
 
     // Update Stage tracker in sidebar
@@ -472,6 +490,12 @@ function switchSubTab(type, channelId) {
 }
 
 async function switchChannel(channelId) {
+    if (currentStatus && currentStatus.running) {
+        showToast("Channel switching is locked while generation pipeline is running.", "warning");
+        const selectEl = document.getElementById("active-channel-select");
+        if (selectEl) selectEl.value = currentChannelId;
+        return;
+    }
     try {
         showToast(`Switching channel to ${channelId}...`, "info");
         const resp = await fetch("/api/channels/select", {
@@ -832,10 +856,17 @@ async function triggerChannelYouTubeAuth(channelId) {
     try {
         const resp = await fetch("/api/youtube/authenticate", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify({ channel_id: channelId })
         });
-        const res = await resp.json();
+        const contentType = resp.headers.get("content-type") || "";
+        let res;
+        if (contentType.includes("application/json")) {
+            res = await resp.json();
+        } else {
+            const rawText = await resp.text();
+            throw new Error(`Server returned status ${resp.status} (${rawText.slice(0, 100).trim()})`);
+        }
         if (res.ok) {
             showToast(res.message || `Successfully connected ${channelId}!`, "success");
             await loadAllChannelSettings();
@@ -843,10 +874,10 @@ async function triggerChannelYouTubeAuth(channelId) {
                 await loadYouTubeStatus();
             }
         } else {
-            showToast(`YouTube Auth error: ${res.error}`, "error");
+            showToast(`YouTube Auth: ${res.error || res.message}`, "error");
         }
     } catch (e) {
-        showToast(`Auth failed: ${e.message}`, "error");
+        showToast(`Auth error: ${e.message}`, "error");
     }
 }
 
@@ -1419,6 +1450,10 @@ function setupEventListeners() {
     // ── CHANNEL SUB-TABS NAVIGATION ──
     document.querySelectorAll(".channel-subtab-btn[data-subchannel]").forEach(btn => {
         btn.addEventListener("click", () => {
+            if (currentStatus && currentStatus.running) {
+                showToast("Channel switching is locked while generation pipeline is running.", "warning");
+                return;
+            }
             const cid = btn.getAttribute("data-subchannel");
             switchSubTab("api", cid);
         });
@@ -1426,6 +1461,10 @@ function setupEventListeners() {
 
     document.querySelectorAll(".channel-subtab-btn[data-subchannel-yt]").forEach(btn => {
         btn.addEventListener("click", () => {
+            if (currentStatus && currentStatus.running) {
+                showToast("Channel switching is locked while generation pipeline is running.", "warning");
+                return;
+            }
             const cid = btn.getAttribute("data-subchannel-yt");
             switchSubTab("yt", cid);
         });
@@ -1451,7 +1490,7 @@ function setupEventListeners() {
                 const resp = await fetch("/api/settings/test-gemini", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ gemini_api_key: key, gemini_model: model })
+                    body: JSON.stringify({ gemini_api_key: key, gemini_model: model, channel_id: cid })
                 });
                 const res = await resp.json();
                 showToast(res.message, res.ok ? "success" : "error");
@@ -1626,9 +1665,12 @@ function setupEventListeners() {
                     if (idEl) idEl.innerText = `ID: ${res.channel.id || ""}`;
                     if (subsEl) subsEl.innerText = `Subscribers: ${res.channel.subscribers || "Active"}`;
                     showToast(`✓ ${cid} connected to YouTube channel: "${res.channel.title}"`, "success");
+                } else if (res.has_client_secret) {
+                    if (detailsEl) detailsEl.style.display = "none";
+                    showToast(`✓ client_secret.json is ready for "${cid}". Click "Connect ${cid}" to authorize!`, "info");
                 } else {
                     if (detailsEl) detailsEl.style.display = "none";
-                    showToast(`ℹ Channel "${cid}" is not connected to YouTube. Upload client_secret.json and click Connect.`, "warning");
+                    showToast(`ℹ Channel "${cid}" requires client_secret.json before connecting. Load or upload client_secret.json below.`, "warning");
                 }
             } catch (e) {
                 showToast(`Error checking status: ${e.message}`, "error");

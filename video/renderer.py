@@ -9,6 +9,10 @@ import math
 from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+# Compatibility fix: MoviePy 1.0.3 references Image.ANTIALIAS removed in Pillow 10+
+if not hasattr(Image, "ANTIALIAS"):
+    Image.ANTIALIAS = getattr(Image, "Resampling", Image).LANCZOS
+
 from moviepy.editor import VideoClip, AudioFileClip, concatenate_videoclips, VideoFileClip
 from config import load_config, FONTS_DIR, OUTPUT_DIR
 from core.logger import log_info, log_warn, log_success

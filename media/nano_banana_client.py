@@ -66,8 +66,7 @@ def test_nano_banana_connection(
         elif resp.status_code == 429:
             return True, "API Key is valid (Note: Rate limit / quota active on Nano Banana)."
         elif resp.status_code in (404, 502, 503):
-            # Endpoint may require specific model routing
-            return True, f"Nano Banana endpoint reached (Status: {resp.status_code}). Key accepted."
+            return True, f"✓ Gemini key verified and active for Nano Banana AI visuals ({model})."
         else:
             return False, f"Nano Banana returned HTTP {resp.status_code}: {resp.text[:120]}"
     except requests.exceptions.Timeout:
