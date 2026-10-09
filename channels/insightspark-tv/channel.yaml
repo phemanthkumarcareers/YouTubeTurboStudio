@@ -1,4 +1,4 @@
-id: the-ai-brief-it
+id: insightspark-tv
 name: InsightSpark TV
 engine: media_video
 enabled: true
@@ -25,7 +25,7 @@ credentials:
   nano_banana_model: nano-banana-flux
 youtube:
   channel_id: ''
-  oauth_profile: the-ai-brief-it
+  oauth_profile: insightspark-tv
   handle: '@InsightSparkTV'
   privacy: public
   category_id: '28'

@@ -132,7 +132,7 @@ def acquire_visual_with_fallback(
     video_type: str = "normal",
     audience_type: str = "general",
     output_dir: Optional[Path] = None,
-    channel_id: str = "the-ai-brief-it"
+    channel_id: str = "insightspark-tv"
 ) -> List[str]:
     """
     Acquires visual assets for a section with intelligent multi-tiered fallback:
@@ -240,7 +240,7 @@ def acquire_visual_with_fallback(
 def synthesize_audio_with_fallback(
     text: str,
     output_prefix: str = "narration",
-    channel_id: str = "the-ai-brief-it",
+    channel_id: str = "insightspark-tv",
     script_data: Optional[dict] = None
 ) -> Tuple[str, str]:
     """

@@ -56,9 +56,16 @@ def mask_secret(value: Optional[str]) -> str:
     return val[:4] + "••••" + val[-4:]
 
 
+def resolve_channel_id(channel_id: str) -> str:
+    """Resolve backwards-compatible aliases to exact folder names."""
+    alias_map = {"the-ai-brief-it": "insightspark-tv", "elders": "wondersaga-tv"}
+    return alias_map.get(channel_id, channel_id)
+
+
 def get_channel_dir(channel_id: str) -> Path:
     """Return directory for a channel."""
-    return BASE_DIR / "channels" / channel_id
+    cid = resolve_channel_id(channel_id)
+    return BASE_DIR / "channels" / cid
 
 
 def get_channel_env_path(channel_id: str) -> Path:
@@ -68,7 +75,8 @@ def get_channel_env_path(channel_id: str) -> Path:
 
 def get_channel_credentials_dir(channel_id: str) -> Path:
     """Return runtime directory for channel OAuth and tokens."""
-    d = CREDENTIALS_DIR / channel_id
+    cid = resolve_channel_id(channel_id)
+    d = CREDENTIALS_DIR / cid
     d.mkdir(parents=True, exist_ok=True)
     return d
 
@@ -76,13 +84,14 @@ def get_channel_credentials_dir(channel_id: str) -> Path:
 def get_youtube_token_path(channel_id: str) -> Path:
     """
     Return path to channel-specific YouTube OAuth token.
-    For 'the-ai-brief-it', migrate existing root token if present.
+    For 'insightspark-tv', migrate existing root token if present.
     """
-    chan_token = get_channel_credentials_dir(channel_id) / "youtube_token.pickle"
+    cid = resolve_channel_id(channel_id)
+    chan_token = get_channel_credentials_dir(cid) / "youtube_token.pickle"
     root_token = BASE_DIR / "youtube_token.pickle"
 
     # Auto-migrate legacy root token for the primary channel if not yet in runtime
-    if not chan_token.exists() and channel_id == "the-ai-brief-it" and root_token.exists():
+    if not chan_token.exists() and cid in ("insightspark-tv", "the-ai-brief-it") and root_token.exists():
         try:
             shutil.copy2(root_token, chan_token)
         except Exception:
@@ -95,15 +104,16 @@ def get_client_secret_path(channel_id: str) -> Path:
     """
     Return path to channel-specific client_secret.json.
     Strictly uses runtime/credentials/<channel_id>/client_secret.json.
-    Root client_secret.json is ONLY used as fallback for 'the-ai-brief-it' legacy migration.
+    Root client_secret.json is ONLY used as fallback for 'insightspark-tv' legacy migration.
     All other channels require their own dedicated client_secret.json for full OAuth isolation.
     """
-    chan_secret = get_channel_credentials_dir(channel_id) / "client_secret.json"
+    cid = resolve_channel_id(channel_id)
+    chan_secret = get_channel_credentials_dir(cid) / "client_secret.json"
     root_secret = BASE_DIR / "client_secret.json"
 
     if chan_secret.exists():
         return chan_secret
-    if channel_id == "the-ai-brief-it" and root_secret.exists():
+    if cid in ("insightspark-tv", "the-ai-brief-it") and root_secret.exists():
         return root_secret
     return chan_secret
 
@@ -112,7 +122,7 @@ def load_channel_credentials(channel_id: str, allow_global_fallback: bool = Fals
     """
     Load resolved credentials for channel following strict isolation:
     1. channels/<channel_id>/.env (Primary channel-specific source)
-    2. Root .env fallback is ONLY used for 'the-ai-brief-it' backwards compatibility,
+    2. Root .env fallback is ONLY used for 'insightspark-tv' backwards compatibility,
        or when allow_global_fallback is explicitly True.
     For all other channels ('kids', 'elders', custom channels), keys default to empty strings
     so channels maintain isolated API keys.
@@ -127,7 +137,8 @@ def load_channel_credentials(channel_id: str, allow_global_fallback: bool = Fals
             chan_env_vars = {}
 
     root_env_vars = {}
-    is_primary = (channel_id == "the-ai-brief-it")
+    cid = resolve_channel_id(channel_id)
+    is_primary = (cid in ("insightspark-tv", "the-ai-brief-it"))
     if (allow_global_fallback or is_primary) and GLOBAL_ENV_PATH.exists():
         try:
             root_env_vars = dotenv_values(GLOBAL_ENV_PATH)

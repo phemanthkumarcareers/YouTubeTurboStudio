@@ -85,40 +85,40 @@ CHANNEL_VOICE_PROFILES = {
             }
         }
     },
-    "elders": {
-        "channel_id": "elders",
-        "description": "Mature adults and seniors. Dignified, unhurried, heartfelt narrative.",
-        "pacing": "-8%",
-        "pitch": "-2Hz",
+    "wondersaga-tv": {
+        "channel_id": "wondersaga-tv",
+        "description": "Wonder Saga TV. Myth, legendary tales, mysterious phenomena, and inspiring wonders.",
+        "pacing": "-5%",
+        "pitch": "-1Hz",
         "roles": {
             "narrator": {
-                "name": "Narrator (Dignified Life Historian)",
+                "name": "Narrator (Wonder Storyteller)",
                 "edge_tts": "en-GB-RyanNeural",
                 "openai_tts": "echo",
                 "elevenlabs": "pNInz6obpgDQGcFmaJgB",
-                "rate": "-8%",
-                "pitch": "-2Hz"
+                "rate": "-5%",
+                "pitch": "-1Hz"
             },
             "character_1": {
-                "name": "Character 1 (Warm Elder Voice)",
+                "name": "Character 1 (Warm Narrator)",
                 "edge_tts": "en-US-GuyNeural",
                 "openai_tts": "onyx",
                 "elevenlabs": "ErXwobaYiN019PkySvjV",
-                "rate": "-6%",
-                "pitch": "-3Hz"
+                "rate": "-4%",
+                "pitch": "-2Hz"
             },
             "character_2": {
                 "name": "Character 2 (Tender Matriarch)",
                 "edge_tts": "en-GB-SoniaNeural",
                 "openai_tts": "shimmer",
                 "elevenlabs": "21m00Tcm4TlvDq8ikWAM",
-                "rate": "-6%",
+                "rate": "-4%",
                 "pitch": "+0Hz"
             }
         }
     },
-    "the-ai-brief-it": {
-        "channel_id": "the-ai-brief-it",
+    "insightspark-tv": {
+        "channel_id": "insightspark-tv",
         "description": "Mind-bending science, deep mysteries, and cosmic tech. Authoritative and punchy.",
         "pacing": "+0%",
         "pitch": "+0Hz",
@@ -142,12 +142,17 @@ CHANNEL_VOICE_PROFILES = {
         }
     }
 }
+# Backward-compatibility aliases
+CHANNEL_VOICE_PROFILES["the-ai-brief-it"] = CHANNEL_VOICE_PROFILES["insightspark-tv"]
+CHANNEL_VOICE_PROFILES["elders"] = CHANNEL_VOICE_PROFILES["wondersaga-tv"]
 
 
 def get_channel_voice_profile(channel_id: str) -> dict:
     """Retrieve the voice profile configuration for a given channel."""
-    clean_id = (channel_id or "the-ai-brief-it").lower().strip()
-    return CHANNEL_VOICE_PROFILES.get(clean_id, CHANNEL_VOICE_PROFILES["the-ai-brief-it"])
+    clean_id = (channel_id or "insightspark-tv").lower().strip()
+    alias_map = {"the-ai-brief-it": "insightspark-tv", "elders": "wondersaga-tv"}
+    resolved = alias_map.get(clean_id, clean_id)
+    return CHANNEL_VOICE_PROFILES.get(resolved, CHANNEL_VOICE_PROFILES["insightspark-tv"])
 
 
 def resolve_speaker_role(speaker_tag: str) -> str:

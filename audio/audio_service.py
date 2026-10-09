@@ -396,7 +396,7 @@ def generate_speech(
     Returns: (mp3_path, srt_path)
     """
     cfg = load_config()
-    channel = channel_id or cfg.get("channel_id", "the-ai-brief-it")
+    channel = channel_id or cfg.get("channel_id", "insightspark-tv")
     provider = cfg.get("tts_provider", "edge-tts")
     profile = get_channel_voice_profile(channel)
     narrator_cfg = get_voice_for_speaker(channel, "narrator", provider=provider)

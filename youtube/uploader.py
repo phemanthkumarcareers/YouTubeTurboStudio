@@ -21,8 +21,8 @@ def get_youtube_service(channel_id: str = None):
     cid = channel_id or registry.get_active_channel_id()
     creds = get_channel_youtube_credentials(cid)
     if not creds:
-        # Fall back to root token if the-ai-brief-it and file exists
-        if cid == "the-ai-brief-it" and TOKEN_PATH.exists():
+        # Fall back to root token if insightspark-tv / the-ai-brief-it and file exists
+        if cid in ("insightspark-tv", "the-ai-brief-it") and TOKEN_PATH.exists():
             with open(TOKEN_PATH, "rb") as f:
                 creds = pickle.load(f)
 

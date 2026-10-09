@@ -76,7 +76,7 @@ class ChannelContext:
         """Instantiate ChannelContext from dictionary with safe defaults."""
         d = copy.deepcopy(data)
         return cls(
-            channel_id=d.get("channel_id") or d.get("id", "the-ai-brief-it"),
+            channel_id=d.get("channel_id") or d.get("id", "insightspark-tv"),
             name=d.get("name", "Default Channel"),
             engine=d.get("engine", "media_video"),
             enabled=d.get("enabled", True),

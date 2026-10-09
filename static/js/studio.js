@@ -8,11 +8,11 @@ let currentConfig = {};
 let currentStatus = {};
 let sseSource = null;
 let currentTags = [];
-let currentChannelId = "the-ai-brief-it";
+let currentChannelId = "insightspark-tv";
 
 // Dynamic focus angles & topic discovery metadata for each channel
 const CHANNEL_METADATA = {
-    "the-ai-brief-it": {
+    "insightspark-tv": {
         name: "InsightSpark TV",
         handle: "@InsightSparkTV",
         topicPlaceholder: "e.g. Hidden Secrets of Everyday Things, Quantum Computing, or leave blank...",
@@ -60,7 +60,7 @@ const CHANNEL_METADATA = {
             "Barnaby the Bear Shares His Honey Pot"
         ]
     },
-    "elders": {
+    "wondersaga-tv": {
         name: "Wonder Saga TV",
         handle: "@WonderSagaTV",
         topicPlaceholder: "e.g. The Lost Library of Alexandria, Myth of Atlantis, or leave blank...",
@@ -85,10 +85,14 @@ const CHANNEL_METADATA = {
         ]
     }
 };
+CHANNEL_METADATA["the-ai-brief-it"] = CHANNEL_METADATA["insightspark-tv"];
+CHANNEL_METADATA["elders"] = CHANNEL_METADATA["wondersaga-tv"];
 
 function updateChannelGenerationOptions(channelId) {
-    const cid = channelId || currentChannelId || "the-ai-brief-it";
-    const meta = CHANNEL_METADATA[cid] || CHANNEL_METADATA["the-ai-brief-it"];
+    const rawCid = channelId || currentChannelId || "insightspark-tv";
+    const aliasMap = {"the-ai-brief-it": "insightspark-tv", "elders": "wondersaga-tv"};
+    const cid = aliasMap[rawCid] || rawCid;
+    const meta = CHANNEL_METADATA[cid] || CHANNEL_METADATA["insightspark-tv"];
 
     // Update Focus Angle dropdown
     const angleSelect = document.getElementById("gen-angle-select");
@@ -427,7 +431,7 @@ function updateChannelUI(chan) {
         if (audType === "children" || cid === "kids") {
             audBadge.innerText = "👶 Kids Only (COPPA)";
             audBadge.className = "audience-badge audience-kids";
-        } else if (cid === "elders") {
+        } else if (cid === "wondersaga-tv" || cid === "elders") {
             audBadge.innerText = "📖 Wonder Saga (General Audience)";
             audBadge.className = "audience-badge audience-general";
         } else {

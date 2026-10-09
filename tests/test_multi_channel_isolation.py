@@ -73,14 +73,16 @@ class TestMultiChannelIsolationAndAnimation(unittest.TestCase):
         self.assertTrue(data.get("ok"))
         self.assertIn("channels", data)
         channels = data["channels"]
-        self.assertIn("the-ai-brief-it", channels)
+        self.assertTrue("insightspark-tv" in channels or "the-ai-brief-it" in channels)
         self.assertIn("kids", channels)
-        self.assertIn("elders", channels)
+        self.assertTrue("wondersaga-tv" in channels or "elders" in channels)
 
         # Check engine types
-        self.assertEqual(channels["the-ai-brief-it"]["channel"]["engine"], "media_video")
+        ai_key = "insightspark-tv" if "insightspark-tv" in channels else "the-ai-brief-it"
+        elders_key = "wondersaga-tv" if "wondersaga-tv" in channels else "elders"
+        self.assertEqual(channels[ai_key]["channel"]["engine"], "media_video")
         self.assertEqual(channels["kids"]["channel"]["engine"], "animation")
-        self.assertEqual(channels["elders"]["channel"]["engine"], "animation")
+        self.assertEqual(channels[elders_key]["channel"]["engine"], "animation")
 
     def test_04_animation_engine_kids_scene_generation(self):
         """Verifies that the Animation Engine generates a valid 1080x1920 cartoon scene plate."""

@@ -24,9 +24,9 @@
       <div class="channel-selector-container">
         <label for="active-channel-select" class="channel-selector-label">Channel:</label>
         <select id="active-channel-select" class="form-select channel-select-dropdown">
-          <option value="the-ai-brief-it">🎬 InsightSpark TV (@InsightSparkTV · Media)</option>
+          <option value="insightspark-tv">🎬 InsightSpark TV (@InsightSparkTV · Media)</option>
           <option value="kids">🎨 Kids Wonder Lab (@KidsWonderLab · Animation)</option>
-          <option value="elders">📖 Wonder Saga TV (@WonderSagaTV · Animation)</option>
+          <option value="wondersaga-tv">📖 Wonder Saga TV (@WonderSagaTV · Animation)</option>
         </select>
         <span id="active-engine-badge" class="engine-badge engine-media">Media Video</span>
         <span id="active-audience-badge" class="audience-badge audience-general">General</span>
@@ -491,19 +491,19 @@
         
         <!-- Channel Sub-Tabs Navigation for API Keys -->
         <div class="channel-subtabs-nav">
-          <button class="channel-subtab-btn active" data-subchannel="the-ai-brief-it">
+          <button class="channel-subtab-btn active" data-subchannel="insightspark-tv">
             <span>🎬</span> InsightSpark TV <em>(Media Video)</em>
           </button>
           <button class="channel-subtab-btn" data-subchannel="kids">
             <span>🎨</span> Kids Wonder Lab <em>(Animation · Kids Only)</em>
           </button>
-          <button class="channel-subtab-btn" data-subchannel="elders">
+          <button class="channel-subtab-btn" data-subchannel="wondersaga-tv">
             <span>📖</span> Wonder Saga TV <em>(Animation · Elders)</em>
           </button>
         </div>
 
         <!-- ═════════ 1. INSIGHTSPARK TV (MEDIA VIDEO) ═════════ -->
-        <div id="subpane-api-the-ai-brief-it" class="channel-subpane">
+        <div id="subpane-api-insightspark-tv" class="channel-subpane">
           <div class="card" style="border: 1px solid var(--sky-blue); background: linear-gradient(135deg, rgba(56,189,248,0.12) 0%, rgba(15,23,42,0.6) 100%);">
             <div class="card-header">
               <div class="card-title">🎬 InsightSpark TV (@InsightSparkTV) — Media Video Engine</div>
@@ -521,15 +521,15 @@
             </div>
             <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700;">
-                <input type="radio" name="ai_provider_radio_the-ai-brief-it" value="gemini" checked>
+                <input type="radio" name="ai_provider_radio_insightspark-tv" value="gemini" checked>
                 <span>🧠 Google Gemini AI</span>
               </label>
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:var(--accent-emerald);">
-                <input type="radio" name="ai_provider_radio_the-ai-brief-it" value="groq">
+                <input type="radio" name="ai_provider_radio_insightspark-tv" value="groq">
                 <span>⚡ Groq AI (Free LLaMA)</span>
               </label>
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#38bdf8;">
-                <input type="radio" name="ai_provider_radio_the-ai-brief-it" value="openai">
+                <input type="radio" name="ai_provider_radio_insightspark-tv" value="openai">
                 <span>🟢 OpenAI (GPT-4o)</span>
               </label>
             </div>
@@ -539,17 +539,17 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">🧠 Google Gemini API (InsightSpark TV)</div>
-              <button class="btn btn-secondary btn-test-gemini" data-chan="the-ai-brief-it" style="font-size:12px;">Test Gemini Key</button>
+              <button class="btn btn-secondary btn-test-gemini" data-chan="insightspark-tv" style="font-size:12px;">Test Gemini Key</button>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Gemini API Key</label>
-                <input type="password" id="gemini-api-key-the-ai-brief-it" class="form-input gemini-key-input" placeholder="AQ.Ab8RN6I_...">
+                <input type="password" id="gemini-api-key-insightspark-tv" class="form-input gemini-key-input" placeholder="AQ.Ab8RN6I_...">
                 <div class="form-help">Individual key for InsightSpark TV from <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--primary);">Google AI Studio</a>.</div>
               </div>
               <div class="form-group">
                 <label class="form-label">Gemini Model</label>
-                <select id="gemini-model-the-ai-brief-it" class="form-select">
+                <select id="gemini-model-insightspark-tv" class="form-select">
                   <option value="gemini-3.8-flash">gemini-3.8-flash (Recommended)</option>
                   <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Fast)</option>
                   <option value="gemini-2.5-flash">gemini-2.5-flash</option>
@@ -563,17 +563,17 @@
           <div class="card" style="border: 1px solid rgba(16,185,129,0.35);">
             <div class="card-header">
               <div class="card-title">⚡ Groq API (InsightSpark TV)</div>
-              <button class="btn btn-secondary btn-test-groq" data-chan="the-ai-brief-it" style="font-size:12px;">Test Groq Key</button>
+              <button class="btn btn-secondary btn-test-groq" data-chan="insightspark-tv" style="font-size:12px;">Test Groq Key</button>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Groq API Key</label>
-                <input type="password" id="groq-api-key-the-ai-brief-it" class="form-input groq-key-input" placeholder="gsk_...">
+                <input type="password" id="groq-api-key-insightspark-tv" class="form-input groq-key-input" placeholder="gsk_...">
                 <div class="form-help">Free key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--accent-emerald);">console.groq.com</a>.</div>
               </div>
               <div class="form-group">
                 <label class="form-label">Groq Model</label>
-                <select id="groq-model-the-ai-brief-it" class="form-select">
+                <select id="groq-model-insightspark-tv" class="form-select">
                   <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Recommended)</option>
                   <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (Ultra Fast)</option>
                   <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b</option>
@@ -586,17 +586,17 @@
           <div class="card" style="border: 1px solid rgba(56,189,248,0.35);">
             <div class="card-header">
               <div class="card-title">🟢 OpenAI API (InsightSpark TV)</div>
-              <button class="btn btn-secondary btn-test-openai" data-chan="the-ai-brief-it" style="font-size:12px;">Test OpenAI Key</button>
+              <button class="btn btn-secondary btn-test-openai" data-chan="insightspark-tv" style="font-size:12px;">Test OpenAI Key</button>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">OpenAI API Key</label>
-                <input type="password" id="openai-api-key-the-ai-brief-it" class="form-input openai-key-input" placeholder="sk-...">
+                <input type="password" id="openai-api-key-insightspark-tv" class="form-input openai-key-input" placeholder="sk-...">
                 <div class="form-help">From <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--sky-blue);">platform.openai.com</a>.</div>
               </div>
               <div class="form-group">
                 <label class="form-label">OpenAI Model</label>
-                <select id="openai-model-the-ai-brief-it" class="form-select">
+                <select id="openai-model-insightspark-tv" class="form-select">
                   <option value="gpt-4o-mini">gpt-4o-mini (Fast & Efficient)</option>
                   <option value="gpt-4o">gpt-4o (High Intelligence)</option>
                 </select>
@@ -608,14 +608,14 @@
           <div class="card" style="border: 1px solid rgba(234, 179, 8, 0.35);">
             <div class="card-header">
               <div class="card-title">🍌 Nano Banana AI Generative Visuals (InsightSpark TV)</div>
-              <button class="btn btn-secondary btn-test-nano-banana" data-chan="the-ai-brief-it" style="font-size:12px;">Test Nano Banana</button>
+              <button class="btn btn-secondary btn-test-nano-banana" data-chan="insightspark-tv" style="font-size:12px;">Test Nano Banana</button>
             </div>
             <div style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;">
               Powered by <strong>Google Gemini API Key</strong> configured above. No separate key needed.
             </div>
             <div class="form-group">
               <label class="form-label">Generative Visuals Model</label>
-              <select id="nano-banana-model-the-ai-brief-it" class="form-select">
+              <select id="nano-banana-model-insightspark-tv" class="form-select">
                 <option value="nano-banana-flux">Nano Banana FLUX (Cinematic & High Detail)</option>
                 <option value="nano-banana-sdxl">Nano Banana SDXL (Fast High-Res)</option>
               </select>
@@ -631,17 +631,17 @@
               <div class="form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                   <label class="form-label" style="margin-bottom:0;">Pexels API Key</label>
-                  <button class="btn btn-secondary btn-test-pexels" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test Pexels</button>
+                  <button class="btn btn-secondary btn-test-pexels" data-chan="insightspark-tv" style="font-size:11px; padding:2px 8px;">Test Pexels</button>
                 </div>
-                <input type="password" id="pexels-api-key-the-ai-brief-it" class="form-input" placeholder="Pexels Key">
+                <input type="password" id="pexels-api-key-insightspark-tv" class="form-input" placeholder="Pexels Key">
                 <div class="form-help">Free key at <a href="https://www.pexels.com/api/" target="_blank" style="color:var(--primary);">pexels.com/api</a></div>
               </div>
               <div class="form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
                   <label class="form-label" style="margin-bottom:0;">Pixabay API Key</label>
-                  <button class="btn btn-secondary btn-test-pixabay" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test Pixabay</button>
+                  <button class="btn btn-secondary btn-test-pixabay" data-chan="insightspark-tv" style="font-size:11px; padding:2px 8px;">Test Pixabay</button>
                 </div>
-                <input type="password" id="pixabay-api-key-the-ai-brief-it" class="form-input" placeholder="Pixabay Key">
+                <input type="password" id="pixabay-api-key-insightspark-tv" class="form-input" placeholder="Pixabay Key">
                 <div class="form-help">Free key at <a href="https://pixabay.com/api/docs/" target="_blank" style="color:var(--primary);">pixabay.com/api/docs</a></div>
               </div>
             </div>
@@ -652,23 +652,23 @@
             <div class="card-header">
               <div class="card-title">🎙️ Audio & Voice Generation (InsightSpark TV)</div>
               <div style="display:flex; gap:8px;">
-                <button class="btn btn-secondary btn-test-elevenlabs" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test ElevenLabs</button>
-                <button class="btn btn-secondary btn-test-openai-tts" data-chan="the-ai-brief-it" style="font-size:11px; padding:2px 8px;">Test OpenAI TTS</button>
+                <button class="btn btn-secondary btn-test-elevenlabs" data-chan="insightspark-tv" style="font-size:11px; padding:2px 8px;">Test ElevenLabs</button>
+                <button class="btn btn-secondary btn-test-openai-tts" data-chan="insightspark-tv" style="font-size:11px; padding:2px 8px;">Test OpenAI TTS</button>
               </div>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">ElevenLabs API Key (Optional)</label>
-                <input type="password" id="elevenlabs-api-key-the-ai-brief-it" class="form-input elevenlabs-key-input" placeholder="ElevenLabs Key (Leave empty to use Microsoft Edge-TTS)">
+                <input type="password" id="elevenlabs-api-key-insightspark-tv" class="form-input elevenlabs-key-input" placeholder="ElevenLabs Key (Leave empty to use Microsoft Edge-TTS)">
               </div>
               <div class="form-group">
                 <label class="form-label">ElevenLabs Voice ID</label>
-                <input type="text" id="elevenlabs-voice-id-the-ai-brief-it" class="form-input" placeholder="TxGEqnHWrfWFTfGW9XjX (Josh)">
+                <input type="text" id="elevenlabs-voice-id-insightspark-tv" class="form-input" placeholder="TxGEqnHWrfWFTfGW9XjX (Josh)">
               </div>
             </div>
           </div>
 
-          <button class="btn btn-primary btn-save-channel-keys" data-chan="the-ai-brief-it" style="width:100%; margin-top:8px;">
+          <button class="btn btn-primary btn-save-channel-keys" data-chan="insightspark-tv" style="width:100%; margin-top:8px;">
             💾 Save API Keys for InsightSpark TV
           </button>
         </div>
@@ -847,11 +847,11 @@
         </div>
 
         <!-- ═════════ 3. WONDER SAGA TV (ANIMATION · ELDERS) ═════════ -->
-        <div id="subpane-api-elders" class="channel-subpane" style="display:none;">
+        <div id="subpane-api-wondersaga-tv" class="channel-subpane" style="display:none;">
           <div class="card" style="border: 1px solid rgba(245,158,11,0.4); background: linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(15,23,42,0.6) 100%);">
             <div class="card-header">
               <div class="card-title">📖 Wonder Saga TV (@WonderSagaTV) — Myth & Story Animation</div>
-              <span class="audience-badge audience-elders">Wonder Seekers (25-75)</span>
+              <span class="audience-badge audience-wondersaga-tv">Wonder Seekers (25-75)</span>
             </div>
             <div style="font-size:12.5px; color:var(--text-secondary);">
               Welcome to Wonder Saga TV — where imagination meets discovery! Every Story Holds a Wonder.
@@ -872,15 +872,15 @@
             </div>
             <div style="display:flex; gap:32px; padding:8px 4px; flex-wrap:wrap;">
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700;">
-                <input type="radio" name="ai_provider_radio_elders" value="gemini" checked>
+                <input type="radio" name="ai_provider_radio_wondersaga-tv" value="gemini" checked>
                 <span>🧠 Google Gemini AI</span>
               </label>
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:var(--accent-emerald);">
-                <input type="radio" name="ai_provider_radio_elders" value="groq">
+                <input type="radio" name="ai_provider_radio_wondersaga-tv" value="groq">
                 <span>⚡ Groq AI (Free LLaMA)</span>
               </label>
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#38bdf8;">
-                <input type="radio" name="ai_provider_radio_elders" value="openai">
+                <input type="radio" name="ai_provider_radio_wondersaga-tv" value="openai">
                 <span>🟢 OpenAI (GPT-4o)</span>
               </label>
             </div>
@@ -890,16 +890,16 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">🧠 Google Gemini API (Wonder Saga TV)</div>
-              <button class="btn btn-secondary btn-test-gemini" data-chan="elders" style="font-size:12px;">Test Gemini Key</button>
+              <button class="btn btn-secondary btn-test-gemini" data-chan="wondersaga-tv" style="font-size:12px;">Test Gemini Key</button>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Gemini API Key</label>
-                <input type="password" id="gemini-api-key-elders" class="form-input gemini-key-input" placeholder="Individual Gemini Key for Wonder Saga TV">
+                <input type="password" id="gemini-api-key-wondersaga-tv" class="form-input gemini-key-input" placeholder="Individual Gemini Key for Wonder Saga TV">
               </div>
               <div class="form-group">
                 <label class="form-label">Gemini Model</label>
-                <select id="gemini-model-elders" class="form-select">
+                <select id="gemini-model-wondersaga-tv" class="form-select">
                   <option value="gemini-2.5-flash">gemini-2.5-flash</option>
                   <option value="gemini-3.8-flash">gemini-3.8-flash</option>
                   <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite</option>
@@ -912,16 +912,16 @@
           <div class="card" style="border: 1px solid rgba(16,185,129,0.35);">
             <div class="card-header">
               <div class="card-title">⚡ Groq API (Wonder Saga TV)</div>
-              <button class="btn btn-secondary btn-test-groq" data-chan="elders" style="font-size:12px;">Test Groq Key</button>
+              <button class="btn btn-secondary btn-test-groq" data-chan="wondersaga-tv" style="font-size:12px;">Test Groq Key</button>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Groq API Key</label>
-                <input type="password" id="groq-api-key-elders" class="form-input groq-key-input" placeholder="Individual Groq Key for Wonder Saga TV">
+                <input type="password" id="groq-api-key-wondersaga-tv" class="form-input groq-key-input" placeholder="Individual Groq Key for Wonder Saga TV">
               </div>
               <div class="form-group">
                 <label class="form-label">Groq Model</label>
-                <select id="groq-model-elders" class="form-select">
+                <select id="groq-model-wondersaga-tv" class="form-select">
                   <option value="openai/gpt-oss-120b">openai/gpt-oss-120b</option>
                   <option value="openai/gpt-oss-20b">openai/gpt-oss-20b</option>
                 </select>
@@ -933,16 +933,16 @@
           <div class="card" style="border: 1px solid rgba(56,189,248,0.35);">
             <div class="card-header">
               <div class="card-title">🟢 OpenAI API (Wonder Saga TV)</div>
-              <button class="btn btn-secondary btn-test-openai" data-chan="elders" style="font-size:12px;">Test OpenAI Key</button>
+              <button class="btn btn-secondary btn-test-openai" data-chan="wondersaga-tv" style="font-size:12px;">Test OpenAI Key</button>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">OpenAI API Key</label>
-                <input type="password" id="openai-api-key-elders" class="form-input openai-key-input" placeholder="Individual OpenAI Key for Wonder Saga TV">
+                <input type="password" id="openai-api-key-wondersaga-tv" class="form-input openai-key-input" placeholder="Individual OpenAI Key for Wonder Saga TV">
               </div>
               <div class="form-group">
                 <label class="form-label">OpenAI Model</label>
-                <select id="openai-model-elders" class="form-select">
+                <select id="openai-model-wondersaga-tv" class="form-select">
                   <option value="gpt-4o-mini">gpt-4o-mini (Fast)</option>
                   <option value="gpt-4o">gpt-4o</option>
                 </select>
@@ -954,14 +954,14 @@
           <div class="card" style="border: 1px solid rgba(234, 179, 8, 0.35);">
             <div class="card-header">
               <div class="card-title">🍌 Nano Banana AI Storybook Visuals (Wonder Saga TV)</div>
-              <button class="btn btn-secondary btn-test-nano-banana" data-chan="elders" style="font-size:12px;">Test Nano Banana</button>
+              <button class="btn btn-secondary btn-test-nano-banana" data-chan="wondersaga-tv" style="font-size:12px;">Test Nano Banana</button>
             </div>
             <div style="font-size:12.5px; color:var(--text-secondary); margin-bottom:12px;">
               Powered by <strong>Google Gemini API Key</strong> configured above. No separate key needed.
             </div>
             <div class="form-group">
               <label class="form-label">Storybook Visuals Model</label>
-              <select id="nano-banana-model-elders" class="form-select">
+              <select id="nano-banana-model-wondersaga-tv" class="form-select">
                 <option value="nano-banana-storybook-v1">Nano Banana Storybook (Watercolor & Nostalgic)</option>
                 <option value="nano-banana-flux">Nano Banana FLUX</option>
               </select>
@@ -973,14 +973,14 @@
             <div class="card-header">
               <div class="card-title">🎙️ Narration Voice (Wonder Saga TV)</div>
               <div style="display:flex; gap:8px;">
-                <button class="btn btn-secondary btn-test-elevenlabs" data-chan="elders" style="font-size:11px; padding:2px 8px;">Test ElevenLabs</button>
-                <button class="btn btn-secondary btn-test-openai-tts" data-chan="elders" style="font-size:11px; padding:2px 8px;">Test OpenAI TTS</button>
+                <button class="btn btn-secondary btn-test-elevenlabs" data-chan="wondersaga-tv" style="font-size:11px; padding:2px 8px;">Test ElevenLabs</button>
+                <button class="btn btn-secondary btn-test-openai-tts" data-chan="wondersaga-tv" style="font-size:11px; padding:2px 8px;">Test OpenAI TTS</button>
               </div>
             </div>
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Narrator Voice</label>
-                <select id="voice-select-elders" class="form-select">
+                <select id="voice-select-wondersaga-tv" class="form-select">
                   <option value="en-GB-RyanNeural">en-GB-RyanNeural (Dignified, Nostalgic UK)</option>
                   <option value="en-US-ChristopherNeural">en-US-ChristopherNeural (Deep, Calm, Dignified)</option>
                   <option value="en-US-GuyNeural">en-US-GuyNeural (Thoughtful, Warm Explainer)</option>
@@ -989,16 +989,16 @@
               </div>
               <div class="form-group">
                 <label class="form-label">ElevenLabs API Key (Optional)</label>
-                <input type="password" id="elevenlabs-api-key-elders" class="form-input elevenlabs-key-input" placeholder="Optional ElevenLabs Key">
+                <input type="password" id="elevenlabs-api-key-wondersaga-tv" class="form-input elevenlabs-key-input" placeholder="Optional ElevenLabs Key">
               </div>
               <div class="form-group">
                 <label class="form-label">ElevenLabs Voice ID (Optional)</label>
-                <input type="text" id="elevenlabs-voice-id-elders" class="form-input" placeholder="e.g. TxGEqnHWrfWFTfGW9XjX (Josh)">
+                <input type="text" id="elevenlabs-voice-id-wondersaga-tv" class="form-input" placeholder="e.g. TxGEqnHWrfWFTfGW9XjX (Josh)">
               </div>
             </div>
           </div>
 
-          <button class="btn btn-primary btn-save-channel-keys" data-chan="elders" style="width:100%; margin-top:8px;">
+          <button class="btn btn-primary btn-save-channel-keys" data-chan="wondersaga-tv" style="width:100%; margin-top:8px;">
             💾 Save API Keys for Wonder Saga TV
           </button>
         </div>
@@ -1011,41 +1011,41 @@
         
         <!-- Channel Sub-Tabs Navigation for YouTube -->
         <div class="channel-subtabs-nav">
-          <button class="channel-subtab-btn active" data-subchannel-yt="the-ai-brief-it">
+          <button class="channel-subtab-btn active" data-subchannel-yt="insightspark-tv">
             <span>🎬</span> InsightSpark TV <em>(YouTube OAuth)</em>
           </button>
           <button class="channel-subtab-btn" data-subchannel-yt="kids">
             <span>🎨</span> Kids Wonder Lab <em>(YouTube OAuth · Kids Only)</em>
           </button>
-          <button class="channel-subtab-btn" data-subchannel-yt="elders">
+          <button class="channel-subtab-btn" data-subchannel-yt="wondersaga-tv">
             <span>📖</span> Wonder Saga TV <em>(YouTube OAuth · Elders)</em>
           </button>
         </div>
 
         <!-- ═════════ 1. YOUTUBE OAUTH: INSIGHTSPARK TV ═════════ -->
-        <div id="subpane-yt-the-ai-brief-it" class="channel-subpane-yt">
+        <div id="subpane-yt-insightspark-tv" class="channel-subpane-yt">
           <div class="card">
             <div class="card-header">
               <div class="card-title">📺 InsightSpark TV — YouTube Account Authorization</div>
               <div style="display:flex; gap:8px;">
-                <button class="btn btn-secondary btn-test-yt-status" data-chan="the-ai-brief-it" style="font-size:12px;">🔍 Check Status</button>
-                <button class="btn btn-primary btn-yt-auth" data-chan="the-ai-brief-it">Connect InsightSpark TV</button>
+                <button class="btn btn-secondary btn-test-yt-status" data-chan="insightspark-tv" style="font-size:12px;">🔍 Check Status</button>
+                <button class="btn btn-primary btn-yt-auth" data-chan="insightspark-tv">Connect InsightSpark TV</button>
               </div>
             </div>
             
-            <div id="yt-details-the-ai-brief-it" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
+            <div id="yt-details-insightspark-tv" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
               <div style="display:flex; align-items:center; gap:14px;">
                 <span style="font-size:32px;">🔴</span>
                 <div>
-                  <div id="yt-name-the-ai-brief-it" style="font-size:16px; font-weight:700;">Channel</div>
-                  <div id="yt-id-the-ai-brief-it" style="font-size:12px; color:var(--text-muted);">ID: </div>
-                  <div id="yt-subs-the-ai-brief-it" style="font-size:12px; color:var(--accent-emerald);"></div>
+                  <div id="yt-name-insightspark-tv" style="font-size:16px; font-weight:700;">Channel</div>
+                  <div id="yt-id-insightspark-tv" style="font-size:12px; color:var(--text-muted);">ID: </div>
+                  <div id="yt-subs-insightspark-tv" style="font-size:12px; color:var(--accent-emerald);"></div>
                 </div>
               </div>
             </div>
 
             <div class="form-help">
-              Connect Google OAuth specifically for <strong>InsightSpark TV (@InsightSparkTV)</strong>. Access tokens are stored strictly in <code>runtime/credentials/the-ai-brief-it/</code>.
+              Connect Google OAuth specifically for <strong>InsightSpark TV (@InsightSparkTV)</strong>. Access tokens are stored strictly in <code>runtime/credentials/insightspark-tv/</code>.
             </div>
           </div>
 
@@ -1056,13 +1056,13 @@
             </div>
             <div class="form-group">
               <label class="form-label">Upload client_secret.json</label>
-              <input type="file" class="form-input yt-secret-file" data-chan="the-ai-brief-it" accept=".json">
+              <input type="file" class="form-input yt-secret-file" data-chan="insightspark-tv" accept=".json">
             </div>
             <div class="form-group" style="margin-top:10px;">
               <label class="form-label">Or File Path to client_secret.json</label>
               <div style="display:flex; gap:10px;">
-                <input type="text" id="yt-secret-path-the-ai-brief-it" class="form-input" placeholder="C:\path\to\client_secret.json">
-                <button class="btn btn-secondary btn-load-secret-path" data-chan="the-ai-brief-it">📁 Load</button>
+                <input type="text" id="yt-secret-path-insightspark-tv" class="form-input" placeholder="C:\path\to\client_secret.json">
+                <button class="btn btn-secondary btn-load-secret-path" data-chan="insightspark-tv">📁 Load</button>
               </div>
             </div>
           </div>
@@ -1075,7 +1075,7 @@
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Default Category</label>
-                <select id="yt-cat-the-ai-brief-it" class="form-select">
+                <select id="yt-cat-insightspark-tv" class="form-select">
                   <option value="28" selected>Science & Technology (28)</option>
                   <option value="27">Education (27)</option>
                   <option value="24">Entertainment (24)</option>
@@ -1083,14 +1083,14 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Default Privacy</label>
-                <select id="yt-priv-the-ai-brief-it" class="form-select">
+                <select id="yt-priv-insightspark-tv" class="form-select">
                   <option value="public">Public</option>
                   <option value="private" selected>Private</option>
                   <option value="unlisted">Unlisted</option>
                 </select>
               </div>
             </div>
-            <button class="btn btn-primary btn-save-yt-settings" data-chan="the-ai-brief-it" style="width:100%; margin-top:10px;">
+            <button class="btn btn-primary btn-save-yt-settings" data-chan="insightspark-tv" style="width:100%; margin-top:10px;">
               💾 Save YouTube Settings for InsightSpark TV
             </button>
           </div>
@@ -1177,29 +1177,29 @@
         </div>
 
         <!-- ═════════ 3. YOUTUBE OAUTH: WONDER SAGA TV ═════════ -->
-        <div id="subpane-yt-elders" class="channel-subpane-yt" style="display:none;">
+        <div id="subpane-yt-wondersaga-tv" class="channel-subpane-yt" style="display:none;">
           <div class="card">
             <div class="card-header">
               <div class="card-title">📺 Wonder Saga TV — YouTube Account Authorization</div>
               <div style="display:flex; gap:8px;">
-                <button class="btn btn-secondary btn-test-yt-status" data-chan="elders" style="font-size:12px;">🔍 Check Status</button>
-                <button class="btn btn-primary btn-yt-auth" data-chan="elders">Connect Wonder Saga TV</button>
+                <button class="btn btn-secondary btn-test-yt-status" data-chan="wondersaga-tv" style="font-size:12px;">🔍 Check Status</button>
+                <button class="btn btn-primary btn-yt-auth" data-chan="wondersaga-tv">Connect Wonder Saga TV</button>
               </div>
             </div>
             
-            <div id="yt-details-elders" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
+            <div id="yt-details-wondersaga-tv" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
               <div style="display:flex; align-items:center; gap:14px;">
                 <span style="font-size:32px;">📖</span>
                 <div>
-                  <div id="yt-name-elders" style="font-size:16px; font-weight:700;">Wonder Saga TV Channel</div>
-                  <div id="yt-id-elders" style="font-size:12px; color:var(--text-muted);">ID: </div>
-                  <div id="yt-subs-elders" style="font-size:12px; color:var(--accent-emerald);"></div>
+                  <div id="yt-name-wondersaga-tv" style="font-size:16px; font-weight:700;">Wonder Saga TV Channel</div>
+                  <div id="yt-id-wondersaga-tv" style="font-size:12px; color:var(--text-muted);">ID: </div>
+                  <div id="yt-subs-wondersaga-tv" style="font-size:12px; color:var(--accent-emerald);"></div>
                 </div>
               </div>
             </div>
 
             <div class="form-help">
-              OAuth token for <strong>Wonder Saga TV (@WonderSagaTV)</strong> is strictly isolated in <code>runtime/credentials/elders/</code>.
+              OAuth token for <strong>Wonder Saga TV (@WonderSagaTV)</strong> is strictly isolated in <code>runtime/credentials/wondersaga-tv/</code>.
             </div>
           </div>
 
@@ -1210,13 +1210,13 @@
             </div>
             <div class="form-group">
               <label class="form-label">Upload client_secret.json</label>
-              <input type="file" class="form-input yt-secret-file" data-chan="elders" accept=".json">
+              <input type="file" class="form-input yt-secret-file" data-chan="wondersaga-tv" accept=".json">
             </div>
             <div class="form-group" style="margin-top:10px;">
               <label class="form-label">Or File Path to client_secret.json</label>
               <div style="display:flex; gap:10px;">
-                <input type="text" id="yt-secret-path-elders" class="form-input" placeholder="C:\path\to\elders_client_secret.json">
-                <button class="btn btn-secondary btn-load-secret-path" data-chan="elders">📁 Load</button>
+                <input type="text" id="yt-secret-path-wondersaga-tv" class="form-input" placeholder="C:\path\to\wondersaga_client_secret.json">
+                <button class="btn btn-secondary btn-load-secret-path" data-chan="wondersaga-tv">📁 Load</button>
               </div>
             </div>
           </div>
@@ -1229,7 +1229,7 @@
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">Default Category</label>
-                <select id="yt-cat-elders" class="form-select">
+                <select id="yt-cat-wondersaga-tv" class="form-select">
                   <option value="24" selected>Entertainment (24)</option>
                   <option value="22">People & Blogs (22)</option>
                   <option value="27">Education (27)</option>
@@ -1237,14 +1237,14 @@
               </div>
               <div class="form-group">
                 <label class="form-label">Default Privacy</label>
-                <select id="yt-priv-elders" class="form-select">
+                <select id="yt-priv-wondersaga-tv" class="form-select">
                   <option value="private" selected>Private</option>
                   <option value="public">Public</option>
                   <option value="unlisted">Unlisted</option>
                 </select>
               </div>
             </div>
-            <button class="btn btn-primary btn-save-yt-settings" data-chan="elders" style="width:100%; margin-top:10px;">
+            <button class="btn btn-primary btn-save-yt-settings" data-chan="wondersaga-tv" style="width:100%; margin-top:10px;">
               💾 Save YouTube Settings for Wonder Saga TV
             </button>
           </div>

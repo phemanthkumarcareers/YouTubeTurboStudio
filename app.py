@@ -554,7 +554,7 @@ def api_audio_profiles():
         "providers": SUPPORTED_AUDIO_PROVIDERS,
         "provider_voices": PROVIDER_VOICES,
         "channel_profiles": CHANNEL_VOICE_PROFILES,
-        "active_profile": CHANNEL_VOICE_PROFILES.get(channel_id, CHANNEL_VOICE_PROFILES.get("the-ai-brief-it"))
+        "active_profile": CHANNEL_VOICE_PROFILES.get(channel_id, CHANNEL_VOICE_PROFILES.get("insightspark-tv"))
     })
 
 

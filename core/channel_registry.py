@@ -140,15 +140,18 @@ class ChannelRegistry:
                     "voice_id": ctx.voice.get("voice_id", "en-US-ChristopherNeural"),
                 })
             # Ensure the primary channel appears first
-            res.sort(key=lambda x: (x["channel_id"] != "the-ai-brief-it", x["name"]))
+            res.sort(key=lambda x: (x["channel_id"] != "insightspark-tv", x["name"]))
             return res
 
     def get_channel(self, channel_id: str) -> Optional[ChannelContext]:
         """Get ChannelContext by ID."""
         with _registry_lock:
-            if channel_id not in self._cache:
+            # Support backwards-compatible aliases
+            alias_map = {"the-ai-brief-it": "insightspark-tv", "elders": "wondersaga-tv"}
+            cid = alias_map.get(channel_id, channel_id)
+            if cid not in self._cache:
                 self.reload()
-            return self._cache.get(channel_id)
+            return self._cache.get(cid)
 
     def get_active_channel_id(self) -> str:
         """Get currently active channel ID."""
@@ -157,29 +160,33 @@ class ChannelRegistry:
                 try:
                     with open(ACTIVE_CHANNEL_FILE, "r", encoding="utf-8") as f:
                         data = json.load(f)
-                        cid = data.get("active_channel_id")
+                        raw_cid = data.get("active_channel_id")
+                        alias_map = {"the-ai-brief-it": "insightspark-tv", "elders": "wondersaga-tv"}
+                        cid = alias_map.get(raw_cid, raw_cid)
                         if cid and cid in self._cache:
                             return cid
                 except Exception:
                     pass
 
-            if "the-ai-brief-it" in self._cache:
-                return "the-ai-brief-it"
+            if "insightspark-tv" in self._cache:
+                return "insightspark-tv"
             if self._cache:
                 return next(iter(self._cache.keys()))
-            return "the-ai-brief-it"
+            return "insightspark-tv"
 
     def set_active_channel_id(self, channel_id: str) -> bool:
         """Set active channel ID."""
         with _registry_lock:
-            if channel_id not in self._cache:
+            alias_map = {"the-ai-brief-it": "insightspark-tv", "elders": "wondersaga-tv"}
+            cid = alias_map.get(channel_id, channel_id)
+            if cid not in self._cache:
                 self.reload()
-            if channel_id not in self._cache:
+            if cid not in self._cache:
                 return False
 
             try:
                 with open(ACTIVE_CHANNEL_FILE, "w", encoding="utf-8") as f:
-                    json.dump({"active_channel_id": channel_id}, f, indent=2)
+                    json.dump({"active_channel_id": cid}, f, indent=2)
                 return True
             except Exception as e:
                 print(f"[Registry] Error writing active channel: {e}")
@@ -192,7 +199,7 @@ class ChannelRegistry:
             chan = self.get_channel(cid)
             if not chan:
                 # Return safe fallback if cache is somehow empty
-                return ChannelContext(channel_id="the-ai-brief-it", name="InsightSpark TV")
+                return ChannelContext(channel_id="insightspark-tv", name="InsightSpark TV")
             return chan
 
     def save_channel(self, channel_id: str, updates: Dict[str, Any]) -> ChannelContext:

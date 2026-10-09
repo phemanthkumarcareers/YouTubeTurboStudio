@@ -63,7 +63,7 @@ def load_client_secret_from_path(filepath: str, channel_id: str = None) -> tuple
             json.dump(data, f, indent=2)
 
         # Also write to root for backward compatibility if the primary channel
-        if cid == "the-ai-brief-it":
+        if cid in ("insightspark-tv", "the-ai-brief-it"):
             with open(CLIENT_SECRET_PATH, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
 
@@ -116,7 +116,7 @@ def check_auth_status(channel_id: str = None) -> dict:
                     creds.refresh(Request(session=sess))
                     with open(token_path, "wb") as f:
                         pickle.dump(creds, f)
-                    if cid == "the-ai-brief-it":
+                    if cid in ("insightspark-tv", "the-ai-brief-it"):
                         with open(TOKEN_PATH, "wb") as f:
                             pickle.dump(creds, f)
                     token_valid = True
@@ -176,7 +176,7 @@ def save_client_secret_json(secret_data: dict, channel_id: str = None) -> bool:
     try:
         with open(dest_path, "w", encoding="utf-8") as f:
             json.dump(secret_data, f, indent=2)
-        if cid == "the-ai-brief-it":
+        if cid in ("insightspark-tv", "the-ai-brief-it"):
             with open(CLIENT_SECRET_PATH, "w", encoding="utf-8") as f:
                 json.dump(secret_data, f, indent=2)
         log_success(f"Saved client_secret.json for '{cid}' successfully.")
@@ -236,7 +236,7 @@ def run_oauth_flow(port: int = 8095, channel_id: str = None) -> dict:
             creds = flow.run_local_server(port=port, prompt="consent")
             with open(token_path, "wb") as f:
                 pickle.dump(creds, f)
-            if cid == "the-ai-brief-it":
+            if cid in ("insightspark-tv", "the-ai-brief-it"):
                 with open(TOKEN_PATH, "wb") as f:
                     pickle.dump(creds, f)
             log_success(f"YouTube OAuth authorization completed for '{cid}' and token saved!")

@@ -1,4 +1,4 @@
-id: elders
+id: wondersaga-tv
 name: Wonder Saga TV
 engine: animation
 enabled: true
@@ -25,7 +25,7 @@ credentials:
   nano_banana_model: nano-banana-storybook-v1
 youtube:
   channel_id: ''
-  oauth_profile: elders
+  oauth_profile: wondersaga-tv
   handle: '@WonderSagaTV'
   privacy: private
   category_id: '24'

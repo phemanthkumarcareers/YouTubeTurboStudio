@@ -48,12 +48,12 @@ class TestPhase1MultiChannelFoundation(unittest.TestCase):
         channels = registry.list_channels()
         channel_ids = [c["channel_id"] for c in channels]
 
-        self.assertIn("the-ai-brief-it", channel_ids, "The AI Brief It channel must be discovered")
+        self.assertTrue("insightspark-tv" in channel_ids or "the-ai-brief-it" in channel_ids, "InsightSpark TV channel must be discovered")
         self.assertIn("kids", channel_ids, "Kids channel must be discovered")
-        self.assertIn("elders", channel_ids, "Elders channel must be discovered")
+        self.assertTrue("wondersaga-tv" in channel_ids or "elders" in channel_ids, "Wonder Saga TV channel must be discovered")
 
-        # Verify engine types
-        ai_brief = registry.get_channel("the-ai-brief-it")
+        # Verify engine types (alias resolution ensures get_channel succeeds with either)
+        ai_brief = registry.get_channel("insightspark-tv") or registry.get_channel("the-ai-brief-it")
         self.assertEqual(ai_brief.engine, "media_video")
         self.assertEqual(ai_brief.name, "InsightSpark TV")
 
@@ -61,9 +61,9 @@ class TestPhase1MultiChannelFoundation(unittest.TestCase):
         self.assertEqual(kids.engine, "animation")
         self.assertTrue(kids.youtube.get("made_for_kids"), "Kids must have made_for_kids=True")
 
-        elders = registry.get_channel("elders")
+        elders = registry.get_channel("wondersaga-tv") or registry.get_channel("elders")
         self.assertEqual(elders.engine, "animation")
-        self.assertFalse(elders.youtube.get("made_for_kids"), "Elders must not inherit made_for_kids")
+        self.assertFalse(elders.youtube.get("made_for_kids"), "Wonder Saga must not inherit made_for_kids")
 
     def test_02_channel_config_validation(self):
         """Verify strict channel configuration validation."""
@@ -92,11 +92,11 @@ class TestPhase1MultiChannelFoundation(unittest.TestCase):
         self.assertEqual(active.engine, "animation")
         self.assertEqual(active.video.get("default_format"), "shorts")
 
-        # Switch to the-ai-brief-it
-        ok = registry.set_active_channel_id("the-ai-brief-it")
+        # Switch to insightspark-tv (or legacy the-ai-brief-it)
+        ok = registry.set_active_channel_id("insightspark-tv")
         self.assertTrue(ok)
         active = registry.get_active_channel()
-        self.assertEqual(active.channel_id, "the-ai-brief-it")
+        self.assertEqual(active.channel_id, "insightspark-tv")
         self.assertEqual(active.engine, "media_video")
         self.assertEqual(active.video.get("default_format"), "normal")
 
@@ -112,14 +112,14 @@ class TestPhase1MultiChannelFoundation(unittest.TestCase):
         self.assertNotIn("1234567890ab", masked)
 
         # Verify channel-specific token paths are isolated
-        ai_token = get_youtube_token_path("the-ai-brief-it")
+        ai_token = get_youtube_token_path("insightspark-tv")
         kids_token = get_youtube_token_path("kids")
-        elders_token = get_youtube_token_path("elders")
+        elders_token = get_youtube_token_path("wondersaga-tv")
 
         self.assertNotEqual(str(ai_token), str(kids_token), "Channels must have separate token paths")
         self.assertNotEqual(str(kids_token), str(elders_token), "Channels must have separate token paths")
         self.assertIn("kids", str(kids_token))
-        self.assertIn("elders", str(elders_token))
+        self.assertTrue("wondersaga-tv" in str(elders_token) or "elders" in str(elders_token))
 
     def test_05_settings_persistence(self):
         """Acceptance Criteria: Settings persist after reload."""
