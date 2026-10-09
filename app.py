@@ -654,7 +654,8 @@ def api_youtube_authenticate():
     try:
         body = request.get_json(silent=True) or {}
         cid = body.get("channel_id") or registry.get_active_channel_id()
-        res = run_oauth_flow(channel_id=cid)
+        force = bool(body.get("force"))
+        res = run_oauth_flow(channel_id=cid, force_reset=force)
         status_code = 200 if res.get("ok") else 400
         return jsonify(res), status_code
     except Exception as e:

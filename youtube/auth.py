@@ -202,14 +202,24 @@ def save_client_credentials(client_id: str, client_secret: str, channel_id: str 
     return save_client_secret_json(data, channel_id=channel_id)
 
 
-def run_oauth_flow(port: int = 8095, channel_id: str = None) -> dict:
+def run_oauth_flow(port: int = 8095, channel_id: str = None, force_reset: bool = False) -> dict:
     """
     Launch interactive Google OAuth flow in user's browser for a specific channel.
     Saves the acquired credentials to that channel's token path.
     """
-    global _auth_in_progress
+    global _auth_in_progress, _last_auth_attempt
+    now = time.time()
+    last_t = globals().get("_last_auth_attempt", 0)
+
+    # Auto-release stuck auth after 90 seconds
+    if _auth_in_progress and (now - last_t > 90 or force_reset):
+        log_warn("Auto-clearing stale OAuth lock after timeout/force request.")
+        _auth_in_progress = False
+
     if _auth_in_progress:
-        return {"ok": False, "error": "Authentication is already in progress"}
+        return {"ok": False, "error": "Authentication is already in progress in your browser. Please complete it or wait a moment."}
+
+    _last_auth_attempt = now
 
     cid = channel_id or registry.get_active_channel_id()
     secret_path = get_client_secret_path(cid)

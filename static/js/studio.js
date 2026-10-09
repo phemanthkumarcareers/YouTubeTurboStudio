@@ -852,27 +852,46 @@ async function saveChannelYtSettings(channelId) {
 }
 
 async function triggerChannelYouTubeAuth(channelId) {
-    showToast(`Launching YouTube OAuth for ${channelId}...`, "info");
+    showToast(`Launching YouTube OAuth for ${channelId}... Complete login in your browser.`, "info");
     try {
-        const resp = await fetch("/api/youtube/authenticate", {
+        let resp = await fetch("/api/youtube/authenticate", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify({ channel_id: channelId })
         });
-        const contentType = resp.headers.get("content-type") || "";
-        let res;
-        if (contentType.includes("application/json")) {
-            res = await resp.json();
-        } else {
-            const rawText = await resp.text();
-            throw new Error(`Server returned status ${resp.status} (${rawText.slice(0, 100).trim()})`);
+        let res = await resp.json().catch(() => ({}));
+        
+        // If locked by a previous failed/abandoned attempt, force reset the lock
+        if (!res.ok && res.error && res.error.includes("already in progress")) {
+            resp = await fetch("/api/youtube/authenticate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                body: JSON.stringify({ channel_id: channelId, force: true })
+            });
+            res = await resp.json().catch(() => ({}));
         }
+
         if (res.ok) {
-            showToast(res.message || `Successfully connected ${channelId}!`, "success");
-            await loadAllChannelSettings();
-            if (channelId === currentChannelId) {
-                await loadYouTubeStatus();
-            }
+            showToast(res.message || `Browser opened. Authorize ${channelId} now!`, "success");
+            // Poll for token acquisition
+            let checks = 0;
+            const pollId = setInterval(async () => {
+                checks++;
+                try {
+                    const stResp = await fetch(`/api/youtube/status?channel_id=${encodeURIComponent(channelId)}`);
+                    const stData = await stResp.json();
+                    if (stData.token_valid || checks > 40) {
+                        clearInterval(pollId);
+                        if (stData.token_valid) {
+                            showToast(`🎉 ${channelId} is now connected to YouTube!`, "success");
+                            await loadAllChannelSettings();
+                            if (channelId === currentChannelId) await loadYouTubeStatus();
+                        }
+                    }
+                } catch (e) {
+                    clearInterval(pollId);
+                }
+            }, 3000);
         } else {
             showToast(`YouTube Auth: ${res.error || res.message}`, "error");
         }

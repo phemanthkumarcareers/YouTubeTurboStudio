@@ -27,7 +27,7 @@ youtube:
   channel_id: ''
   oauth_profile: insightspark-tv
   handle: '@InsightSparkTV'
-  privacy: private
+  privacy: public
   category_id: '28'
   made_for_kids: false
   auto_upload: false
