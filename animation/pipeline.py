@@ -152,6 +152,12 @@ def execute_animation_pipeline(
                             ]
                         }
 
+                if is_kids:
+                    from kids.safeguards import kids_safeguards
+                    gate_check = kids_safeguards.evaluate(script_data, channel_metadata={"youtube": channel_context.youtube})
+                    if gate_check["hard_blocked"]:
+                        raise ValueError(f"Kids Safeguards Hard Gate Violation: {gate_check['violations']}")
+
                 update_state(script_data=script_data)
                 log_success(f"[ANIMATION] Script created with {len(script_data.get('scenes', []))} scenes.")
                 set_stage("script", "done")
@@ -212,16 +218,25 @@ def execute_animation_pipeline(
                 # -------------------------------------------------------------
                 # STEP 5: QUALITY CONTROL (QC)
                 # -------------------------------------------------------------
-                qc_report = animation_qc.evaluate(
-                    scene_graph=scene_graph,
-                    video_path=final_mp4_path,
-                    audio_path=narration_mp3
-                )
+                if is_kids:
+                    from kids.qc import kids_qc
+                    qc_report = kids_qc.evaluate(
+                        scene_graph=scene_graph,
+                        video_path=final_mp4_path,
+                        script_data=script_data,
+                        channel_metadata={"youtube": channel_context.youtube}
+                    )
+                else:
+                    qc_report = animation_qc.evaluate(
+                        scene_graph=scene_graph,
+                        video_path=final_mp4_path,
+                        audio_path=narration_mp3
+                    )
 
                 if qc_report.get("passed"):
-                    log_success(f"[ANIMATION] QC Passed! Score: {qc_report['score']}/100")
+                    log_success(f"[ANIMATION] QC Passed! Score: {qc_report['score']}/100 (Publish Ready: {qc_report.get('publish_ready', True)})")
                 else:
-                    log_warn(f"[ANIMATION] QC Warning: Score {qc_report['score']}/100")
+                    log_warn(f"[ANIMATION] QC Warning: Score {qc_report['score']}/100 (Publish Ready: False)")
 
             update_state(running=False, current_step="done")
             log_success(f"[ANIMATION] Pipeline successfully completed for {channel_context.name}!")

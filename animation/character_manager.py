@@ -38,9 +38,21 @@ class CharacterManager:
         cx = w // 2
         cy = int(h * 0.44)
 
-        if style == "kids":
-            self._render_kids_character(
-                draw, cx, cy, w, h, mouth_open_pct, eye_blink_pct, gesture, motion, walk_cycle
+        if style == "kids" or style in ("pip_bunny", "barnaby_bear", "ollie_owl", "sparky"):
+            from kids.characters import kids_characters
+            char_key = style if style != "kids" else character_id
+            kids_characters.render_character(
+                character_id=char_key,
+                cx=cx,
+                cy=cy,
+                w=w,
+                h=h,
+                draw=draw,
+                mouth_open=mouth_open_pct,
+                blink=eye_blink_pct,
+                gesture=gesture,
+                motion=motion,
+                walk_cycle=walk_cycle
             )
         else:
             self._render_elders_character(

@@ -70,11 +70,14 @@ class Storyboarder:
                 cam_type = "slow_zoom_in" if i % 2 == 0 else "punch_zoom"
                 
                 # Characters
+                char_id = sc.get("character") or "sparky_host"
+                char_style = char_id if char_id in ("pip_bunny", "barnaby_bear", "ollie_owl") else "kids"
+                char_name = "Pip Bunny" if "bunny" in char_id else ("Barnaby Bear" if "bear" in char_id else ("Ollie Owl" if "owl" in char_id else "Sparky"))
                 chars = [
                     CharacterPlacement(
-                        character_id="sparky_host",
-                        name="Sparky",
-                        style="kids",
+                        character_id=char_id,
+                        name=char_name,
+                        style=char_style,
                         x_percent=0.50 if is_shorts else 0.40,
                         y_percent=0.62 if is_shorts else 0.58,
                         scale=1.1 if is_shorts else 1.25,
@@ -84,20 +87,40 @@ class Storyboarder:
                     )
                 ]
 
-                # Props
-                prop_type = kids_props[i % len(kids_props)]
-                prop_action = "held" if gesture == "hold_prop" else "float"
-                props = [
-                    PropPlacement(
-                        prop_id=f"prop_{s_id}",
-                        name=prop_type.capitalize(),
-                        prop_type=prop_type,
-                        x_percent=0.72 if is_shorts else 0.65,
-                        y_percent=0.55 if is_shorts else 0.52,
-                        scale=1.0 if is_shorts else 1.2,
-                        action=prop_action
+                # Props (supports prop_count for counting lessons)
+                prop_type = sc.get("prop") or kids_props[i % len(kids_props)]
+                prop_count = int(sc.get("prop_count", 1))
+                props = []
+                prop_action = "held" if (gesture == "hold_prop" and prop_count == 1) else "float"
+
+                if prop_count > 1:
+                    # Layout multiple counted items horizontally
+                    spacing = 0.16
+                    start_x = 0.50 - ((prop_count - 1) * spacing) / 2.0
+                    for p_idx in range(prop_count):
+                        props.append(
+                            PropPlacement(
+                                prop_id=f"prop_{s_id}_{p_idx+1}",
+                                name=f"{prop_type.capitalize()} {p_idx+1}",
+                                prop_type=prop_type,
+                                x_percent=max(0.15, min(0.85, start_x + p_idx * spacing)),
+                                y_percent=0.48 if is_shorts else 0.45,
+                                scale=0.85,
+                                action="float"
+                            )
+                        )
+                else:
+                    props.append(
+                        PropPlacement(
+                            prop_id=f"prop_{s_id}",
+                            name=prop_type.capitalize(),
+                            prop_type=prop_type,
+                            x_percent=0.72 if is_shorts else 0.65,
+                            y_percent=0.55 if is_shorts else 0.52,
+                            scale=1.0 if is_shorts else 1.2,
+                            action=prop_action
+                        )
                     )
-                ]
 
                 # SFX Cues
                 sfx_cues = [

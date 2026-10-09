@@ -46,6 +46,12 @@ class PropsManager:
             self._render_vintage_book(draw, cx, cy)
         elif prop_type in ("glasses", "reading_glasses"):
             self._render_reading_glasses(draw, cx, cy)
+        elif prop_type in ("apple", "red_apple"):
+            self._render_apple(draw, cx, cy)
+        elif prop_type in ("balloon", "red_balloon"):
+            self._render_balloon(draw, cx, cy, time_sec)
+        elif prop_type in ("alphabet_block", "letter_block", "block"):
+            self._render_alphabet_block(draw, cx, cy)
         elif prop_type in ("clock", "pocket_watch"):
             self._render_pocket_watch(draw, cx, cy, time_sec)
         else:
@@ -170,6 +176,39 @@ class PropsManager:
         center_y = cy + 10
         draw.line([(cx, center_y), (cx + 14 * math.cos(hour_angle), center_y + 14 * math.sin(hour_angle))], fill=(30, 41, 59), width=3)
         draw.line([(cx, center_y), (cx + 22 * math.cos(min_angle), center_y + 22 * math.sin(min_angle))], fill=(225, 29, 72), width=2)
+
+    def _render_apple(self, draw: ImageDraw.ImageDraw, cx: int, cy: int):
+        """Shiny red apple with green leaf."""
+        # Apple lobes
+        draw.ellipse([cx - 45, cy - 35, cx + 5, cy + 35], fill=(220, 38, 38), outline=(153, 27, 27), width=2)
+        draw.ellipse([cx - 5, cy - 35, cx + 45, cy + 35], fill=(220, 38, 38), outline=(153, 27, 27), width=2)
+        # Specular shine
+        draw.ellipse([cx - 30, cy - 25, cx - 18, cy - 5], fill=(254, 202, 202))
+        # Stem
+        draw.line([(cx, cy - 30), (cx + 5, cy - 55)], fill=(120, 53, 15), width=4)
+        # Leaf
+        draw.chord([cx + 5, cy - 60, cx + 35, cy - 40], start=180, end=360, fill=(34, 197, 94))
+
+    def _render_balloon(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, t: float):
+        """Glossy floating balloon with string."""
+        # Balloon body
+        draw.ellipse([cx - 38, cy - 55, cx + 38, cy + 35], fill=(236, 72, 153), outline=(190, 24, 93), width=2)
+        # Knot
+        draw.polygon([(cx - 8, cy + 38), (cx + 8, cy + 38), (cx, cy + 32)], fill=(190, 24, 93))
+        # Shine
+        draw.ellipse([cx - 24, cy - 42, cx - 12, cy - 20], fill=(255, 255, 255, 220))
+        # String
+        sway = math.sin(t * 3.0) * 10
+        draw.arc([int(cx + sway - 15), cy + 40, int(cx + sway + 15), cy + 85], start=0, end=180, fill=(148, 163, 184), width=2)
+
+    def _render_alphabet_block(self, draw: ImageDraw.ImageDraw, cx: int, cy: int):
+        """Wooden educational block with gold embossed letter A."""
+        draw.rounded_rectangle([cx - 45, cy - 45, cx + 45, cy + 45], radius=12, fill=(253, 224, 71), outline=(217, 119, 6), width=4)
+        draw.rounded_rectangle([cx - 35, cy - 35, cx + 35, cy + 35], radius=8, outline=(245, 158, 11), width=2)
+        # Draw letter A lines
+        draw.line([(cx, cy - 25), (cx - 20, cy + 22)], fill=(225, 29, 72), width=6)
+        draw.line([(cx, cy - 25), (cx + 20, cy + 22)], fill=(225, 29, 72), width=6)
+        draw.line([(cx - 12, cy + 6), (cx + 12, cy + 6)], fill=(225, 29, 72), width=6)
 
     def _render_default_prop(self, draw: ImageDraw.ImageDraw, cx: int, cy: int, t: float):
         """Generic cheerful animated floating badge."""
