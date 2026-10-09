@@ -34,7 +34,7 @@ def is_stopped() -> bool:
 
 def execute_pipeline(steps: list[str] = None, topic_override: str = "",
                      focus_angle: str = "", video_type: str = "normal",
-                     custom_script: dict = None):
+                     custom_script: dict = None, footage_source: str = None):
     """
     Run pipeline in background thread.
     steps: list like ['research', 'script', 'narration', 'media', 'video', 'thumbnail']
@@ -48,6 +48,8 @@ def execute_pipeline(steps: list[str] = None, topic_override: str = "",
     def _worker():
         try:
             cfg = load_config()
+            if footage_source:
+                cfg["video_source"] = footage_source
             research_data = state.get("research_data")
             script_data = custom_script or state.get("script_data")
 
@@ -118,7 +120,7 @@ def execute_pipeline(steps: list[str] = None, topic_override: str = "",
                 if is_stopped(): return
                 log_stage("media", "running")
                 set_stage("media", "running")
-                media_map = fetch_media_for_script(script_data, video_type=video_type)
+                media_map = fetch_media_for_script(script_data, video_type=video_type, source=footage_source)
                 set_stage("media", "done")
                 log_stage("media", "done")
 

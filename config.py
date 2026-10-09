@@ -45,9 +45,12 @@ DEFAULT_CONFIG = {
     "openai_model": "gpt-4o-mini",
     
     # Stock Media Keys & Sources
+    "nano_banana_api_key": os.getenv("NANO_BANANA_API_KEY", ""),
+    "nano_banana_model": "nano-banana-flux",
+    "nano_banana_base_url": os.getenv("NANO_BANANA_BASE_URL", "https://api.banana.dev/v1/generate"),
     "pexels_api_key": os.getenv("PEXELS_API_KEY", ""),
     "pixabay_api_key": os.getenv("PIXABAY_API_KEY", ""),
-    "video_source": "pexels_images", # 'pexels_images', 'pexels_videos', 'pixabay_images', 'pixabay_videos', 'local'
+    "video_source": "pexels_images", # 'pexels_images', 'pexels_videos', 'pixabay_images', 'pixabay_videos', 'nano_banana', 'local'
     "local_media_dir": str(RESOURCES_DIR / "media"),
 
     # Voice / Audio
@@ -173,6 +176,7 @@ def save_config(updates: dict) -> dict:
         env_keys = {
             "gemini_api_key": "GEMINI_API_KEY",
             "groq_api_key": "GROQ_API_KEY",
+            "nano_banana_api_key": "NANO_BANANA_API_KEY",
             "pexels_api_key": "PEXELS_API_KEY",
             "pixabay_api_key": "PIXABAY_API_KEY",
             "elevenlabs_api_key": "ELEVENLABS_API_KEY",

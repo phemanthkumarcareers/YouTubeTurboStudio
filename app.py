@@ -76,6 +76,7 @@ def api_generate():
     topic_override = body.get("topic", "").strip()
     focus_angle = body.get("focus_angle", "").strip()
     video_type = body.get("video_type", "normal")
+    footage_source = body.get("footage_source")
 
     st = get_state()
     if st.get("running"):
@@ -85,7 +86,8 @@ def api_generate():
         steps=steps,
         topic_override=topic_override,
         focus_angle=focus_angle,
-        video_type=video_type
+        video_type=video_type,
+        footage_source=footage_source
     )
     return jsonify({"ok": True, "message": "Pipeline initiated"})
 

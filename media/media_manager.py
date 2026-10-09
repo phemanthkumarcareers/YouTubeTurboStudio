@@ -33,18 +33,23 @@ def _create_fallback_gradient(dest_path: str, width: int = 1920, height: int = 1
     img.save(dest_path, "JPEG", quality=90)
 
 
-def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int, list[str]]:
+from typing import Optional
+
+
+def fetch_media_for_script(script: dict, video_type: str = "normal", source: Optional[str] = None) -> dict[int, list[str]]:
     """
     Downloads media for each section of the script.
+    When source == "nano_banana", generates AI visuals with Nano Banana.
     Returns: {section_id: [path1, path2, ...]}
     """
     cfg = load_config()
-    source = cfg.get("video_source", "pexels_images")
+    effective_source = source or cfg.get("video_source", "pexels_images")
     pexels_key = cfg.get("pexels_api_key", "").strip()
     pixabay_key = cfg.get("pixabay_api_key", "").strip()
 
     is_shorts = (video_type == "shorts")
     orientation = "portrait" if is_shorts else "landscape"
+    w, h = (1080, 1920) if is_shorts else (1920, 1080)
     target_count = 2 if is_shorts else 1
 
     img_dir = OUTPUT_DIR / "images"
@@ -53,7 +58,7 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
     result_map = {}
     sections = script.get("sections", [])
 
-    log_info(f"Fetching media assets for {len(sections)} sections (Mode: {source}, Orientation: {orientation})...")
+    log_info(f"Fetching media assets for {len(sections)} sections (Mode: {effective_source}, Orientation: {orientation})...")
 
     for sec in sections:
         sec_id = sec.get("id", 1)
@@ -62,28 +67,47 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
 
         log_info(f"   [Section {sec_id}] Searching '{query}'...")
 
+        # 0. Nano Banana AI Generative Visuals
+        nano_key = (cfg.get("gemini_api_key") or cfg.get("nano_banana_api_key", "")).strip()
+        is_nano_selected = (effective_source == "nano_banana")
+        if (is_nano_selected and nano_key) or (not pexels_key and nano_key and is_nano_selected):
+            try:
+                from media.nano_banana_client import generate_image_with_nano_banana
+                dest = str(img_dir / f"sec_{sec_id}_nano_banana.jpg")
+                res = generate_image_with_nano_banana(
+                    prompt=f"{query}, cinematic high resolution, 4k, photorealistic",
+                    width=w,
+                    height=h,
+                    output_path=dest,
+                    api_key=nano_key
+                )
+                if res and os.path.exists(res):
+                    sec_paths.append(res)
+            except Exception as e:
+                log_warn(f"   [Section {sec_id}] Nano Banana generation error: {e}")
+
         # 1. Try Pexels
-        if "pexels" in source and pexels_key:
-            if "video" in source:
+        if not sec_paths and "pexels" in effective_source and pexels_key:
+            if "video" in effective_source:
                 urls = pexels_videos(query, pexels_key, orientation=orientation, count=target_count)
             else:
                 urls = pexels_photos(query, pexels_key, orientation=orientation, count=target_count)
 
             for i, u in enumerate(urls):
-                ext = ".mp4" if "video" in source else ".jpg"
+                ext = ".mp4" if "video" in effective_source else ".jpg"
                 dest = str(img_dir / f"sec_{sec_id}_px_{i}{ext}")
                 if download_file(u, dest):
                     sec_paths.append(dest)
 
         # 2. Try Pixabay if Pexels returned nothing or if pixabay configured
         if not sec_paths and pixabay_key:
-            if "video" in source:
+            if "video" in effective_source:
                 urls = search_pixabay_videos(query, pixabay_key, orientation=orientation, count=target_count)
             else:
                 urls = search_pixabay_photos(query, pixabay_key, orientation=orientation, count=target_count)
 
             for i, u in enumerate(urls):
-                ext = ".mp4" if "video" in source else ".jpg"
+                ext = ".mp4" if "video" in effective_source else ".jpg"
                 dest = str(img_dir / f"sec_{sec_id}_pb_{i}{ext}")
                 if download_file(u, dest):
                     sec_paths.append(dest)
@@ -91,7 +115,6 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
         # 3. Fallback to existing or synthetic gradient background
         if not sec_paths:
             fallback_file = str(img_dir / f"sec_{sec_id}_fallback.jpg")
-            w, h = (1080, 1920) if is_shorts else (1920, 1080)
             _create_fallback_gradient(fallback_file, width=w, height=h, sec_id=sec_id)
             sec_paths.append(fallback_file)
             log_warn(f"   [Section {sec_id}] No stock media found for '{query}'. Used atmospheric backdrop.")

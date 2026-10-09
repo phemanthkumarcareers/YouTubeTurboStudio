@@ -201,6 +201,13 @@ async function loadSettings() {
         setSelectVal("gemini-model-select", currentConfig.gemini_model || "gemini-3.8-flash");
         setSelectVal("groq-model-select", currentConfig.groq_model || "llama-3.3-70b-versatile");
         setSelectVal("video-source-select", currentConfig.video_source || "pexels_images");
+        if (currentConfig.video_source === "nano_banana") {
+            const rNb = document.getElementById("source-nano-banana");
+            if (rNb) rNb.checked = true;
+        } else {
+            const rStk = document.getElementById("source-stock-footage");
+            if (rStk) rStk.checked = true;
+        }
         setSelectVal("tts-provider-select", currentConfig.tts_provider || "edge-tts");
         setSelectVal("yt-default-privacy", currentConfig.youtube_privacy || "private");
         setSelectVal("yt-default-category", currentConfig.youtube_category_id || "28");
@@ -272,6 +279,8 @@ async function loadSettings() {
 // ── SAVE SETTINGS ──
 async function saveAllSettings() {
     const selectedProvider = document.querySelector('input[name="ai_provider_radio"]:checked')?.value || currentConfig.llm_provider || "gemini";
+    const footageSourceMode = document.querySelector('input[name="footage_source_mode"]:checked')?.value || "stock";
+    const chosenVideoSource = (footageSourceMode === "nano_banana") ? "nano_banana" : (getVal("video-source-select") || currentConfig.video_source || "pexels_images");
     
     const payload = {
         llm_provider: selectedProvider,
@@ -284,7 +293,7 @@ async function saveAllSettings() {
         pixabay_api_key: getVal("pixabay-api-key") || currentConfig.pixabay_api_key || "",
         elevenlabs_api_key: getVal("elevenlabs-api-key") || currentConfig.elevenlabs_api_key || "",
 
-        video_source: getVal("video-source-select") || currentConfig.video_source || "pexels_images",
+        video_source: chosenVideoSource,
         tts_provider: getVal("tts-provider-select") || currentConfig.tts_provider || "edge-tts",
         voice_id: getVal("voice-select") || currentConfig.voice_id || "en-US-ChristopherNeural",
         voice_rate: getVal("voice-rate-input") || currentConfig.voice_rate || "+0%",
@@ -481,6 +490,9 @@ function startPipeline() {
         return;
     }
 
+    const footageSourceMode = document.querySelector('input[name="footage_source_mode"]:checked')?.value || "stock";
+    const footageSource = (footageSourceMode === "nano_banana") ? "nano_banana" : (getVal("video-source-select") || "pexels_videos");
+
     fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -488,7 +500,8 @@ function startPipeline() {
             steps: steps,
             topic: topic,
             focus_angle: angle,
-            video_type: videoType
+            video_type: videoType,
+            footage_source: footageSource
         })
     }).then(r => r.json()).then(res => {
         if (res.ok) {
@@ -657,6 +670,33 @@ function setupEventListeners() {
     // Generate Tab
     document.getElementById("btn-generate").addEventListener("click", startPipeline);
     document.getElementById("btn-stop").addEventListener("click", stopPipeline);
+
+    // Footage Source Mode Radios (Step 4)
+    document.querySelectorAll('input[name="footage_source_mode"]').forEach(radio => {
+        radio.addEventListener("change", (e) => {
+            const sel = document.getElementById("video-source-select");
+            if (sel) {
+                if (e.target.value === "nano_banana") {
+                    sel.value = "nano_banana";
+                } else if (sel.value === "nano_banana") {
+                    sel.value = "pexels_videos";
+                }
+            }
+        });
+    });
+
+    const videoSourceSel = document.getElementById("video-source-select");
+    if (videoSourceSel) {
+        videoSourceSel.addEventListener("change", (e) => {
+            if (e.target.value === "nano_banana") {
+                const r = document.getElementById("source-nano-banana");
+                if (r) r.checked = true;
+            } else {
+                const r = document.getElementById("source-stock-footage");
+                if (r) r.checked = true;
+            }
+        });
+    }
 
     // Review Tab
     document.getElementById("btn-save-meta").addEventListener("click", saveMetadata);
