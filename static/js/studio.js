@@ -235,7 +235,8 @@ async function loadSettings() {
         }
 
         // Channel Info & YouTube Defaults
-        setVal("channel-name-input", currentConfig.channel_name || "");
+        setVal("channel-name-input", currentConfig.channel_name || "InsightSpark TV");
+        setVal("channel-handle-input", currentConfig.channel_handle || "@InsightSparkTV");
         setVal("channel-desc-input", currentConfig.channel_description || "");
 
         // Voice Select — build options from server list and mark saved voice as selected
@@ -303,7 +304,8 @@ async function saveAllSettings() {
         music_enabled: document.getElementById("music-enabled-check") ? document.getElementById("music-enabled-check").checked : (currentConfig.music_enabled !== false),
         subtitles_enabled: document.getElementById("subtitles-enabled-check") ? document.getElementById("subtitles-enabled-check").checked : (currentConfig.subtitles_enabled !== false),
 
-        channel_name: getVal("channel-name-input") || currentConfig.channel_name || "",
+        channel_name: getVal("channel-name-input") || currentConfig.channel_name || "InsightSpark TV",
+        channel_handle: getVal("channel-handle-input") || currentConfig.channel_handle || "@InsightSparkTV",
         channel_description: getVal("channel-desc-input") || currentConfig.channel_description || "",
         youtube_privacy: getVal("yt-default-privacy") || currentConfig.youtube_privacy || "private",
         youtube_category_id: getVal("yt-default-category") || currentConfig.youtube_category_id || "28"
