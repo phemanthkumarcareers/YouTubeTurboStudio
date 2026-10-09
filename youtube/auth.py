@@ -225,7 +225,10 @@ def run_oauth_flow(port: int = 8095, channel_id: str = None) -> dict:
     token_path = get_youtube_token_path(cid)
     token_path.parent.mkdir(parents=True, exist_ok=True)
 
-    from google_auth_oauthlib.flow import InstalledAppFlow
+    try:
+        from google_auth_oauthlib.flow import InstalledAppFlow
+    except ImportError:
+        return {"ok": False, "error": "google-auth-oauthlib is not installed. Please install requirements."}
 
     def _auth_worker():
         global _auth_in_progress
@@ -233,13 +236,25 @@ def run_oauth_flow(port: int = 8095, channel_id: str = None) -> dict:
         try:
             log_info(f"Starting Google OAuth in browser for channel '{cid}'...")
             flow = InstalledAppFlow.from_client_secrets_file(str(secret_path), YOUTUBE_SCOPES)
-            creds = flow.run_local_server(port=port, prompt="consent")
-            with open(token_path, "wb") as f:
-                pickle.dump(creds, f)
-            if cid in ("insightspark-tv", "the-ai-brief-it"):
-                with open(TOKEN_PATH, "wb") as f:
+            
+            # Try designated port, fallback to dynamic available port if needed
+            creds = None
+            for p in (port, port + 1, port + 2, 0):
+                try:
+                    creds = flow.run_local_server(port=p, prompt="consent")
+                    break
+                except Exception as port_err:
+                    if p == 0:
+                        raise port_err
+                    log_warn(f"Port {p} failed for OAuth, trying alternate port: {port_err}")
+
+            if creds:
+                with open(token_path, "wb") as f:
                     pickle.dump(creds, f)
-            log_success(f"YouTube OAuth authorization completed for '{cid}' and token saved!")
+                if cid in ("insightspark-tv", "the-ai-brief-it"):
+                    with open(TOKEN_PATH, "wb") as f:
+                        pickle.dump(creds, f)
+                log_success(f"YouTube OAuth authorization completed for '{cid}' and token saved!")
         except Exception as e:
             log_error(f"YouTube OAuth authorization failed for '{cid}': {e}")
         finally:

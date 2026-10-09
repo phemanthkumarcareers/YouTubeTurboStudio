@@ -651,10 +651,17 @@ def api_youtube_load_secret_path():
 
 @app.route("/api/youtube/authenticate", methods=["POST"])
 def api_youtube_authenticate():
-    body = request.get_json(silent=True) or {}
-    cid = body.get("channel_id") or registry.get_active_channel_id()
-    res = run_oauth_flow(channel_id=cid)
-    return jsonify(res)
+    try:
+        body = request.get_json(silent=True) or {}
+        cid = body.get("channel_id") or registry.get_active_channel_id()
+        res = run_oauth_flow(channel_id=cid)
+        status_code = 200 if res.get("ok") else 400
+        return jsonify(res), status_code
+    except Exception as e:
+        import traceback
+        err_msg = str(e)
+        log_error(f"Error in api_youtube_authenticate: {traceback.format_exc()}")
+        return jsonify({"ok": False, "error": f"OAuth initialization error: {err_msg}"}), 500
 
 
 @app.route("/api/youtube/upload", methods=["POST"])
