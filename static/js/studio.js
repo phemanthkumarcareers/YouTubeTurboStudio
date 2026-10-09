@@ -197,7 +197,10 @@ async function initChannelManager() {
             });
             // Update UI based on active channel
             const activeCh = data.channels.find(c => c.channel_id === currentChannelId);
-            if (activeCh) updateChannelUI(activeCh);
+            if (activeCh) {
+                updateChannelUI(activeCh);
+                await loadEligibleParents(activeCh.channel_id);
+            }
         }
     } catch (e) {
         console.error("Error loading channels:", e);
@@ -206,6 +209,43 @@ async function initChannelManager() {
     selectEl.addEventListener("change", () => {
         switchChannel(selectEl.value);
     });
+}
+
+async function loadEligibleParents(channelId) {
+    try {
+        const cid = channelId || currentChannelId;
+        const resp = await fetch(`/api/content-modes/eligible-parents?channel_id=${encodeURIComponent(cid)}`);
+        const data = await resp.json();
+        const parents = data.eligible_parents || [];
+        const linkedRadio = document.getElementById("mode-shorts-linked");
+        const lockedMsg = document.getElementById("shorts-linked-locked-msg");
+        const parentSelect = document.getElementById("parent-long-select");
+        const linkedConfig = document.getElementById("linked-shorts-config");
+
+        if (parents.length > 0) {
+            if (linkedRadio) linkedRadio.disabled = false;
+            if (lockedMsg) lockedMsg.style.display = "none";
+            if (parentSelect) {
+                parentSelect.innerHTML = parents.map(p => 
+                    `<option value="${p.content_id}">${p.title} (${p.created_at ? p.created_at.substring(0, 10) : 'Recent'})</option>`
+                ).join("");
+            }
+        } else {
+            if (linkedRadio) {
+                linkedRadio.disabled = true;
+                if (linkedRadio.checked) {
+                    const longRadio = document.getElementById("mode-long");
+                    if (longRadio) longRadio.checked = true;
+                    if (linkedConfig) linkedConfig.style.display = "none";
+                }
+            }
+            if (lockedMsg) lockedMsg.style.display = "block";
+            if (parentSelect) parentSelect.innerHTML = "";
+            if (linkedConfig) linkedConfig.style.display = "none";
+        }
+    } catch (e) {
+        console.error("Error loading eligible parents:", e);
+    }
 }
 
 function updateChannelUI(chan) {
@@ -252,6 +292,7 @@ async function switchChannel(channelId) {
             updateChannelUI(res.channel);
             await loadSettings();
             await loadYouTubeStatus();
+            await loadEligibleParents(channelId);
             showToast(`Active channel switched to "${res.channel.name}"!`, "success");
         } else {
             showToast(`Switch failed: ${res.error}`, "error");
@@ -592,7 +633,32 @@ async function saveManualCredentials() {
 function startPipeline() {
     const topic = getVal("gen-topic-input");
     const angle = getVal("gen-angle-select");
-    const videoType = document.querySelector('input[name="video_format"]:checked').value;
+    const modeEl = document.querySelector('input[name="content_mode"]:checked');
+    const contentMode = modeEl ? modeEl.value : "long";
+    const videoType = (contentMode === "long") ? "normal" : "shorts";
+
+    let parentContentId = null;
+    let numShorts = 1;
+    let genMode = "purpose_built";
+    let options = {};
+
+    if (contentMode === "shorts_linked") {
+        parentContentId = getVal("parent-long-select");
+        if (!parentContentId) {
+            showToast("Please select an eligible Long video parent first.", "error");
+            return;
+        }
+        numShorts = parseInt(getVal("num-shorts-input") || 1, 10);
+        genMode = getVal("linked-gen-mode-select") || "purpose_built";
+        options = {
+            unique_hook: document.getElementById("opt-unique-hook")?.checked ?? true,
+            preserve_value: document.getElementById("opt-preserve-value")?.checked ?? true,
+            add_url: document.getElementById("opt-add-url")?.checked ?? true,
+            add_cta: document.getElementById("opt-add-cta")?.checked ?? true,
+            keep_family: document.getElementById("opt-keep-family")?.checked ?? true,
+            prevent_duplicate: document.getElementById("opt-prevent-duplicate")?.checked ?? true
+        };
+    }
 
     const steps = [];
     if (document.getElementById("chk-research").checked) steps.push("research");
@@ -615,7 +681,12 @@ function startPipeline() {
             steps: steps,
             topic: topic,
             focus_angle: angle,
-            video_type: videoType
+            video_type: videoType,
+            content_mode: contentMode,
+            parent_content_id: parentContentId,
+            num_shorts: numShorts,
+            generation_mode: genMode,
+            options: options
         })
     }).then(r => r.json()).then(res => {
         if (res.ok) {
@@ -685,6 +756,38 @@ async function loadReviewData() {
             }
         } catch (qcErr) {
             console.error("Error fetching QC report:", qcErr);
+        }
+
+        // Load Internal Readiness Panel
+        try {
+            if (statusData.content_id) {
+                const readResp = await fetch(`/api/readiness/${encodeURIComponent(statusData.content_id)}`);
+                const readData = await readResp.json();
+                if (readData.ok && readData.readiness) {
+                    const r = readData.readiness;
+                    const rBadge = document.getElementById("readiness-status-badge");
+                    if (rBadge) {
+                        rBadge.innerText = `STATUS: ${r.status}`;
+                        rBadge.style.color = (r.status === "READY FOR REVIEW") ? "var(--accent-emerald)" : "#ef4444";
+                    }
+                    const pqEl = document.getElementById("readiness-pq");
+                    if (pqEl) pqEl.innerText = `${r.production_quality.score}/100 [${r.production_quality.status}]`;
+                    const origEl = document.getElementById("readiness-orig");
+                    if (origEl) origEl.innerText = `${r.originality.score}/100 [${r.originality.status}]`;
+                    const techEl = document.getElementById("readiness-tech");
+                    if (techEl) techEl.innerText = r.technical_qc;
+                    const compEl = document.getElementById("readiness-comp");
+                    if (compEl) compEl.innerText = r.content_compliance;
+                    const chanEl = document.getElementById("readiness-chan");
+                    if (chanEl) chanEl.innerText = r.channel_validation;
+                    const kidsEl = document.getElementById("readiness-kids");
+                    if (kidsEl) kidsEl.innerText = r.kids_safety;
+                    const assetEl = document.getElementById("readiness-asset");
+                    if (assetEl) assetEl.innerText = r.asset_provenance;
+                }
+            }
+        } catch (rErr) {
+            console.error("Error fetching readiness report:", rErr);
         }
     } catch (e) {
         console.error("Error loading review data:", e);
@@ -805,6 +908,16 @@ function setupEventListeners() {
     // Generate Tab
     document.getElementById("btn-generate").addEventListener("click", startPipeline);
     document.getElementById("btn-stop").addEventListener("click", stopPipeline);
+
+    // Content Mode Radios
+    document.querySelectorAll('input[name="content_mode"]').forEach(radio => {
+        radio.addEventListener("change", (e) => {
+            const linkedBox = document.getElementById("linked-shorts-config");
+            if (linkedBox) {
+                linkedBox.style.display = (e.target.value === "shorts_linked") ? "block" : "none";
+            }
+        });
+    });
 
     // Review Tab
     document.getElementById("btn-save-meta").addEventListener("click", saveMetadata);

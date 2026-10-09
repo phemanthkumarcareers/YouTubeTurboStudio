@@ -110,11 +110,56 @@ def init_db():
             );
         """)
 
+        # 6. Content History Table (Content Family + Originality + Governance)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS content_history (
+                content_id TEXT PRIMARY KEY,
+                channel_id TEXT NOT NULL,
+                content_family_id TEXT NOT NULL,
+                content_type TEXT NOT NULL,
+                relationship_type TEXT NOT NULL,
+                parent_content_id TEXT,
+                topic TEXT NOT NULL,
+                concept TEXT NOT NULL,
+                hook TEXT NOT NULL,
+                hook_type TEXT DEFAULT 'question',
+                script TEXT NOT NULL,
+                script_fingerprint TEXT NOT NULL,
+                story_structure TEXT DEFAULT '',
+                visual_plan TEXT DEFAULT '',
+                scene_signatures TEXT DEFAULT '[]',
+                animation_actions TEXT DEFAULT '[]',
+                assets_used TEXT DEFAULT '[]',
+                music_used TEXT DEFAULT '',
+                voice_profile TEXT DEFAULT '',
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                production_quality_score REAL DEFAULT 0.0,
+                originality_score REAL DEFAULT 0.0,
+                technical_qc_result TEXT DEFAULT 'PASS',
+                compliance_result TEXT DEFAULT 'PASS',
+                channel_validator_result TEXT DEFAULT 'PASS',
+                kids_safety_result TEXT DEFAULT 'N/A',
+                educational_accuracy_result TEXT DEFAULT 'N/A',
+                asset_provenance_result TEXT DEFAULT 'PASS',
+                readiness_status TEXT DEFAULT 'PENDING',
+                youtube_video_id TEXT,
+                youtube_url TEXT,
+                publish_timestamp TEXT,
+                analytics_snapshots TEXT DEFAULT '{}',
+                created_at TEXT NOT NULL
+            );
+        """)
+
         # Create indexes for fast lookup
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_channel ON jobs (channel_id);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs (status);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_analytics_channel ON analytics (channel_id);")
         cursor.execute("CREATE INDEX IF NOT EXISTS idx_review_channel ON review_queue (channel_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_content_channel ON content_history (channel_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_content_family ON content_history (content_family_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_content_parent ON content_history (parent_content_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_content_type ON content_history (content_type);")
 
         conn.commit()
 

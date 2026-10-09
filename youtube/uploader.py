@@ -50,11 +50,22 @@ def upload_video_to_youtube(
     thumb_path: Optional[str] = None,
     channel_id: Optional[str] = None,
     expected_youtube_channel_id: Optional[str] = None,
-    made_for_kids: bool = False
+    made_for_kids: bool = False,
+    content_id: Optional[str] = None,
+    parent_content_id: Optional[str] = None,
+    relationship_type: str = "STANDALONE",
+    readiness_report: Optional[dict] = None
 ) -> str:
     """
-    Resumable video upload with progress callback and pre-upload channel verification.
+    Resumable video upload with progress callback, channel verification,
+    and Section 4 / Section 8 compliance & originality gating.
     """
+    from core.compliance_gate import compliance_gate_mgr
+    from core.content_family import content_family_mgr
+
+    # Enforce hard publishing gate (Upload target never overrides failed gates)
+    if readiness_report:
+        compliance_gate_mgr.assert_can_publish(readiness_report)
     if not os.path.exists(video_path):
         raise FileNotFoundError(f"Video file not found at: {video_path}")
 
@@ -72,6 +83,13 @@ def upload_video_to_youtube(
 
     update_state(uploading=True, upload_pct=0, channel_id=cid)
     yt = get_youtube_service(cid)
+
+    # Build short description with parent URL if derived
+    description = content_family_mgr.build_short_description(
+        base_description=description,
+        relationship_type=relationship_type,
+        parent_content_id=parent_content_id
+    )
 
     # Append hashtags to description so they show on the YouTube video page
     if tags:
@@ -120,6 +138,9 @@ def upload_video_to_youtube(
     yt_url = f"https://www.youtube.com/watch?v={video_id}"
     update_state(upload_pct=100, yt_url=yt_url)
     log_success(f"Video successfully uploaded to YouTube! Watch link: {yt_url}")
+
+    if content_id:
+        content_family_mgr.update_youtube_publish(content_id, video_id, yt_url)
 
     # Set custom thumbnail if available
     if thumb_path and os.path.exists(thumb_path):

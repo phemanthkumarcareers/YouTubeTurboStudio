@@ -237,6 +237,8 @@ def execute_animation_pipeline(
                 else:
                     log_warn(f"[ANIMATION] QC Warning: Score {qc_report['score']}/100 (Publish Ready: False)")
 
+                update_state(qc_report=qc_report, script_data=script_data)
+
             update_state(running=False, current_step="done")
             log_success(f"[ANIMATION] Pipeline successfully completed for {channel_context.name}!")
 

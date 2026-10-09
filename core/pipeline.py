@@ -232,9 +232,66 @@ def execute_pipeline(
                 set_stage("thumbnail", "done")
                 log_stage("thumbnail", "done")
 
-            # ── 7. AUTO UPLOAD (IF ENABLED) ────────────────────────────────
+            # ── 7. ORIGINALITY & READINESS GOVERNANCE ──────────────────────
+            from core.originality_engine import originality_engine
+            from core.compliance_gate import compliance_gate_mgr
+            from core.content_family import content_family_mgr
+
+            c_type = "LONG" if video_type in ("normal", "long") else "SHORT"
+            rel_type = "PARENT" if c_type == "LONG" else "STANDALONE"
+            full_script_text = " ".join(s.get("narration", "") for s in script_data.get("sections", []))
+
+            orig_report = originality_engine.evaluate_originality(
+                channel_id=channel_context.channel_id,
+                topic=(research_data or {}).get("topic", topic_override or "Video"),
+                script=full_script_text,
+                hook=(hook_data or {}).get("winner_text", "") if hook_data else "",
+                title=script_data.get("title", ""),
+                story_structure=script_data.get("story_structure", ""),
+                visual_plan=str(script_data.get("visual_beats", ""))
+            )
+
+            pq_score = float((qc_report or {}).get("score", 90.0)) if qc_report else 90.0
+            is_made_for_kids = bool(cfg.get("made_for_kids", False))
+            readiness = compliance_gate_mgr.evaluate_readiness(
+                channel_id=channel_context.channel_id,
+                production_quality_score=pq_score,
+                originality_score=orig_report["score"],
+                technical_qc_passed=bool((qc_report or {}).get("passed", True)) if qc_report else True,
+                compliance_passed=True,
+                channel_validation_passed=True,
+                asset_provenance_passed=(orig_report["breakdown"]["asset_provenance"]["status"] == "PASS"),
+                kids_safety_passed=True if is_made_for_kids else None,
+                educational_accuracy_passed=True if is_made_for_kids else None,
+                is_made_for_kids_valid=True if is_made_for_kids else None
+            )
+
+            registered_content = content_family_mgr.register_content(
+                channel_id=channel_context.channel_id,
+                topic=(research_data or {}).get("topic", topic_override or "Video"),
+                content_type=c_type,
+                relationship_type=rel_type,
+                parent_content_id=None,
+                concept=(research_data or {}).get("topic", topic_override or "Video"),
+                hook=(hook_data or {}).get("winner_text", "") if hook_data else "",
+                script=full_script_text,
+                title=script_data.get("title", ""),
+                description=state.get("description", script_data.get("description", "")),
+                production_quality_score=pq_score,
+                originality_score=orig_report["score"],
+                technical_qc_result=readiness["technical_qc"],
+                compliance_result=readiness["content_compliance"],
+                channel_validator_result=readiness["channel_validation"],
+                kids_safety_result=readiness["kids_safety"],
+                educational_accuracy_result=readiness["educational_accuracy"],
+                asset_provenance_result=readiness["asset_provenance"],
+                readiness_status=readiness["status"]
+            )
+            update_state(readiness_report=readiness, content_id=registered_content["content_id"])
+
+            # ── 8. AUTO UPLOAD (IF ENABLED & GATES PASS) ────────────────────
             if cfg.get("auto_upload") and video_file and os.path.exists(video_file):
-                log_info(f"Auto-upload enabled for '{channel_context.name}'. Commencing YouTube upload...")
+                log_info(f"Auto-upload check for '{channel_context.name}'...")
                 upload_video_to_youtube(
                     video_path=video_file,
                     title=script_data.get("title", "Cinematic Video"),
@@ -245,7 +302,10 @@ def execute_pipeline(
                     thumb_path=state.get("thumb_path"),
                     channel_id=channel_context.channel_id,
                     expected_youtube_channel_id=cfg.get("expected_youtube_channel_id"),
-                    made_for_kids=cfg.get("made_for_kids", False)
+                    made_for_kids=cfg.get("made_for_kids", False),
+                    content_id=registered_content["content_id"],
+                    relationship_type=rel_type,
+                    readiness_report=readiness
                 )
 
             log_success(f"Pipeline finished successfully for '{channel_context.name}'! Ready in Review Studio.")

@@ -107,15 +107,65 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label">Video Format / Aspect Ratio</label>
-              <div style="display:flex; gap:16px;">
+              <label class="form-label" style="font-weight:600;">CONTENT TYPE</label>
+              <div style="display:flex; flex-direction:column; gap:8px;">
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="radio" name="video_format" value="normal" checked>
-                  <span><strong>16:9 Standard</strong> (1920×1080)</span>
+                  <input type="radio" name="content_mode" value="long" checked id="mode-long">
+                  <span><strong>Long Video</strong> (16:9 Standard, eligible parent)</span>
                 </label>
                 <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                  <input type="radio" name="video_format" value="shorts">
-                  <span><strong>9:16 Shorts</strong> (1080×1920)</span>
+                  <input type="radio" name="content_mode" value="shorts" id="mode-shorts">
+                  <span><strong>Shorts</strong> (9:16 Standalone, no parent link)</span>
+                </label>
+                <label id="lbl-mode-shorts-linked" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <input type="radio" name="content_mode" value="shorts_linked" id="mode-shorts-linked">
+                  <span><strong>Shorts - Link Long Video</strong> (Associated with active channel Long video)</span>
+                </label>
+              </div>
+              <div id="shorts-linked-locked-msg" class="badge-warning" style="display:none; margin-top:8px; font-size:12px; padding:6px 10px; border-radius:4px; background:rgba(234,179,8,0.15); color:#eab308; border:1px solid rgba(234,179,8,0.3);">
+                🔒 <em>Generate, import, or publish an eligible Long video first.</em>
+              </div>
+            </div>
+
+            <!-- Linked Shorts Configuration Box -->
+            <div id="linked-shorts-config" style="display:none; background:var(--bg-card-secondary, rgba(255,255,255,0.03)); border:1px solid var(--border-color); border-radius:6px; padding:12px; margin-bottom:16px;">
+              <div style="font-weight:600; font-size:13px; margin-bottom:8px;">🔗 Linked Shorts Configuration</div>
+              <div class="form-group" style="margin-bottom:8px;">
+                <label class="form-label" style="font-size:12px;">Parent Long Video (Active Channel Only)</label>
+                <select id="parent-long-select" class="form-select" style="font-size:13px;"></select>
+              </div>
+              <div class="grid-2" style="margin-bottom:8px;">
+                <div>
+                  <label class="form-label" style="font-size:12px;">Number of Shorts</label>
+                  <input type="number" id="num-shorts-input" class="form-input" min="1" max="10" value="1" style="font-size:13px;">
+                </div>
+                <div>
+                  <label class="form-label" style="font-size:12px;">Generation Mode</label>
+                  <select id="linked-gen-mode-select" class="form-select" style="font-size:13px;">
+                    <option value="purpose_built">Purpose-built</option>
+                    <option value="extract">Extract</option>
+                    <option value="hybrid">Hybrid</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--text-muted);">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="opt-unique-hook" checked> <span>Generate unique hook for every Short</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="opt-preserve-value" checked> <span>Preserve standalone value</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="opt-add-url" checked> <span>Add parent Long-video URL to description when URL exists</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="opt-add-cta" checked> <span>Add contextual "Watch Full Video" CTA</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="opt-keep-family" checked> <span>Keep in same content family</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                  <input type="checkbox" id="opt-prevent-duplicate" checked> <span>Prevent duplicate Short concepts</span>
                 </label>
               </div>
             </div>
@@ -277,6 +327,36 @@
               </div>
               <div id="qc-details-box" style="font-size:12px; color:var(--text-secondary); line-height:1.6; margin-top:6px;">
                 Ready for quality audit. Run the pipeline to inspect hook, script critique, fact check, and video metrics.
+              </div>
+            </div>
+
+            <!-- Section 9: Internal Readiness Panel -->
+            <div id="readiness-card" class="card" style="margin-bottom:16px;">
+              <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="card-title">⚖️ Internal Readiness & Content Guard</div>
+                <div id="readiness-status-badge" class="badge-channel" style="font-weight:700; color:#3b82f6;">STATUS: PENDING</div>
+              </div>
+              <div style="font-size:12px; margin-top:8px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                  <div style="padding:8px; background:rgba(255,255,255,0.03); border-radius:4px; border:1px solid var(--border-color);">
+                    <div style="color:var(--text-muted); font-size:11px;">PRODUCTION QUALITY</div>
+                    <div id="readiness-pq" style="font-weight:600; font-size:14px;">--/100</div>
+                  </div>
+                  <div style="padding:8px; background:rgba(255,255,255,0.03); border-radius:4px; border:1px solid var(--border-color);">
+                    <div style="color:var(--text-muted); font-size:11px;">ORIGINALITY SCORE</div>
+                    <div id="readiness-orig" style="font-weight:600; font-size:14px;">--/100</div>
+                  </div>
+                </div>
+                <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px; font-size:12px;">
+                  <div style="display:flex; justify-content:space-between;"><span>TECHNICAL QC:</span> <strong id="readiness-tech">--</strong></div>
+                  <div style="display:flex; justify-content:space-between;"><span>CONTENT COMPLIANCE:</span> <strong id="readiness-comp">--</strong></div>
+                  <div style="display:flex; justify-content:space-between;"><span>CHANNEL VALIDATION:</span> <strong id="readiness-chan">--</strong></div>
+                  <div style="display:flex; justify-content:space-between;"><span>KIDS SAFETY:</span> <strong id="readiness-kids">N/A</strong></div>
+                  <div style="display:flex; justify-content:space-between;"><span>ASSET PROVENANCE:</span> <strong id="readiness-asset">--</strong></div>
+                </div>
+                <div style="margin-top:10px; font-size:11px; color:var(--text-muted); font-style:italic; border-top:1px solid var(--border-color); padding-top:6px;">
+                  ℹ️ Internal readiness gate only. Does not claim guaranteed YouTube monetization.
+                </div>
               </div>
             </div>
 

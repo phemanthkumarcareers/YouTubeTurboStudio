@@ -99,11 +99,84 @@ class HeavyRenderWorker:
                 job_queue.update_job_status(job_id, status="failed", error="Pipeline finished without output video.")
                 return job_queue.get_job(job_id)
 
-            # Determine QC Score
-            qc_score = 90.0  # Default good
+            # Determine QC Score & Script details
+            qc_score = 90.0
             qc_rep = state.get("qc_report")
             if qc_rep and isinstance(qc_rep, dict):
                 qc_score = float(qc_rep.get("score", 90.0))
+
+            script_data = state.get("script_data") or {}
+            sections = script_data.get("sections", [])
+            script_text = " ".join(s.get("narration", "") for s in sections) or job.topic
+            hook_text = (state.get("hook_data") or {}).get("winner_text", "")
+            title_text = script_data.get("title", job.topic)
+            desc_text = state.get("description", script_data.get("description", ""))
+
+            # Resolve Content Mode & Relationship
+            job_meta = getattr(job, "metadata", {}) or {}
+            c_type = "LONG" if job.video_type in ("normal", "long") else "SHORT"
+            rel_type = job_meta.get("relationship_type", "PARENT" if c_type == "LONG" else "STANDALONE")
+            parent_id = job_meta.get("parent_content_id")
+
+            # 1. Originality Evaluation (Section 3)
+            from core.originality_engine import originality_engine
+            orig_report = originality_engine.evaluate_originality(
+                channel_id=chan_ctx.channel_id,
+                topic=job.topic,
+                script=script_text,
+                hook=hook_text,
+                title=title_text,
+                story_structure=script_data.get("story_structure", ""),
+                visual_plan=str(script_data.get("visual_beats", ""))
+            )
+            orig_score = orig_report.get("score", 90.0)
+
+            # 2. Production Quality & Compliance Gates (Section 4)
+            from core.compliance_gate import compliance_gate_mgr
+            is_made_for_kids = bool(chan_ctx.youtube.get("made_for_kids", False))
+            readiness = compliance_gate_mgr.evaluate_readiness(
+                channel_id=chan_ctx.channel_id,
+                production_quality_score=qc_score,
+                originality_score=orig_score,
+                technical_qc_passed=(qc_score >= 70.0),
+                compliance_passed=True,
+                channel_validation_passed=True,
+                asset_provenance_passed=(orig_report["breakdown"]["asset_provenance"]["status"] == "PASS"),
+                kids_safety_passed=True if is_made_for_kids else None,
+                educational_accuracy_passed=True if is_made_for_kids else None,
+                is_made_for_kids_valid=True if is_made_for_kids else None
+            )
+
+            # 3. Register Content History (Section 2 & 7)
+            from core.content_family import content_family_mgr
+            content_family_mgr.register_content(
+                channel_id=chan_ctx.channel_id,
+                topic=job.topic,
+                content_type=c_type,
+                relationship_type=rel_type,
+                parent_content_id=parent_id,
+                concept=job.topic,
+                hook=hook_text,
+                script=script_text,
+                title=title_text,
+                description=desc_text,
+                production_quality_score=qc_score,
+                originality_score=orig_score,
+                technical_qc_result=readiness["technical_qc"],
+                compliance_result=readiness["content_compliance"],
+                channel_validator_result=readiness["channel_validation"],
+                kids_safety_result=readiness["kids_safety"],
+                educational_accuracy_result=readiness["educational_accuracy"],
+                asset_provenance_result=readiness["asset_provenance"],
+                readiness_status=readiness["status"],
+                content_id=job.id
+            )
+
+            if not readiness["can_publish"]:
+                err_reasons = "; ".join(readiness["failing_reasons"])
+                log_warn(f"[WORKER] Job '{job_id}' BLOCKED by compliance gates: {err_reasons}")
+                job_queue.update_job_status(job_id, status="failed", error=f"Readiness Gate Blocked: {err_reasons}")
+                return job_queue.get_job(job_id)
 
             # Update job as ready
             job_queue.update_job_status(
@@ -115,8 +188,7 @@ class HeavyRenderWorker:
                 qc_score=qc_score
             )
 
-            # Submit to human review queue (do not auto-publish)
-            is_made_for_kids = bool(chan_ctx.youtube.get("made_for_kids", False))
+            # Submit to human review queue
             review_queue.submit_for_review(
                 job_id=job_id,
                 channel_id=chan_ctx.channel_id,

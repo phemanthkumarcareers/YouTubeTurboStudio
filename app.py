@@ -168,6 +168,24 @@ def api_generate():
     video_type = body.get("video_type", "normal")
     channel_id = body.get("channel_id") or registry.get_active_channel_id()
 
+    content_mode = body.get("content_mode", "shorts" if video_type == "shorts" else "long").lower()
+    parent_content_id = body.get("parent_content_id")
+    if content_mode == "shorts_linked":
+        if not parent_content_id:
+            return jsonify({"ok": False, "error": "Linked Shorts mode requires selecting a parent Long video."}), 400
+        from core.content_family import content_family_mgr, CrossChannelLinkingError
+        try:
+            valid, err, parent = content_family_mgr.validate_parent(channel_id, parent_content_id)
+            if not valid:
+                return jsonify({"ok": False, "error": err}), 400
+        except CrossChannelLinkingError as cce:
+            return jsonify({"ok": False, "error": str(cce)}), 400
+        video_type = "shorts"
+    elif content_mode == "shorts":
+        video_type = "shorts"
+    elif content_mode == "long":
+        video_type = "normal"
+
     st = get_state()
     if st.get("running"):
         return jsonify({"ok": False, "error": "Pipeline is already running."}), 400
@@ -555,9 +573,18 @@ def api_jobs():
         cid = body.get("channel_id") or registry.get_active_channel().channel_id
         topic = body.get("topic", "")
         vtype = body.get("video_type", "shorts")
-        if not topic:
-            return jsonify({"ok": False, "error": "Topic is required to enqueue a job."}), 400
-        job = job_queue.enqueue(channel_id=cid, topic=topic, video_type=vtype, metadata=body.get("metadata", {}))
+        meta = body.get("metadata", {})
+        if meta.get("relationship_type") == "DERIVED" or meta.get("parent_content_id"):
+            parent_id = meta.get("parent_content_id")
+            from core.content_family import content_family_mgr, CrossChannelLinkingError
+            try:
+                valid, msg, _ = content_family_mgr.validate_parent(cid, parent_id)
+                if not valid:
+                    return jsonify({"ok": False, "error": msg}), 400
+            except CrossChannelLinkingError as cce:
+                return jsonify({"ok": False, "error": str(cce)}), 400
+
+        job = job_queue.enqueue(channel_id=cid, topic=topic, video_type=vtype, metadata=meta)
         return jsonify({"ok": True, "job": job.to_dict()})
 
     cid = request.args.get("channel_id")
@@ -693,6 +720,78 @@ def api_learning_loop():
     return jsonify({"ok": True, "strategy": strategy})
 
 
+# ── CONTENT GUARD: CONTENT MODES, ORIGINALITY & READINESS ROUTES ────────────
+
+@app.route("/api/content-modes/eligible-parents", methods=["GET"])
+def api_eligible_parents():
+    from core.content_family import content_family_mgr
+    cid = request.args.get("channel_id") or registry.get_active_channel_id()
+    parents = content_family_mgr.list_eligible_parents(cid)
+    return jsonify({"ok": True, "channel_id": cid, "eligible_parents": parents})
+
+
+@app.route("/api/content-modes/validate-parent", methods=["POST"])
+def api_validate_parent():
+    from core.content_family import content_family_mgr, CrossChannelLinkingError
+    body = request.get_json(force=True) or {}
+    cid = body.get("channel_id") or registry.get_active_channel_id()
+    parent_id = body.get("parent_content_id")
+    try:
+        valid, msg, parent = content_family_mgr.validate_parent(cid, parent_id)
+        return jsonify({"ok": valid, "valid": valid, "message": msg, "parent": parent})
+    except CrossChannelLinkingError as e:
+        return jsonify({"ok": False, "valid": False, "error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"ok": False, "valid": False, "error": str(e)}), 400
+
+
+@app.route("/api/readiness/<content_id>", methods=["GET"])
+def api_get_readiness(content_id):
+    from core.content_family import content_family_mgr
+    from core.compliance_gate import compliance_gate_mgr
+    rec = content_family_mgr.get_content(content_id)
+    if not rec:
+        return jsonify({"ok": False, "error": "Content record not found."}), 404
+    report = compliance_gate_mgr.evaluate_readiness(
+        channel_id=rec["channel_id"],
+        production_quality_score=rec["production_quality_score"],
+        originality_score=rec["originality_score"],
+        technical_qc_passed=(rec["technical_qc_result"] == "PASS"),
+        compliance_passed=(rec["compliance_result"] == "PASS"),
+        channel_validation_passed=(rec["channel_validator_result"] == "PASS"),
+        asset_provenance_passed=(rec["asset_provenance_result"] == "PASS"),
+        kids_safety_passed=True if rec["kids_safety_result"] == "PASS" else (False if rec["kids_safety_result"] == "FAIL" else None),
+        educational_accuracy_passed=True if rec["educational_accuracy_result"] == "PASS" else (False if rec["educational_accuracy_result"] == "FAIL" else None)
+    )
+    return jsonify({"ok": True, "readiness": report, "content": rec})
+
+
+@app.route("/api/originality/evaluate", methods=["POST"])
+def api_evaluate_originality():
+    from core.originality_engine import originality_engine
+    body = request.get_json(force=True) or {}
+    cid = body.get("channel_id") or registry.get_active_channel_id()
+    res = originality_engine.evaluate_originality(
+        channel_id=cid,
+        topic=body.get("topic", ""),
+        script=body.get("script", ""),
+        hook=body.get("hook", ""),
+        title=body.get("title", ""),
+        story_structure=body.get("story_structure", ""),
+        visual_plan=body.get("visual_plan", "")
+    )
+    return jsonify({"ok": True, "report": res})
+
+
+@app.route("/api/regenerate-stage", methods=["POST"])
+def api_regenerate_stage():
+    from core.targeted_regeneration import regeneration_mgr
+    body = request.get_json(force=True) or {}
+    comp = body.get("component", "hook_similarity")
+    cid = body.get("channel_id") or registry.get_active_channel_id()
+    data = body.get("data", {})
+    updated = regeneration_mgr.regenerate(comp, data, cid)
+    return jsonify({"ok": True, "component": comp, "updated_data": updated})
 
 
 # ── ENTRY POINT ─────────────────────────────────────────────────────────────
