@@ -70,12 +70,14 @@ def fetch_media_for_script(script: dict, video_type: str = "normal", source: Opt
         # 0. Nano Banana AI Generative Visuals
         nano_key = (cfg.get("gemini_api_key") or cfg.get("nano_banana_api_key", "")).strip()
         is_nano_selected = (effective_source == "nano_banana")
-        if (is_nano_selected and nano_key) or (not pexels_key and nano_key and is_nano_selected):
+        if is_nano_selected:
             try:
                 from media.nano_banana_client import generate_image_with_nano_banana
                 dest = str(img_dir / f"sec_{sec_id}_nano_banana.jpg")
+                sec_text = sec.get("narration") or sec.get("title") or query
+                prompt = f"{query}, {sec_text[:80]}, cinematic 4k, photorealistic masterpiece, vivid detail"
                 res = generate_image_with_nano_banana(
-                    prompt=f"{query}, cinematic high resolution, 4k, photorealistic",
+                    prompt=prompt,
                     width=w,
                     height=h,
                     output_path=dest,
@@ -87,7 +89,7 @@ def fetch_media_for_script(script: dict, video_type: str = "normal", source: Opt
                 log_warn(f"   [Section {sec_id}] Nano Banana generation error: {e}")
 
         # 1. Try Pexels
-        if not sec_paths and "pexels" in effective_source and pexels_key:
+        if not sec_paths and pexels_key:
             if "video" in effective_source:
                 urls = pexels_videos(query, pexels_key, orientation=orientation, count=target_count)
             else:
