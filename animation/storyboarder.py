@@ -17,7 +17,8 @@ class Storyboarder:
         script_data: Dict[str, Any],
         channel_context: ChannelContext,
         video_format: str = "shorts",
-        fps: int = 30
+        fps: int = 30,
+        target_audio_duration: Optional[float] = None
     ) -> SceneGraph:
         """
         Creates a complete SceneGraph tailored to channel guidelines.
@@ -48,6 +49,14 @@ class Storyboarder:
                     {"scene_id": 1, "title": "Story Beat", "narration": narration, "duration": 6.0}
                 ]
 
+        # If audio duration is provided and exceeds defined scene durations, proportionately scale scene durations
+        nominal_duration = sum(float(sc.get("duration", 5.0 if is_kids else 6.5)) for sc in scenes_data)
+        scale_factor = 1.0
+        if target_audio_duration and target_audio_duration > 0 and nominal_duration > 0:
+            # Add a small 0.8s tail pause for natural ending
+            target_dur = target_audio_duration + 0.8
+            scale_factor = max(1.0, target_dur / nominal_duration)
+
         scene_list: List[Scene] = []
 
         # Curated palette & environments
@@ -59,7 +68,7 @@ class Storyboarder:
 
         for i, sc in enumerate(scenes_data):
             s_id = sc.get("scene_id", i + 1)
-            duration = float(sc.get("duration", 5.0 if is_kids else 6.5))
+            duration = float(sc.get("duration", 5.0 if is_kids else 6.5)) * scale_factor
             narration_text = sc.get("narration", "")
 
             if is_kids:

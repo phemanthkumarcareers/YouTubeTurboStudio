@@ -530,6 +530,7 @@ async function switchChannel(channelId) {
             await loadSettings();
             await loadYouTubeStatus();
             await loadEligibleParents(channelId);
+            await loadReviewData();
             showToast(`Active channel switched to "${res.channel.name}"!`, "success");
         } else {
             showToast(`Switch failed: ${res.error}`, "error");

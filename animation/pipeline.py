@@ -189,11 +189,21 @@ def execute_animation_pipeline(
                 set_stage("video", "running")
                 log_stage("VIDEO", "RUNNING")
 
+                audio_dur = None
+                if narration_mp3 and os.path.exists(narration_mp3):
+                    try:
+                        from moviepy.editor import AudioFileClip
+                        with AudioFileClip(narration_mp3) as a_tmp:
+                            audio_dur = float(a_tmp.duration)
+                    except Exception:
+                        pass
+
                 scene_graph = storyboarder.build_storyboard(
                     script_data=script_data,
                     channel_context=channel_context,
                     video_format=video_type,
-                    fps=15 if mode == "preview" else 30
+                    fps=15 if mode == "preview" else 30,
+                    target_audio_duration=audio_dur
                 )
                 log_info(f"[ANIMATION] Storyboard generated ({len(scene_graph.scenes)} scenes, total {scene_graph.total_duration:.1f}s)")
 
@@ -206,6 +216,13 @@ def execute_animation_pipeline(
                     mode=mode,
                     narration_audio_path=narration_mp3 if (narration_mp3 and os.path.exists(narration_mp3)) else None
                 )
+
+                # Keep final_video.mp4 synchronized so Review Studio displays the latest generated video
+                try:
+                    import shutil
+                    shutil.copy2(final_mp4_path, str(OUTPUT_DIR / "final_video.mp4"))
+                except Exception as cp_err:
+                    log_warn(f"Failed to copy animation to final_video.mp4: {cp_err}")
 
                 update_state(video_path=final_mp4_path)
                 set_stage("video", "done")

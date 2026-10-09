@@ -225,9 +225,17 @@ def api_stop():
 
 @app.route("/api/media/video")
 def serve_video():
+    st = get_state()
+    video_path = st.get("video_path")
+    if video_path and os.path.exists(video_path):
+        return send_file(str(video_path), mimetype="video/mp4")
     p = OUTPUT_DIR / "final_video.mp4"
     if p.exists():
         return send_file(str(p), mimetype="video/mp4")
+    # Also check most recent mp4 in output directory
+    mp4s = sorted(OUTPUT_DIR.glob("*.mp4"), key=os.path.getmtime, reverse=True)
+    if mp4s:
+        return send_file(str(mp4s[0]), mimetype="video/mp4")
     abort(404)
 
 
