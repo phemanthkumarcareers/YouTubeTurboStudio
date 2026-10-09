@@ -24,21 +24,25 @@ CREDENTIALS_DIR.mkdir(parents=True, exist_ok=True)
 MANAGED_KEYS = [
     "gemini_api_key",
     "groq_api_key",
+    "openai_api_key",
+    "openai_base_url",
+    "nano_banana_api_key",
     "pexels_api_key",
     "pixabay_api_key",
     "elevenlabs_api_key",
-    "openai_api_key",
-    "openai_base_url",
+    "elevenlabs_voice_id",
 ]
 
 KEY_TO_ENV_NAME = {
     "gemini_api_key": "GEMINI_API_KEY",
     "groq_api_key": "GROQ_API_KEY",
+    "openai_api_key": "OPENAI_API_KEY",
+    "openai_base_url": "OPENAI_BASE_URL",
+    "nano_banana_api_key": "NANO_BANANA_API_KEY",
     "pexels_api_key": "PEXELS_API_KEY",
     "pixabay_api_key": "PIXABAY_API_KEY",
     "elevenlabs_api_key": "ELEVENLABS_API_KEY",
-    "openai_api_key": "OPENAI_API_KEY",
-    "openai_base_url": "OPENAI_BASE_URL",
+    "elevenlabs_voice_id": "ELEVENLABS_VOICE_ID",
 }
 
 

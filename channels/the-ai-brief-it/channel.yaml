@@ -22,6 +22,7 @@ credentials:
   groq_model: openai/gpt-oss-120b
   openai_model: gpt-4o-mini
   video_source: pexels_images
+  nano_banana_model: nano-banana-flux
 youtube:
   channel_id: ''
   oauth_profile: the-ai-brief-it

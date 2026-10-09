@@ -28,7 +28,7 @@ from config import (
 from core.state import get_state, update_state
 from core.logger import log_stream, log_info, log_warn, log_success, log_error
 from core.pipeline import execute_pipeline, request_stop
-from agents.llm_client import test_gemini_connection, test_groq_connection, generate
+from agents.llm_client import test_gemini_connection, test_groq_connection, test_openai_connection, generate
 from media.pexels_client import test_pexels_key
 from media.pixabay_client import test_pixabay_key
 from media.nano_banana_client import test_nano_banana_connection
@@ -429,11 +429,13 @@ def api_channel_credentials(channel_id):
         save_channel_credentials(channel_id, body)
         # Update channel model preferences if present
         crd_updates = {}
-        for k in ("llm_provider", "gemini_model", "groq_model", "openai_model", "video_source"):
+        for k in ("llm_provider", "gemini_model", "groq_model", "openai_model", "nano_banana_model", "video_source"):
             if k in body:
                 crd_updates[k] = body[k]
         if crd_updates:
             registry.save_channel(channel_id, {"credentials": crd_updates})
+        if "voice" in body:
+            registry.save_channel(channel_id, {"voice": body["voice"]})
         log_success(f"Credentials updated strictly for channel '{channel_id}'.")
         return jsonify({
             "ok": True,
@@ -478,6 +480,16 @@ def api_test_groq():
     key = body.get("groq_api_key", "")
     model = body.get("groq_model", "llama-3.3-70b-versatile")
     ok, msg = test_groq_connection(key, model)
+    return jsonify({"ok": ok, "message": msg})
+
+
+@app.route("/api/settings/test-openai", methods=["POST"])
+def api_test_openai():
+    body = request.get_json(force=True) or {}
+    key = body.get("openai_api_key", "")
+    model = body.get("openai_model", "gpt-4o-mini")
+    base_url = body.get("openai_base_url", "https://api.openai.com/v1")
+    ok, msg = test_openai_connection(key, base_url=base_url, model_name=model)
     return jsonify({"ok": ok, "message": msg})
 
 

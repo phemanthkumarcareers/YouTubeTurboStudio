@@ -10,12 +10,13 @@ let sseSource = null;
 let currentTags = [];
 let currentChannelId = "the-ai-brief-it";
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     initTabs();
     initSSE();
     initChannelManager();
-    loadSettings();
-    loadYouTubeStatus();
+    await loadSettings();
+    await loadAllChannelSettings();
+    await loadYouTubeStatus();
     startStatusPolling();
     setupEventListeners();
 });
@@ -56,8 +57,14 @@ function initTabs() {
 
             // Refresh specific tab contents on switch
             if (targetTab === "tab-review") loadReviewData();
-            if (targetTab === "tab-youtube") loadYouTubeStatus();
-            if (targetTab === "tab-api-keys") loadSettings();
+            if (targetTab === "tab-youtube") {
+                loadYouTubeStatus();
+                loadAllChannelSettings();
+            }
+            if (targetTab === "tab-api-keys") {
+                loadSettings();
+                loadAllChannelSettings();
+            }
         });
     });
 }
@@ -329,6 +336,8 @@ async function switchChannel(channelId) {
         if (res.ok) {
             currentChannelId = channelId;
             updateChannelUI(res.channel);
+            switchSubTab("api", channelId);
+            switchSubTab("yt", channelId);
             await loadSettings();
             await loadYouTubeStatus();
             await loadEligibleParents(channelId);
@@ -549,6 +558,7 @@ async function loadAllChannelSettings() {
             // API Keys
             setVal(`gemini-api-key-${cid}`, creds.gemini_api_key || "");
             setVal(`groq-api-key-${cid}`, creds.groq_api_key || "");
+            setVal(`openai-api-key-${cid}`, creds.openai_api_key || "");
             setVal(`nano-banana-api-key-${cid}`, creds.nano_banana_api_key || "");
             setVal(`pexels-api-key-${cid}`, creds.pexels_api_key || "");
             setVal(`pixabay-api-key-${cid}`, creds.pixabay_api_key || "");
@@ -557,6 +567,7 @@ async function loadAllChannelSettings() {
 
             setSelectVal(`gemini-model-${cid}`, cfg.gemini_model || "gemini-3.8-flash");
             setSelectVal(`groq-model-${cid}`, cfg.groq_model || "openai/gpt-oss-120b");
+            setSelectVal(`openai-model-${cid}`, cfg.openai_model || "gpt-4o-mini");
             setSelectVal(`nano-banana-model-${cid}`, cfg.nano_banana_model || "");
             setSelectVal(`voice-select-${cid}`, cfg.voice_id || "");
 
@@ -592,6 +603,7 @@ async function saveChannelKeys(channelId) {
     const cleanKey = (val) => (val && !val.includes("••••")) ? val : "";
     const gKey = cleanKey(getVal(`gemini-api-key-${channelId}`));
     const grKey = cleanKey(getVal(`groq-api-key-${channelId}`));
+    const oaKey = cleanKey(getVal(`openai-api-key-${channelId}`));
     const nbKey = cleanKey(getVal(`nano-banana-api-key-${channelId}`));
     const pxKey = cleanKey(getVal(`pexels-api-key-${channelId}`));
     const pbKey = cleanKey(getVal(`pixabay-api-key-${channelId}`));
@@ -599,6 +611,7 @@ async function saveChannelKeys(channelId) {
     const elVoiceId = getVal(`elevenlabs-voice-id-${channelId}`);
     const gModel = getVal(`gemini-model-${channelId}`);
     const grModel = getVal(`groq-model-${channelId}`);
+    const oaModel = getVal(`openai-model-${channelId}`);
     const nbModel = getVal(`nano-banana-model-${channelId}`);
     const provider = document.querySelector(`input[name="ai_provider_radio_${channelId}"]:checked`)?.value || "gemini";
     const voiceId = getVal(`voice-select-${channelId}`);
@@ -606,6 +619,7 @@ async function saveChannelKeys(channelId) {
     const payload = {
         gemini_api_key: gKey,
         groq_api_key: grKey,
+        openai_api_key: oaKey,
         nano_banana_api_key: nbKey,
         pexels_api_key: pxKey,
         pixabay_api_key: pbKey,
@@ -614,6 +628,7 @@ async function saveChannelKeys(channelId) {
         llm_provider: provider,
         gemini_model: gModel,
         groq_model: grModel,
+        openai_model: oaModel,
         nano_banana_model: nbModel
     };
     if (voiceId) {
@@ -1161,8 +1176,8 @@ async function uploadToYouTubeDirect() {
 // ── EVENT LISTENERS SETUP ──
 function setupEventListeners() {
     // Generate Tab
-    document.getElementById("btn-generate").addEventListener("click", startPipeline);
-    document.getElementById("btn-stop").addEventListener("click", stopPipeline);
+    document.getElementById("btn-generate")?.addEventListener("click", startPipeline);
+    document.getElementById("btn-stop")?.addEventListener("click", stopPipeline);
 
     // Content Mode Radios
     document.querySelectorAll('input[name="content_mode"]').forEach(radio => {
@@ -1175,10 +1190,10 @@ function setupEventListeners() {
     });
 
     // Review Tab
-    document.getElementById("btn-save-meta").addEventListener("click", saveMetadata);
-    document.getElementById("btn-regen-desc").addEventListener("click", regenerateDescriptionAI);
-    document.getElementById("btn-regen-thumb").addEventListener("click", regenerateThumbnail);
-    document.getElementById("btn-publish-yt").addEventListener("click", uploadToYouTubeDirect);
+    document.getElementById("btn-save-meta")?.addEventListener("click", saveMetadata);
+    document.getElementById("btn-regen-desc")?.addEventListener("click", regenerateDescriptionAI);
+    document.getElementById("btn-regen-thumb")?.addEventListener("click", regenerateThumbnail);
+    document.getElementById("btn-publish-yt")?.addEventListener("click", uploadToYouTubeDirect);
 
     // Tags input keydown
     const tagInput = document.getElementById("new-tag-input");
@@ -1193,7 +1208,7 @@ function setupEventListeners() {
     }
 
     // Voice preview
-    document.getElementById("btn-preview-voice").addEventListener("click", async () => {
+    document.getElementById("btn-preview-voice")?.addEventListener("click", async () => {
         const voiceId = getVal("voice-select");
         showToast("Synthesizing voice sample...", "info");
         try {
@@ -1216,21 +1231,6 @@ function setupEventListeners() {
         }
     });
 
-    // API Key Testers
-    document.getElementById("btn-test-gemini").addEventListener("click", async () => {
-        showToast("Testing Google Gemini connection...", "info");
-        const resp = await fetch("/api/settings/test-gemini", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                gemini_api_key: getVal("gemini-api-key"),
-                gemini_model: getVal("gemini-model-select")
-            })
-        });
-        const res = await resp.json();
-        showToast(res.message, res.ok ? "success" : "error");
-    });
-
     // Radio change listeners for instant provider switching
     document.querySelectorAll('input[name="ai_provider_radio"]').forEach(radio => {
         radio.addEventListener("change", () => {
@@ -1243,54 +1243,6 @@ function setupEventListeners() {
         subCheckEl.addEventListener("change", () => {
             saveAllSettings();
         });
-    }
-
-    document.getElementById("btn-test-pexels").addEventListener("click", async () => {
-        showToast("Testing Pexels API Key...", "info");
-        const resp = await fetch("/api/settings/test-pexels", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ pexels_api_key: getVal("pexels-api-key") })
-        });
-        const res = await resp.json();
-        showToast(res.message, res.ok ? "success" : "error");
-    });
-
-    document.getElementById("btn-test-pixabay").addEventListener("click", async () => {
-        showToast("Testing Pixabay API Key...", "info");
-        const resp = await fetch("/api/settings/test-pixabay", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ pixabay_api_key: getVal("pixabay-api-key") })
-        });
-        const res = await resp.json();
-        showToast(res.message, res.ok ? "success" : "error");
-    });
-
-    // Test Groq API Key
-    const btnTestGroq = document.getElementById("btn-test-groq");
-    if (btnTestGroq) {
-        btnTestGroq.addEventListener("click", async () => {
-            showToast("Testing Groq API connection...", "info");
-            const resp = await fetch("/api/settings/test-groq", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    groq_api_key: getVal("groq-api-key"),
-                    groq_model: getVal("groq-model-select")
-                })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
-        });
-    }
-
-    // Save All Settings buttons
-    document.getElementById("btn-save-settings").addEventListener("click", saveAllSettings);
-
-    const btnSaveYt = document.getElementById("btn-save-youtube");
-    if (btnSaveYt) {
-        btnSaveYt.addEventListener("click", saveAllSettings);
     }
 
     // Auto-save when voice or audio controls are changed so selection is never lost
@@ -1308,7 +1260,7 @@ function setupEventListeners() {
     }
 
     // Save Banned Topics
-    document.getElementById("btn-save-banned").addEventListener("click", async () => {
+    document.getElementById("btn-save-banned")?.addEventListener("click", async () => {
         const raw = getVal("banned-topics-textarea");
         const lines = raw.split("\n").map(l => l.trim()).filter(l => l.length > 0);
         const resp = await fetch("/api/settings/banned-topics", {
@@ -1320,7 +1272,7 @@ function setupEventListeners() {
         if (res.ok) showToast("Banned topics updated!", "success");
     });
 
-    // ── CHANNEL SUB-TABS & PER-CHANNEL CONTROLS ──
+    // ── CHANNEL SUB-TABS NAVIGATION ──
     document.querySelectorAll(".channel-subtab-btn[data-subchannel]").forEach(btn => {
         btn.addEventListener("click", () => {
             const cid = btn.getAttribute("data-subchannel");
@@ -1335,6 +1287,7 @@ function setupEventListeners() {
         });
     });
 
+    // ── SAVE PER-CHANNEL API KEYS ──
     document.querySelectorAll(".btn-save-channel-keys").forEach(btn => {
         btn.addEventListener("click", () => {
             const cid = btn.getAttribute("data-chan");
@@ -1342,115 +1295,203 @@ function setupEventListeners() {
         });
     });
 
+    // ── PER-CHANNEL API TEST BUTTONS ──
+    // 1. Gemini
     document.querySelectorAll(".btn-test-gemini").forEach(btn => {
         btn.addEventListener("click", async () => {
             const cid = btn.getAttribute("data-chan");
             const key = getVal(`gemini-api-key-${cid}`);
             const model = getVal(`gemini-model-${cid}`) || "gemini-3.8-flash";
-            showToast(`Testing Gemini for ${cid}...`, "info");
-            const resp = await fetch("/api/settings/test-gemini", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ gemini_api_key: key, gemini_model: model })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
+            showToast(`Testing Gemini API for ${cid}...`, "info");
+            try {
+                const resp = await fetch("/api/settings/test-gemini", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ gemini_api_key: key, gemini_model: model })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`Gemini test failed: ${e.message}`, "error");
+            }
         });
     });
 
+    // 2. Groq
     document.querySelectorAll(".btn-test-groq").forEach(btn => {
         btn.addEventListener("click", async () => {
             const cid = btn.getAttribute("data-chan");
             const key = getVal(`groq-api-key-${cid}`);
-            const model = getVal(`groq-model-${cid}`) || "openai/gpt-oss-120b";
-            showToast(`Testing Groq for ${cid}...`, "info");
-            const resp = await fetch("/api/settings/test-groq", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ groq_api_key: key, groq_model: model })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
+            const model = getVal(`groq-model-${cid}`) || "llama-3.3-70b-versatile";
+            showToast(`Testing Groq API for ${cid}...`, "info");
+            try {
+                const resp = await fetch("/api/settings/test-groq", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ groq_api_key: key, groq_model: model })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`Groq test failed: ${e.message}`, "error");
+            }
         });
     });
 
-    document.querySelectorAll(".btn-test-pexels").forEach(btn => {
+    // 3. OpenAI
+    document.querySelectorAll(".btn-test-openai").forEach(btn => {
         btn.addEventListener("click", async () => {
             const cid = btn.getAttribute("data-chan");
-            const key = getVal(`pexels-api-key-${cid}`);
-            showToast(`Testing Pexels for ${cid}...`, "info");
-            const resp = await fetch("/api/settings/test-pexels", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ pexels_api_key: key })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
+            const key = getVal(`openai-api-key-${cid}`);
+            const model = getVal(`openai-model-${cid}`) || "gpt-4o-mini";
+            showToast(`Testing OpenAI API for ${cid}...`, "info");
+            try {
+                const resp = await fetch("/api/settings/test-openai", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ openai_api_key: key, openai_model: model })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`OpenAI test failed: ${e.message}`, "error");
+            }
         });
     });
 
-    document.querySelectorAll(".btn-test-pixabay").forEach(btn => {
-        btn.addEventListener("click", async () => {
-            const cid = btn.getAttribute("data-chan");
-            const key = getVal(`pixabay-api-key-${cid}`);
-            showToast(`Testing Pixabay for ${cid}...`, "info");
-            const resp = await fetch("/api/settings/test-pixabay", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ pixabay_api_key: key })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
-        });
-    });
-
+    // 4. Nano Banana Generative Visuals
     document.querySelectorAll(".btn-test-nano-banana").forEach(btn => {
         btn.addEventListener("click", async () => {
             const cid = btn.getAttribute("data-chan");
             const key = getVal(`nano-banana-api-key-${cid}`);
             const model = getVal(`nano-banana-model-${cid}`) || "nano-banana-flux";
             showToast(`Testing Nano Banana for ${cid}...`, "info");
-            const resp = await fetch("/api/settings/test-nano-banana", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nano_banana_api_key: key, nano_banana_model: model })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
+            try {
+                const resp = await fetch("/api/settings/test-nano-banana", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nano_banana_api_key: key, nano_banana_model: model })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`Nano Banana test failed: ${e.message}`, "error");
+            }
         });
     });
 
+    // 5. Pexels Stock
+    document.querySelectorAll(".btn-test-pexels").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`pexels-api-key-${cid}`);
+            showToast(`Testing Pexels for ${cid}...`, "info");
+            try {
+                const resp = await fetch("/api/settings/test-pexels", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ pexels_api_key: key })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`Pexels test failed: ${e.message}`, "error");
+            }
+        });
+    });
+
+    // 6. Pixabay Stock
+    document.querySelectorAll(".btn-test-pixabay").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            const key = getVal(`pixabay-api-key-${cid}`);
+            showToast(`Testing Pixabay for ${cid}...`, "info");
+            try {
+                const resp = await fetch("/api/settings/test-pixabay", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ pixabay_api_key: key })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`Pixabay test failed: ${e.message}`, "error");
+            }
+        });
+    });
+
+    // 7. ElevenLabs Voice
     document.querySelectorAll(".btn-test-elevenlabs").forEach(btn => {
         btn.addEventListener("click", async () => {
             const cid = btn.getAttribute("data-chan");
             const key = getVal(`elevenlabs-api-key-${cid}`);
             const voiceId = getVal(`elevenlabs-voice-id-${cid}`) || "";
             showToast(`Testing ElevenLabs for ${cid}...`, "info");
-            const resp = await fetch("/api/settings/test-elevenlabs", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ elevenlabs_api_key: key, elevenlabs_voice_id: voiceId })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
+            try {
+                const resp = await fetch("/api/settings/test-elevenlabs", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ elevenlabs_api_key: key, elevenlabs_voice_id: voiceId })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`ElevenLabs test failed: ${e.message}`, "error");
+            }
         });
     });
 
+    // 8. OpenAI TTS
     document.querySelectorAll(".btn-test-openai-tts").forEach(btn => {
         btn.addEventListener("click", async () => {
             const cid = btn.getAttribute("data-chan");
-            const key = getVal(`gemini-api-key-${cid}`) || ""; // Or global key
-            showToast(`Testing OpenAI TTS connection...`, "info");
-            const resp = await fetch("/api/settings/test-openai-tts", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ openai_api_key: key, openai_tts_model: "tts-1", openai_tts_voice: "alloy" })
-            });
-            const res = await resp.json();
-            showToast(res.message, res.ok ? "success" : "error");
+            const key = getVal(`openai-api-key-${cid}`) || getVal(`gemini-api-key-${cid}`);
+            showToast(`Testing OpenAI TTS connection for ${cid}...`, "info");
+            try {
+                const resp = await fetch("/api/settings/test-openai-tts", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ openai_api_key: key, openai_tts_model: "tts-1", openai_tts_voice: "alloy" })
+                });
+                const res = await resp.json();
+                showToast(res.message, res.ok ? "success" : "error");
+            } catch (e) {
+                showToast(`OpenAI TTS test failed: ${e.message}`, "error");
+            }
         });
     });
 
+    // ── PER-CHANNEL YOUTUBE CONTROLS & TEST STATUS BUTTONS ──
+    // 9. YouTube Status Check Button
+    document.querySelectorAll(".btn-test-yt-status").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const cid = btn.getAttribute("data-chan");
+            showToast(`Checking YouTube connection for ${cid}...`, "info");
+            try {
+                const resp = await fetch(`/api/youtube/status?channel_id=${encodeURIComponent(cid)}`);
+                const res = await resp.json();
+                const detailsEl = document.getElementById(`yt-details-${cid}`);
+                const nameEl = document.getElementById(`yt-name-${cid}`);
+                const idEl = document.getElementById(`yt-id-${cid}`);
+                const subsEl = document.getElementById(`yt-subs-${cid}`);
+
+                if (res.token_valid && res.channel) {
+                    if (detailsEl) detailsEl.style.display = "block";
+                    if (nameEl) nameEl.innerText = res.channel.title || "Authenticated Channel";
+                    if (idEl) idEl.innerText = `ID: ${res.channel.id || ""}`;
+                    if (subsEl) subsEl.innerText = `Subscribers: ${res.channel.subscribers || "Active"}`;
+                    showToast(`✓ ${cid} connected to YouTube channel: "${res.channel.title}"`, "success");
+                } else {
+                    if (detailsEl) detailsEl.style.display = "none";
+                    showToast(`ℹ Channel "${cid}" is not connected to YouTube. Upload client_secret.json and click Connect.`, "warning");
+                }
+            } catch (e) {
+                showToast(`Error checking status: ${e.message}`, "error");
+            }
+        });
+    });
+
+    // 10. YouTube OAuth Connect Button
     document.querySelectorAll(".btn-yt-auth").forEach(btn => {
         btn.addEventListener("click", () => {
             const cid = btn.getAttribute("data-chan");
@@ -1458,6 +1499,7 @@ function setupEventListeners() {
         });
     });
 
+    // 11. YouTube Client Secret Path Loader
     document.querySelectorAll(".btn-load-secret-path").forEach(btn => {
         btn.addEventListener("click", () => {
             const cid = btn.getAttribute("data-chan");
@@ -1465,6 +1507,7 @@ function setupEventListeners() {
         });
     });
 
+    // 12. YouTube Client Secret File Upload
     document.querySelectorAll(".yt-secret-file").forEach(input => {
         input.addEventListener("change", (e) => {
             const cid = input.getAttribute("data-chan");
@@ -1474,6 +1517,7 @@ function setupEventListeners() {
         });
     });
 
+    // 13. YouTube Publishing Defaults Save
     document.querySelectorAll(".btn-save-yt-settings").forEach(btn => {
         btn.addEventListener("click", () => {
             const cid = btn.getAttribute("data-chan");
@@ -1481,11 +1525,12 @@ function setupEventListeners() {
         });
     });
 
-    // YouTube Auth legacy buttons fallback
-    const legacyYtAuth = document.getElementById("btn-yt-authenticate");
-    if (legacyYtAuth) legacyYtAuth.addEventListener("click", triggerYouTubeAuth);
-    const legacyManualCreds = document.getElementById("btn-save-manual-creds");
-    if (legacyManualCreds) legacyManualCreds.addEventListener("click", saveManualCredentials);
+    // ── OPTIONAL FALLBACK HANDLERS ──
+    document.getElementById("btn-save-settings")?.addEventListener("click", saveAllSettings);
+    document.getElementById("btn-save-youtube")?.addEventListener("click", saveAllSettings);
+    document.getElementById("btn-save-av-settings")?.addEventListener("click", saveAllSettings);
+    document.getElementById("btn-yt-authenticate")?.addEventListener("click", triggerYouTubeAuth);
+    document.getElementById("btn-save-manual-creds")?.addEventListener("click", saveManualCredentials);
 }
 
 // ── UTILITY HELPERS ──

@@ -114,6 +114,8 @@ class ChannelContext:
             "openai_api_key": creds.get("openai_api_key", ""),
             "openai_base_url": creds.get("openai_base_url", "https://api.openai.com/v1"),
             "openai_model": cred_meta.get("openai_model", "gpt-4o-mini"),
+            "nano_banana_api_key": creds.get("nano_banana_api_key", ""),
+            "nano_banana_model": cred_meta.get("nano_banana_model", "nano-banana-flux"),
             # Stock media
             "pexels_api_key": creds.get("pexels_api_key", ""),
             "pixabay_api_key": creds.get("pixabay_api_key", ""),

@@ -174,5 +174,55 @@ class TestMultiChannelIsolationAndAnimation(unittest.TestCase):
         self.assertEqual(failing_report["kids_safety"], "FAIL")
 
 
+    def test_08_openai_test_route(self):
+        """Verifies that the /api/settings/test-openai endpoint functions and validates input."""
+        # Empty key returns validation failure without crashing
+        resp = self.client.post("/api/settings/test-openai", json={
+            "openai_api_key": "",
+            "openai_model": "gpt-4o-mini"
+        })
+        self.assertEqual(resp.status_code, 200)
+        data = resp.get_json()
+        self.assertFalse(data.get("ok"))
+        self.assertIn("API key cannot be empty", data.get("message", ""))
+
+    def test_09_youtube_status_endpoint_per_channel(self):
+        """Verifies that /api/youtube/status queries channel-isolated status."""
+        for cid in ("the-ai-brief-it", "kids", "elders"):
+            resp = self.client.get(f"/api/youtube/status?channel_id={cid}")
+            self.assertEqual(resp.status_code, 200)
+            data = resp.get_json()
+            self.assertEqual(data.get("channel_id"), cid)
+            self.assertIn("token_valid", data)
+            self.assertIn("has_client_secret", data)
+
+    def test_10_per_channel_openai_and_nanobanana_credentials(self):
+        """Verifies that OpenAI and Nano Banana keys persist per channel without leaking."""
+        resp = self.client.post("/api/channels/the-ai-brief-it/credentials", json={
+            "openai_api_key": "sk-test-ai-brief-openai",
+            "openai_model": "gpt-4o",
+            "nano_banana_api_key": "nb-test-key-brief",
+            "nano_banana_model": "nano-banana-flux"
+        })
+        self.assertEqual(resp.status_code, 200)
+
+        # Check the-ai-brief-it has the keys
+        brief_creds = load_channel_credentials("the-ai-brief-it")
+        self.assertEqual(brief_creds.get("openai_api_key"), "sk-test-ai-brief-openai")
+        self.assertEqual(brief_creds.get("nano_banana_api_key"), "nb-test-key-brief")
+
+        # Verify kids and elders do NOT have the keys
+        kids_creds = load_channel_credentials("kids")
+        self.assertNotEqual(kids_creds.get("openai_api_key"), "sk-test-ai-brief-openai")
+        self.assertNotEqual(kids_creds.get("nano_banana_api_key"), "nb-test-key-brief")
+
+        # Cleanup
+        save_channel_credentials("the-ai-brief-it", {
+            "openai_api_key": "",
+            "nano_banana_api_key": ""
+        })
+
+
 if __name__ == "__main__":
     unittest.main()
+

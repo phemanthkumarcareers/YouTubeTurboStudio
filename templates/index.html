@@ -527,6 +527,10 @@
                 <input type="radio" name="ai_provider_radio_the-ai-brief-it" value="groq">
                 <span>⚡ Groq AI (Free LLaMA)</span>
               </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#38bdf8;">
+                <input type="radio" name="ai_provider_radio_the-ai-brief-it" value="openai">
+                <span>🟢 OpenAI (GPT-4o)</span>
+              </label>
             </div>
           </div>
 
@@ -572,6 +576,28 @@
                   <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (Recommended)</option>
                   <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (Ultra Fast)</option>
                   <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- OpenAI Configuration -->
+          <div class="card" style="border: 1px solid rgba(56,189,248,0.35);">
+            <div class="card-header">
+              <div class="card-title">🟢 OpenAI API (The AI Brief It)</div>
+              <button class="btn btn-secondary btn-test-openai" data-chan="the-ai-brief-it" style="font-size:12px;">Test OpenAI Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">OpenAI API Key</label>
+                <input type="password" id="openai-api-key-the-ai-brief-it" class="form-input openai-key-input" placeholder="sk-...">
+                <div class="form-help">From <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--sky-blue);">platform.openai.com</a>.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">OpenAI Model</label>
+                <select id="openai-model-the-ai-brief-it" class="form-select">
+                  <option value="gpt-4o-mini">gpt-4o-mini (Fast & Efficient)</option>
+                  <option value="gpt-4o">gpt-4o (High Intelligence)</option>
                 </select>
               </div>
             </div>
@@ -683,6 +709,10 @@
                 <input type="radio" name="ai_provider_radio_kids" value="groq">
                 <span>⚡ Groq AI (Free LLaMA)</span>
               </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#38bdf8;">
+                <input type="radio" name="ai_provider_radio_kids" value="openai">
+                <span>🟢 OpenAI (GPT-4o)</span>
+              </label>
             </div>
           </div>
 
@@ -725,6 +755,27 @@
                 <select id="groq-model-kids" class="form-select">
                   <option value="openai/gpt-oss-120b">openai/gpt-oss-120b</option>
                   <option value="openai/gpt-oss-20b">openai/gpt-oss-20b</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- OpenAI Configuration -->
+          <div class="card" style="border: 1px solid rgba(56,189,248,0.35);">
+            <div class="card-header">
+              <div class="card-title">🟢 OpenAI API (Kids Wonder Lab)</div>
+              <button class="btn btn-secondary btn-test-openai" data-chan="kids" style="font-size:12px;">Test OpenAI Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">OpenAI API Key</label>
+                <input type="password" id="openai-api-key-kids" class="form-input openai-key-input" placeholder="Individual OpenAI Key for Kids">
+              </div>
+              <div class="form-group">
+                <label class="form-label">OpenAI Model</label>
+                <select id="openai-model-kids" class="form-select">
+                  <option value="gpt-4o-mini">gpt-4o-mini (Fast)</option>
+                  <option value="gpt-4o">gpt-4o</option>
                 </select>
               </div>
             </div>
@@ -790,6 +841,10 @@
                 <label class="form-label">ElevenLabs API Key (Optional)</label>
                 <input type="password" id="elevenlabs-api-key-kids" class="form-input elevenlabs-key-input" placeholder="Optional ElevenLabs Key">
               </div>
+              <div class="form-group">
+                <label class="form-label">ElevenLabs Voice ID (Optional)</label>
+                <input type="text" id="elevenlabs-voice-id-kids" class="form-input" placeholder="e.g. 21m00Tcm4TlvDq8ikWAM (Rachel)">
+              </div>
             </div>
           </div>
 
@@ -830,6 +885,10 @@
               <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:var(--accent-emerald);">
                 <input type="radio" name="ai_provider_radio_elders" value="groq">
                 <span>⚡ Groq AI (Free LLaMA)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:10px; cursor:pointer; font-weight:700; color:#38bdf8;">
+                <input type="radio" name="ai_provider_radio_elders" value="openai">
+                <span>🟢 OpenAI (GPT-4o)</span>
               </label>
             </div>
           </div>
@@ -872,6 +931,27 @@
                 <select id="groq-model-elders" class="form-select">
                   <option value="openai/gpt-oss-120b">openai/gpt-oss-120b</option>
                   <option value="openai/gpt-oss-20b">openai/gpt-oss-20b</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- OpenAI Configuration -->
+          <div class="card" style="border: 1px solid rgba(56,189,248,0.35);">
+            <div class="card-header">
+              <div class="card-title">🟢 OpenAI API (Golden Stories)</div>
+              <button class="btn btn-secondary btn-test-openai" data-chan="elders" style="font-size:12px;">Test OpenAI Key</button>
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">OpenAI API Key</label>
+                <input type="password" id="openai-api-key-elders" class="form-input openai-key-input" placeholder="Individual OpenAI Key for Elders">
+              </div>
+              <div class="form-group">
+                <label class="form-label">OpenAI Model</label>
+                <select id="openai-model-elders" class="form-select">
+                  <option value="gpt-4o-mini">gpt-4o-mini (Fast)</option>
+                  <option value="gpt-4o">gpt-4o</option>
                 </select>
               </div>
             </div>
@@ -922,6 +1002,10 @@
                 <label class="form-label">ElevenLabs API Key (Optional)</label>
                 <input type="password" id="elevenlabs-api-key-elders" class="form-input elevenlabs-key-input" placeholder="Optional ElevenLabs Key">
               </div>
+              <div class="form-group">
+                <label class="form-label">ElevenLabs Voice ID (Optional)</label>
+                <input type="text" id="elevenlabs-voice-id-elders" class="form-input" placeholder="e.g. TxGEqnHWrfWFTfGW9XjX (Josh)">
+              </div>
             </div>
           </div>
 
@@ -954,7 +1038,10 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">📺 The AI Brief It — YouTube Account Authorization</div>
-              <button class="btn btn-primary btn-yt-auth" data-chan="the-ai-brief-it">Connect The AI Brief It</button>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-test-yt-status" data-chan="the-ai-brief-it" style="font-size:12px;">🔍 Check Status</button>
+                <button class="btn btn-primary btn-yt-auth" data-chan="the-ai-brief-it">Connect The AI Brief It</button>
+              </div>
             </div>
             
             <div id="yt-details-the-ai-brief-it" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
@@ -1035,7 +1122,10 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">📺 Kids Wonder Lab — YouTube Account Authorization</div>
-              <button class="btn btn-primary btn-yt-auth" data-chan="kids">Connect Kids Wonder Lab</button>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-test-yt-status" data-chan="kids" style="font-size:12px;">🔍 Check Status</button>
+                <button class="btn btn-primary btn-yt-auth" data-chan="kids">Connect Kids Wonder Lab</button>
+              </div>
             </div>
             
             <div id="yt-details-kids" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">
@@ -1102,7 +1192,10 @@
           <div class="card">
             <div class="card-header">
               <div class="card-title">📺 Golden Stories & Wisdom — YouTube Account Authorization</div>
-              <button class="btn btn-primary btn-yt-auth" data-chan="elders">Connect Golden Stories</button>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-secondary btn-test-yt-status" data-chan="elders" style="font-size:12px;">🔍 Check Status</button>
+                <button class="btn btn-primary btn-yt-auth" data-chan="elders">Connect Golden Stories</button>
+              </div>
             </div>
             
             <div id="yt-details-elders" style="display:none; padding:12px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); margin-bottom:14px;">

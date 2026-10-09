@@ -209,7 +209,7 @@ class ChannelRegistry:
             # Separate credentials / secrets from channel settings
             creds_updates = {}
             for k in list(updates.keys()):
-                if k.endswith("_api_key") or k in ("openai_base_url",):
+                if k.endswith("_api_key") or k in ("openai_base_url", "elevenlabs_voice_id"):
                     creds_updates[k] = updates.pop(k)
 
             if creds_updates:
