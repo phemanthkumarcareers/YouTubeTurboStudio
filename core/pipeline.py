@@ -80,6 +80,8 @@ def execute_pipeline(
             for k, v in base_cfg.items():
                 if k not in cfg or cfg[k] is None or cfg[k] == "":
                     cfg[k] = v
+            # Keep runtime config synced so all agents and LLM clients load the channel credentials
+            save_config(cfg)
 
             log_info(f"Pipeline started for channel: '{channel_context.name}' (ID: {channel_context.channel_id})")
 

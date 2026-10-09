@@ -125,6 +125,9 @@ def api_select_channel():
     chan = registry.get_active_channel()
     update_state(channel_id=chan.channel_id)
     log_info(f"Switched active channel to '{chan.name}' ({chan.channel_id})")
+    creds = load_channel_credentials(chan.channel_id)
+    flat_cfg = chan.to_pipeline_config(creds)
+    save_config(flat_cfg)
     masked_creds = get_masked_channel_credentials(chan.channel_id)
     yt_status = check_auth_status(chan.channel_id)
 

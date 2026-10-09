@@ -208,6 +208,23 @@ def _generate_openai(prompt: str, config: dict, json_mode: bool = False) -> str:
 def generate(prompt: str, json_mode: bool = False) -> str:
     """Unified text generation routing with cross-provider fallback across Gemini, Groq, and OpenAI."""
     cfg = load_config()
+    
+    # If API keys are missing in config_data.json, load from active channel credentials
+    if not cfg.get("gemini_api_key") and not cfg.get("groq_api_key") and not cfg.get("openai_api_key"):
+        try:
+            from core.channel_registry import registry
+            from core.credential_manager import load_channel_credentials
+            active_cid = registry.get_active_channel_id()
+            chan = registry.get_channel(active_cid)
+            if chan:
+                ch_creds = load_channel_credentials(active_cid)
+                chan_cfg = chan.to_pipeline_config(ch_creds)
+                for k, v in chan_cfg.items():
+                    if k not in cfg or not cfg[k]:
+                        cfg[k] = v
+        except Exception:
+            pass
+
     provider = cfg.get("llm_provider", "gemini").lower()
 
     if provider == "groq":
