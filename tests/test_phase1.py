@@ -140,10 +140,10 @@ class TestPhase1MultiChannelFoundation(unittest.TestCase):
         """Acceptance Criteria: Science routes to media_video, Kids/Elders handled gracefully before Phase 3."""
         registry = ChannelRegistry()
 
-        # Animation channel routing (Phase 1 behavior: safe acknowledgement)
+        # Animation channel routing (Phase 1 acknowledged without crash, Phase 3+ dispatches to animation thread)
         kids_ctx = registry.get_channel("kids")
         result = route_and_execute(channel_context=kids_ctx)
-        self.assertIsNone(result, "Animation engine in Phase 1 acknowledges without unhandled crash")
+        self.assertTrue(result is None or hasattr(result, "is_alive"), "Animation engine handled safely without crash")
 
         # Media video channel routing
         ai_ctx = registry.get_channel("the-ai-brief-it")

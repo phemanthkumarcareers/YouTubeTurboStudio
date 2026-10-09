@@ -41,19 +41,16 @@ def route_and_execute(
         )
 
     elif engine == "animation":
-        # Animation Engine MVP is scheduled for Phase 3
-        log_warn(
-            f"[ROUTER] Animation Engine for channel '{channel_context.name}' is scheduled for Phase 3 (Shared Animation Engine MVP). "
-            f"Channel configuration, audience profile ({channel_context.audience.get('type')}), and safeguards are active."
+        from animation.pipeline import execute_animation_pipeline
+        log_info(f"[ROUTER] Dispatching '{channel_context.name}' to Shared Animation Engine...")
+        return execute_animation_pipeline(
+            channel_context=channel_context,
+            steps=steps,
+            topic_override=topic_override,
+            focus_angle=focus_angle,
+            video_type=video_type,
+            custom_script=custom_script
         )
-        # Update pipeline state safely
-        update_state(
-            running=False,
-            channel_id=channel_context.channel_id,
-            error=None
-        )
-        log_info(f"[ROUTER] Channel '{channel_context.name}' is registered and ready for Phase 3 Animation Engine.")
-        return None
 
     else:
         raise ValueError(f"Unknown engine '{engine}' configured for channel '{channel_context.channel_id}'.")
