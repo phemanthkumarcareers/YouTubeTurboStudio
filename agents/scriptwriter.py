@@ -89,5 +89,34 @@ Do NOT output any markdown backticks, explanations, or commentary. Only the raw 
     raw_resp = generate(prompt, json_mode=True)
     script_data = clean_json_response(raw_resp)
     script_data["video_type"] = video_type
+
+    # High-Viral SEO & Hashtag Optimization
+    existing_tags = script_data.get("tags", [])
+    if is_shorts:
+        # Guarantee YouTube Shorts algorithm discovery tags
+        viral_tags = ["shorts", "viral", "viral shorts", "fyp", "trending", "youtube shorts", "facts", "mystery", "didyouknow"]
+        # Merge without duplicates
+        combined_tags = list(dict.fromkeys(viral_tags + existing_tags))
+        script_data["tags"] = combined_tags[:15]
+        
+        # Enforce viral hashtags in title and description if not present
+        if "#shorts" not in script_data.get("title", "").lower():
+            script_data["title"] = f"{script_data.get('title', '').strip()} #shorts"
+
+        desc = script_data.get("description", "").rstrip()
+        viral_hashtags_block = "\n\n#shorts #viral #viralshorts #trending #facts #curiosity #insightsparktv"
+        if "#shorts" not in desc.lower():
+            script_data["description"] = desc + viral_hashtags_block
+    else:
+        # Long-form high-RPM documentary tags
+        viral_tags = ["documentary", "mind blowing facts", "science", "psychology", "mystery", "viral", "education", "insightspark tv"]
+        combined_tags = list(dict.fromkeys(existing_tags + viral_tags))
+        script_data["tags"] = combined_tags[:15]
+
+        desc = script_data.get("description", "").rstrip()
+        viral_hashtags_block = "\n\n#documentary #science #facts #mystery #psychology #curiosity #insightsparktv"
+        if "#documentary" not in desc.lower():
+            script_data["description"] = desc + viral_hashtags_block
+
     log_success(f"Script created with {len(script_data.get('sections', []))} sections: '{script_data.get('title')}'")
     return script_data
