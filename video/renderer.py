@@ -185,6 +185,10 @@ def _draw_subtitles_and_overlay(frame_img: Image.Image, subtitle: str, W: int, H
             x_pos = (W - l_w) // 2
             cur_y = y_pos + (l_idx * line_h)
 
+            # High-retention rounded pill backdrop behind subtitle text
+            pad_x, pad_y = 16, 6
+            draw.rounded_rectangle([x_pos - pad_x, cur_y - pad_y, x_pos + l_w + pad_x, cur_y + font_size + pad_y], radius=8, fill=(10, 10, 20, 160))
+
             fill_color = palette[(base_color_idx + l_idx) % len(palette)]
             # Fast compiled stroke in C for ultra-sharp outline
             draw.text((x_pos, cur_y), line_str, font=sub_font, fill=fill_color, stroke_width=4, stroke_fill=(0, 0, 0))
@@ -192,12 +196,20 @@ def _draw_subtitles_and_overlay(frame_img: Image.Image, subtitle: str, W: int, H
     return np.array(frame_img.convert("RGB"))
 
 
-def _ken_burns_frame(fitted: Image.Image, t: float, duration: float, W: int, H: int, zoom_start: float = 1.0, zoom_end: float = 1.15, pan_dir: tuple = (1, 0)) -> Image.Image:
-    """Computes smooth Ken Burns crop and zoom with fast Bilinear interpolation."""
-    progress = min(1.0, max(0.0, t / max(duration, 0.1)))
+def _ken_burns_frame(fitted: Image.Image, t: float, duration: float, W: int, H: int, zoom_start: float = 1.0, zoom_end: float = 1.15, pan_dir: tuple = (1, 0), is_shorts: bool = False) -> Image.Image:
+    """Computes smooth Ken Burns crop and zoom with dynamic retention pulses."""
+    dur = max(duration, 0.1)
+    progress = min(1.0, max(0.0, t / dur))
     eased = 0.5 - 0.5 * math.cos(progress * math.pi)
 
+    # Base scale
     scale = zoom_start + (zoom_end - zoom_start) * eased
+
+    # In Shorts or dynamic videos, apply subtle rhythmic retention pulse (every 2.5s) to retain gaze
+    if is_shorts and dur >= 2.0:
+        pulse = 0.02 * math.sin(t * (2.0 * math.pi / 2.5))
+        scale = max(1.0, scale + pulse)
+
     fw, fh = fitted.size
 
     scaled_w = int(fw / scale)
@@ -269,7 +281,7 @@ def render_video(script: dict, media_map: dict[int, list[str]], audio_path: str,
         def make_frame(t, fitted=fitted_base, pan_dir=pan_dir, start_t=sec_start_t, title=sec_title, show_sub=show_subtitles):
             global_t = start_t + t
             sub_text = _find_cue_at_time(cues, global_t) if show_sub else ""
-            transformed = _ken_burns_frame(fitted, t, sec_dur, W, H, zoom_start, zoom_end, pan_dir)
+            transformed = _ken_burns_frame(fitted, t, sec_dur, W, H, zoom_start, zoom_end, pan_dir, is_shorts=is_shorts)
             return _draw_subtitles_and_overlay(transformed, sub_text, W, H, is_shorts, title, show_subtitles=show_sub)
 
         clip = VideoClip(make_frame, duration=sec_dur)

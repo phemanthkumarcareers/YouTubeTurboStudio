@@ -88,13 +88,32 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
                 if download_file(u, dest):
                     sec_paths.append(dest)
 
-        # 3. Fallback to existing or synthetic gradient background
+        # 3. AI Generative Image Fallback (FLUX / Pollinations) before basic gradient
+        if not sec_paths:
+            ai_img_file = str(img_dir / f"sec_{sec_id}_ai_visual.jpg")
+            w, h = (1080, 1920) if is_shorts else (1920, 1080)
+            try:
+                import urllib.parse, requests
+                clean_query = query.replace("\n", " ").strip()
+                prompt_full = f"{clean_query}, cinematic high resolution, 8k masterpiece"
+                encoded = urllib.parse.quote(prompt_full)
+                url = f"https://image.pollinations.ai/prompt/{encoded}?width={w}&height={h}&model=flux"
+                resp = requests.get(url, timeout=15)
+                if resp.status_code == 200 and resp.content and len(resp.content) > 1000:
+                    with open(ai_img_file, "wb") as f:
+                        f.write(resp.content)
+                    sec_paths.append(ai_img_file)
+                    log_success(f"   [Section {sec_id}] Synthesized AI visual for '{query}'.")
+            except Exception as ai_err:
+                log_warn(f"   [Section {sec_id}] AI visual fallback bypassed: {ai_err}")
+
+        # 4. Guaranteed atmospheric gradient background
         if not sec_paths:
             fallback_file = str(img_dir / f"sec_{sec_id}_fallback.jpg")
             w, h = (1080, 1920) if is_shorts else (1920, 1080)
             _create_fallback_gradient(fallback_file, width=w, height=h, sec_id=sec_id)
             sec_paths.append(fallback_file)
-            log_warn(f"   [Section {sec_id}] No stock media found for '{query}'. Used atmospheric backdrop.")
+            log_warn(f"   [Section {sec_id}] No media found for '{query}'. Used atmospheric backdrop.")
         else:
             log_success(f"   [Section {sec_id}] Acquired {len(sec_paths)} media item(s).")
 

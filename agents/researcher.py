@@ -10,18 +10,17 @@ from agents.llm_client import generate
 from core.logger import log_info, log_warn, log_success
 
 FOCUS_ANGLES = [
+    "Unbelievable Human Body & Medical Wonders",
+    "Fascinating Facts & Everyday Secrets",
+    "Mind & Dark Psychology Phenomena",
+    "Mind-Blowing Science & Physics Curiosities",
+    "Mysterious Phenomena & Real-World Curiosities",
+    "Futuristic Technology & AI Horizons",
     "Theoretical Physics & Time Travel",
     "The Dark Forest Theory & Cosmic Fermi Paradox",
-    "Mind-bending Mathematical Paradoxes",
-    "Frightening AI Horizons & Technological Singularity",
-    "Existential Psychology & Cognitive Biases",
-    "The Limits of Human Biology & Immortality",
-    "Deep-Sea Cryptogeography & The Ocean Abyss",
-    "Cosmic Scale, Black Holes, and False Vacuum Decay",
     "Ancient Civilizations & Erased Human History",
-    "Quantum Mechanics & Multiverse Realities",
-    "Cutting-edge Biotechnology & Synthetic Life",
-    "The Simulation Hypothesis & Computational Reality"
+    "Deep-Sea Cryptogeography & The Ocean Abyss",
+    "Quantum Mechanics & Multiverse Realities"
 ]
 
 
