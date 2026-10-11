@@ -32,7 +32,7 @@ from core.fallback_manager import synthesize_audio_with_fallback
 from audio.music_manager import mix_voice_and_bgm
 from media.media_manager import fetch_media_for_script
 from video.renderer import render_video
-from video.thumbnail_generator import generate_thumbnail
+from video.thumbnail_generator import generate_thumbnail, generate_thumbnail_variants
 from core.quality import evaluate_video_quality
 from youtube.uploader import upload_video_to_youtube
 
@@ -261,7 +261,12 @@ def execute_pipeline(
                         first_img = paths[0]
                         break
                 thumb_file = generate_thumbnail(script_data, image_path=first_img)
-                update_state(thumb_path=thumb_file)
+                try:
+                    thumb_variants = generate_thumbnail_variants(script_data, image_path=first_img)
+                except Exception as th_err:
+                    log_warn(f"Thumbnail variants warning: {th_err}")
+                    thumb_variants = [thumb_file]
+                update_state(thumb_path=thumb_file, thumb_variants=thumb_variants)
                 set_stage("thumbnail", "done")
                 log_stage("thumbnail", "done")
 

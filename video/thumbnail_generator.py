@@ -45,9 +45,10 @@ def _wrap_text(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.FreeTypeFon
     return lines or [text]
 
 
-def generate_thumbnail(script: dict, image_path: str = None, output_file: str = None) -> str:
+def generate_thumbnail(script: dict, image_path: str = None, output_file: str = None, variant: str = "curiosity") -> str:
     """
-    Generate an engaging YouTube thumbnail (1280x720).
+    Generate an engaging YouTube thumbnail (1280x720) with CTR-optimized styling.
+    Variants supported: 'curiosity' (default), 'urgency', 'dramatic'.
     """
     TW, TH = 1280, 720
     if not output_file:
@@ -67,7 +68,8 @@ def generate_thumbnail(script: dict, image_path: str = None, output_file: str = 
             nw, nh = bg.size
             bg = bg.crop(((nw - TW) // 2, (nh - TH) // 2, (nw - TW) // 2 + TW, (nh - TH) // 2 + TH))
             # Subtle blur & contrast boost for background readability
-            bg = bg.filter(ImageFilter.GaussianBlur(radius=1.5))
+            blur_radius = 1.0 if variant == "dramatic" else 1.8
+            bg = bg.filter(ImageFilter.GaussianBlur(radius=blur_radius))
         except Exception as e:
             log_warn(f"Thumbnail base image error: {e}. Using dark background.")
             bg = Image.new("RGB", (TW, TH), (15, 15, 26))
@@ -77,8 +79,9 @@ def generate_thumbnail(script: dict, image_path: str = None, output_file: str = 
     # Dark cinematic gradient overlay
     overlay = Image.new("RGBA", (TW, TH), (0, 0, 0, 0))
     ov_draw = ImageDraw.Draw(overlay)
+    gradient_strength = 230 if variant == "dramatic" else 210
     for x in range(TW):
-        alpha = int(210 * (1 - (x / TW) * 0.45))
+        alpha = int(gradient_strength * (1 - (x / TW) * 0.45))
         ov_draw.line([(x, 0), (x, TH)], fill=(5, 5, 15, alpha))
     # Bottom shadow bar
     ov_draw.rectangle([0, TH - 90, TW, TH], fill=(0, 0, 0, 195))
@@ -86,9 +89,22 @@ def generate_thumbnail(script: dict, image_path: str = None, output_file: str = 
     bg = Image.alpha_composite(bg.convert("RGBA"), overlay).convert("RGB")
     draw = ImageDraw.Draw(bg)
 
-    # Accent colored glow bar on the left
-    draw.rectangle([50, 80, 60, TH - 120], fill=(99, 102, 241)) # Indigo accent
-    draw.rectangle([70, 80, 500, 86], fill=(245, 158, 11)) # Amber secondary
+    # Accent colored glow bar on the left based on variant
+    if variant == "urgency":
+        draw.rectangle([50, 80, 60, TH - 120], fill=(239, 68, 68)) # Red accent
+        draw.rectangle([70, 80, 500, 86], fill=(245, 158, 11)) # Amber secondary
+        badge_text = "WARNING"
+        badge_bg = (220, 38, 38)
+    elif variant == "dramatic":
+        draw.rectangle([50, 80, 60, TH - 120], fill=(168, 85, 247)) # Purple accent
+        draw.rectangle([70, 80, 500, 86], fill=(6, 182, 212)) # Cyan secondary
+        badge_text = "THE TRUTH"
+        badge_bg = (147, 51, 234)
+    else: # curiosity
+        draw.rectangle([50, 80, 60, TH - 120], fill=(99, 102, 241)) # Indigo accent
+        draw.rectangle([70, 80, 500, 86], fill=(245, 158, 11)) # Amber secondary
+        badge_text = "MUST WATCH"
+        badge_bg = (225, 29, 72) # Crimson
 
     # Render Title Text (Max 2 lines, large bold font with heavy drop shadow)
     font_main = _get_font(74, bold=True)
@@ -109,7 +125,8 @@ def generate_thumbnail(script: dict, image_path: str = None, output_file: str = 
         fw = words[0]
         rest = (" " + words[1]) if len(words) > 1 else ""
 
-        draw.text((75, y), fw, font=font_main, fill=(251, 191, 36)) # Amber-400
+        highlight_color = (251, 191, 36) if variant != "urgency" else (252, 211, 77)
+        draw.text((75, y), fw, font=font_main, fill=highlight_color)
         fw_bbox = draw.textbbox((0, 0), fw, font=font_main)
         fw_w = fw_bbox[2] - fw_bbox[0]
         if rest:
@@ -119,15 +136,32 @@ def generate_thumbnail(script: dict, image_path: str = None, output_file: str = 
     font_sub = _get_font(30, bold=True)
     draw.text((75, TH - 65), f"▶  {channel_name}", font=font_sub, fill=(203, 213, 225))
 
-    # "4K HDR" / "EXPLAINED" Badge on Top Right
+    # High CTR Badge on Top Right
     badge_font = _get_font(26, bold=True)
-    badge_text = "MUST WATCH"
     bbox = draw.textbbox((0, 0), badge_text, font=badge_font)
     bw = bbox[2] - bbox[0]
     bx = TW - bw - 90
-    draw.rounded_rectangle([bx - 14, 50, bx + bw + 14, 96], radius=6, fill=(225, 29, 72)) # Crimson
+    draw.rounded_rectangle([bx - 14, 50, bx + bw + 14, 96], radius=6, fill=badge_bg)
     draw.text((bx, 57), badge_text, font=badge_font, fill=(255, 255, 255))
 
     bg.save(output_file, "JPEG", quality=95)
-    log_success(f"Generated YouTube Thumbnail: {os.path.basename(output_file)}")
+    log_success(f"Generated YouTube Thumbnail ({variant}): {os.path.basename(output_file)}")
     return output_file
+
+
+def generate_thumbnail_variants(script: dict, image_path: str = None) -> list[str]:
+    """Generate 3 distinct high-CTR thumbnail variants for A/B testing."""
+    variants = ["curiosity", "urgency", "dramatic"]
+    out_paths = []
+    out_dir = OUTPUT_DIR / "thumbnails"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    for var in variants:
+        dest = str(out_dir / f"thumbnail_{var}.jpg")
+        generate_thumbnail(script, image_path=image_path, output_file=dest, variant=var)
+        out_paths.append(dest)
+
+    # Keep primary thumbnail in default location
+    primary_thumb = str(OUTPUT_DIR / "thumbnail.jpg")
+    generate_thumbnail(script, image_path=image_path, output_file=primary_thumb, variant="curiosity")
+    return out_paths
