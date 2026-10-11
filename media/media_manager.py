@@ -55,6 +55,17 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
 
     log_info(f"Fetching media assets for {len(sections)} sections (Mode: {source}, Orientation: {orientation})...")
 
+    # Persistent tracking of used media URLs & generated seeds to prevent reuse
+    used_history_file = OUTPUT_DIR / ".used_media_registry.json"
+    used_items = set()
+    if used_history_file.exists():
+        try:
+            import json
+            with open(used_history_file, "r", encoding="utf-8") as uf:
+                used_items = set(json.load(uf))
+        except Exception:
+            used_items = set()
+
     for sec in sections:
         sec_id = sec.get("id", 1)
         query = sec.get("visual_query", "cinematic nature space")
@@ -62,48 +73,59 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
 
         log_info(f"   [Section {sec_id}] Searching '{query}'...")
 
-        # 1. Try Pexels
+        # 1. Try Pexels (filtering out already used URLs)
         if "pexels" in source and pexels_key:
             if "video" in source:
-                urls = pexels_videos(query, pexels_key, orientation=orientation, count=target_count)
+                urls = pexels_videos(query, pexels_key, orientation=orientation, count=target_count + 4)
             else:
-                urls = pexels_photos(query, pexels_key, orientation=orientation, count=target_count)
+                urls = pexels_photos(query, pexels_key, orientation=orientation, count=target_count + 4)
 
-            for i, u in enumerate(urls):
+            # Filter out already used items
+            fresh_urls = [u for u in urls if u not in used_items]
+            for i, u in enumerate(fresh_urls[:target_count]):
                 ext = ".mp4" if "video" in source else ".jpg"
                 dest = str(img_dir / f"sec_{sec_id}_px_{i}{ext}")
                 if download_file(u, dest):
                     sec_paths.append(dest)
+                    used_items.add(u)
 
-        # 2. Try Pixabay if Pexels returned nothing or if pixabay configured
+        # 2. Try Pixabay if needed (filtering out already used URLs)
         if not sec_paths and pixabay_key:
             if "video" in source:
-                urls = search_pixabay_videos(query, pixabay_key, orientation=orientation, count=target_count)
+                urls = search_pixabay_videos(query, pixabay_key, orientation=orientation, count=target_count + 4)
             else:
-                urls = search_pixabay_photos(query, pixabay_key, orientation=orientation, count=target_count)
+                urls = search_pixabay_photos(query, pixabay_key, orientation=orientation, count=target_count + 4)
 
-            for i, u in enumerate(urls):
+            fresh_urls = [u for u in urls if u not in used_items]
+            for i, u in enumerate(fresh_urls[:target_count]):
                 ext = ".mp4" if "video" in source else ".jpg"
                 dest = str(img_dir / f"sec_{sec_id}_pb_{i}{ext}")
                 if download_file(u, dest):
                     sec_paths.append(dest)
+                    used_items.add(u)
 
-        # 3. AI Generative Image Fallback (FLUX / Pollinations) before basic gradient
+        # 3. AI Generative Image Fallback (FLUX / Pollinations with fresh random seed per generation)
         if not sec_paths:
-            ai_img_file = str(img_dir / f"sec_{sec_id}_ai_visual.jpg")
+            import time, random
+            timestamp_seed = int(time.time() * 1000) % 10000000 + random.randint(100, 99999)
+            ai_img_file = str(img_dir / f"sec_{sec_id}_ai_{timestamp_seed}.jpg")
             w, h = (1080, 1920) if is_shorts else (1920, 1080)
             try:
                 import urllib.parse, requests
                 clean_query = query.replace("\n", " ").strip()
-                prompt_full = f"{clean_query}, cinematic high resolution, 8k masterpiece"
+                # Unique artistic style tag per prompt to ensure no visual duplication
+                styles = ["cinematic hyperrealistic 8k", "dramatic lighting photorealistic", "epic atmospheric masterpiece", "sharp focus award winning"]
+                chosen_style = random.choice(styles)
+                prompt_full = f"{clean_query}, {chosen_style}, highly detailed, uncompressed"
                 encoded = urllib.parse.quote(prompt_full)
-                url = f"https://image.pollinations.ai/prompt/{encoded}?width={w}&height={h}&model=flux"
-                resp = requests.get(url, timeout=15)
+                url = f"https://image.pollinations.ai/prompt/{encoded}?width={w}&height={h}&seed={timestamp_seed}&model=flux&nologo=true"
+                resp = requests.get(url, timeout=18)
                 if resp.status_code == 200 and resp.content and len(resp.content) > 1000:
                     with open(ai_img_file, "wb") as f:
                         f.write(resp.content)
                     sec_paths.append(ai_img_file)
-                    log_success(f"   [Section {sec_id}] Synthesized AI visual for '{query}'.")
+                    used_items.add(url)
+                    log_success(f"   [Section {sec_id}] Synthesized unique AI visual (seed={timestamp_seed}) for '{query}'.")
             except Exception as ai_err:
                 log_warn(f"   [Section {sec_id}] AI visual fallback bypassed: {ai_err}")
 
@@ -118,5 +140,13 @@ def fetch_media_for_script(script: dict, video_type: str = "normal") -> dict[int
             log_success(f"   [Section {sec_id}] Acquired {len(sec_paths)} media item(s).")
 
         result_map[sec_id] = sec_paths
+
+    # Save updated used items registry to disk (capped to latest 1500 items)
+    try:
+        import json
+        with open(used_history_file, "w", encoding="utf-8") as uf:
+            json.dump(list(used_items)[-1500:], uf)
+    except Exception:
+        pass
 
     return result_map

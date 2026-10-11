@@ -155,13 +155,7 @@ def execute_pipeline(steps: list[str] = None, topic_override: str = "",
                         first_img = paths[0]
                         break
                 thumb_file = generate_thumbnail(script_data, image_path=first_img)
-                try:
-                    from video.thumbnail_generator import generate_thumbnail_variants
-                    thumb_variants = generate_thumbnail_variants(script_data, image_path=first_img)
-                except Exception as th_err:
-                    log_warn(f"Thumbnail variants warning: {th_err}")
-                    thumb_variants = [thumb_file]
-                update_state(thumb_path=thumb_file, thumb_variants=thumb_variants)
+                update_state(thumb_path=thumb_file)
                 set_stage("thumbnail", "done")
                 log_stage("thumbnail", "done")
 

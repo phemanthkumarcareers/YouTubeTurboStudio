@@ -16,6 +16,8 @@ def write_script(research: dict, video_type: str = "normal", custom_instructions
     topic = research.get("topic", "Mysteries of the Universe")
     hook = research.get("hook_question", "")
     key_points = research.get("key_points", [])
+    trigger = research.get("psychological_trigger", "Curiosity Gap")
+    thumb_hint = research.get("thumbnail_hint", "")
 
     is_shorts = (video_type == "shorts")
     if is_shorts:
@@ -26,6 +28,7 @@ def write_script(research: dict, video_type: str = "normal", custom_instructions
         )
         sections_req = (
             "For Shorts: exactly 5 to 6 sections. Each section narration must be 20 to 30 words (approx 9-11 seconds of speech). "
+            "Section 1 MUST be the instant 3-second hook that delivers on the curiosity gap. "
             "Total across all sections must be 135-160 words."
         )
     else:
@@ -39,13 +42,14 @@ def write_script(research: dict, video_type: str = "normal", custom_instructions
             "Structure: 1. Intriguing Hook, 2. Origin & Paradox, 3-5. Deep Scientific/Historical Mechanics, 6-9. Unsettling Twists & Revelations, 10-12. Philosophical Implications, 13-14. Profound Conclusion."
         )
 
-    log_info(f"Drafting script for '{topic}' ({'Shorts 50-60s' if is_shorts else 'Long-form 3-8 mins'})...")
+    log_info(f"Drafting script for '{topic}' ({'Shorts 50-60s' if is_shorts else 'Long-form 3-8 mins'}, Trigger: {trigger})...")
 
-    prompt = f"""You are an elite YouTube documentary writer whose scripts achieve 70%+ audience retention.
+    prompt = f"""You are an elite YouTube documentary & viral shorts writer whose scripts achieve 70%+ audience retention.
 Write a complete, gripping script based on this topic research:
 
 Topic: {topic}
 Opening Hook: {hook}
+Psychological Trigger: {trigger}
 Core Points: {json.dumps(key_points)}
 Target Length: {target_duration}
 Format: {format_guideline}
@@ -53,27 +57,29 @@ Additional User Direction: {custom_instructions if custom_instructions else "Non
 
 Requirements:
 1. "title": Catchy, clickable YouTube title (under 65 characters, high curiosity gap, NO misleading clickbait).
-2. "description": 2-3 paragraph YouTube description including hook, key questions, and call to action.
-3. "tags": 10-14 relevant SEO tags.
-4. "sections": Array of sequential sections.
+2. "thumbnail_text": 3-4 bold, emotionally triggering words for the thumbnail (e.g. "{thumb_hint or 'YOUR BRAIN LIED'}").
+3. "description": 2-3 paragraph YouTube description including hook, key questions, and call to action.
+4. "tags": 10-14 relevant SEO tags.
+5. "sections": Array of sequential sections.
    {sections_req}
    Each section MUST have:
    - "id": 1, 2, 3...
-   - "title": Section header / subtitle (e.g. "The Anomaly", "Event Horizon", "The Unseen Force")
+   - "title": Section header / subtitle (e.g. "The Glitch", "The Hidden Truth", "The Revelation")
    - "narration": Exact spoken voiceover words. Cinematic, natural speech cadence. No markdown formatting or sound effect cues.
-   - "visual_query": 2 to 4 English keywords best suited for searching stock videos/photos on Pexels/Pixabay (e.g. "deep space galaxy", "cyberpunk neural network", "ancient ruins desert", "ocean storm lightning").
+   - "visual_query": 2 to 4 English keywords best suited for searching stock videos/photos on Pexels/Pixabay (e.g. "human eye pupil close up", "deep space nebula", "airplane cockpit night", "brain synaptic neuron glowing").
 
 Output strictly valid JSON with this structure:
 {{
   "title": "Title here",
+  "thumbnail_text": "3-4 BOLD WORDS",
   "description": "Full description here",
   "tags": ["tag1", "tag2", "tag3"],
   "sections": [
     {{
       "id": 1,
-      "title": "The Anomaly",
+      "title": "The Hook",
       "narration": "Exact narration words for this section...",
-      "visual_query": "deep space nebula"
+      "visual_query": "brain scanning animation"
     }}
   ]
 }}

@@ -54,22 +54,31 @@ def research_topic(topic_override: str = "", focus_angle: str = "", video_type: 
 
     if topic_override and topic_override.strip():
         log_info(f"Researching custom user topic: '{topic_override}'...")
-        prompt = f"""You are a senior YouTube strategist specializing in high-retention educational and mystery videos.
-The user wants a video specifically about: "{topic_override.strip()}"
-Format: {"YouTube Shorts (vertical 9:16, punchy 50-60 second viral story)" if video_type == "shorts" else "Long-form YouTube Documentary (16:9 cinematic 3-8 minute deep dive)"}
+        prompt = f"""You are a world-class YouTube Retention & Viral Content Strategist specializing in faceless educational, science, psychology, and curiosity channels (like Kurzgesagt, Vsauce, Riddles, and Aperture).
+The user gave this raw topic: "{topic_override.strip()}"
+Channel Profile: {channel_desc}
+Format: {"YouTube Shorts (vertical 9:16, 50-60 second rapid viral curiosity loop)" if video_type == "shorts" else "Long-form YouTube Documentary (16:9 cinematic 3-8 minute deep dive)"}
 
-Analyze this topic and produce a compelling research dossier in valid JSON format:
+Analyze this raw topic and internally engineer:
+1. An irresistible curiosity gap that challenges common assumptions.
+2. A shocking 3-second opening hook question that stops viewers from scrolling.
+3. The underlying psychological trigger (Curiosity Gap, Epiphany, Mild Paranoia, Loss Aversion, or Existential Awe).
+4. A high-CTR thumbnail concept text (3-4 bold, emotionally triggering words).
+
+Return a compelling research dossier in valid JSON format:
 {{
   "topic": "{topic_override.strip()}",
-  "hook_question": "A provocative, irresistible opening question that makes viewers stop scrolling",
-  "why_now": "Why this specific topic is fascinating, relevant, or mind-expanding right now",
+  "hook_question": "Shocking, provocative 3-second opening hook line that stops the scroll immediately",
+  "psychological_trigger": "Curiosity Gap / Epiphany / Mild Paranoia / Existential Awe",
+  "thumbnail_hint": "3-4 bold high-CTR words (e.g. YOUR BRAIN LIED, NEVER DO THIS, THE REAL REASON)",
+  "why_now": "Why this specific topic is fascinating, urgent, or mind-expanding right now",
   "key_points": [
-    "Core premise and intriguing setup",
-    "Underlying scientific or historical mechanism",
-    "Startling counter-intuitive revelation or twist",
-    "Broader existential or philosophical implication"
+    "Shocking setup and counter-intuitive revelation",
+    "Underlying biological, scientific or hidden mechanism",
+    "Fascinating twist that overrides conventional wisdom",
+    "Memorable punchline or takeaway"
   ],
-  "visual_theme": "Suggested visual atmosphere and color palette (e.g. dark cosmic blue, retro cyberpunk, minimalist eerie)"
+  "visual_theme": "Suggested visual atmosphere and color palette"
 }}
 
 Output ONLY the JSON object. Do not wrap in markdown or backticks."""
